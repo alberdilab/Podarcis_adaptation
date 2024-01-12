@@ -1,0 +1,415 @@
+genome,domain,phylum,class,order,family,genus,species,completeness,contamination,mag_size
+AH1_2nd_1_bin.3,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,87.6,3.113,4307999
+AH1_2nd_1_bin.7,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__MGBC136627,s__,99.05,1.265,3994722
+AH1_2nd_1_bin.8,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,70.87,2.37,3239665
+AH1_2nd_10_bin.12,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__,g__,s__,94.63,0.518,3362487
+AH1_2nd_10_bin.14,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,92.25,2.23,4352363
+AH1_2nd_10_bin.21,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,96.29,0.91,4387627
+AH1_2nd_10_bin.24,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,92.56,0.805,4724982
+AH1_2nd_10_bin.28,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Ruminococcaceae,g__Negativibacillus,s__,76.93,2.93,2394657
+AH1_2nd_10_bin.31,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__Parabacteroides_B,s__,99.23,3.012,4431822
+AH1_2nd_10_bin.32,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__Parabacteroides,s__,74.09,1.724,5040088
+AH1_2nd_10_bin.35,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Hungatella_A,s__,95.67,0.632,3795236
+AH1_2nd_10_bin.37,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Enterocloster,s__,95.52,0.949,3714991
+AH1_2nd_10_bin.4,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Erysipelotrichaceae,g__NSJ-61,s__,92.92,1.981,3859347
+AH1_2nd_10_bin.48,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Clostridium_Q,s__,87.08,2.215,4263496
+AH1_2nd_10_bin.53,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,86.64,1.812,3648236
+AH1_2nd_10_bin.54,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Ruminococcaceae,g__UBA866,s__,88.86,2.818,2799287
+AH1_2nd_10_bin.6,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Rikenellaceae,g__Alistipes,s__,73.72,0.48,2070704
+AH1_2nd_10_bin.60,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__Parabacteroides,s__,96.59,0,4474248
+AH1_2nd_10_bin.63,d__Bacteria,p__Firmicutes_C,c__Negativicutes,o__Selenomonadales,f__,g__,s__,96.51,1.16,3049229
+AH1_2nd_10_bin.73,d__Bacteria,p__Fusobacteriota,c__Fusobacteriia,o__Fusobacteriales,f__Fusobacteriaceae,g__Cetobacterium_A,s__Cetobacterium_A somerae,74.28,0,1735217
+AH1_2nd_10_bin.74,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__MGBC140009,s__,97.42,1.342,4242152
+AH1_2nd_10_bin.83,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Odoribacter,s__,91.69,0.107,3931265
+AH1_2nd_10_bin.87,d__Bacteria,p__Cyanobacteria,c__Vampirovibrionia,o__Gastranaerophilales,f__Gastranaerophilaceae,g__,s__,85.89,0.854,1962912
+AH1_2nd_10_bin.89,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Eisenbergiella,s__,72.94,5.189,4880253
+AH1_2nd_11_bin.1,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,96.11,1.933,5190285
+AH1_2nd_11_bin.11,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Rikenellaceae,g__Alistipes,s__,88.62,4.567,2862636
+AH1_2nd_11_bin.14,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Odoribacter,s__,99.33,0,3569505
+AH1_2nd_11_bin.16,d__Bacteria,p__Proteobacteria,c__Alphaproteobacteria,o__RF32,f__CAG-239,g__MGBC133411,s__,98.92,1.075,1927407
+AH1_2nd_11_bin.17,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Eisenbergiella,s__,95.8,0.208,3865460
+AH1_2nd_11_bin.23,d__Bacteria,p__Firmicutes,c__Bacilli,o__Mycoplasmatales,f__Mycoplasmoidaceae,g__Mycoplasmoides,s__,100,0.187,972839
+AH1_2nd_11_bin.3,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Hungatella_A,s__,96.24,1.259,4358433
+AH1_2nd_11_bin.30,d__Bacteria,p__Verrucomicrobiota,c__Verrucomicrobiae,o__Verrucomicrobiales,f__Akkermansiaceae,g__Akkermansia,s__,97.95,0.68,3054780
+AH1_2nd_11_bin.32,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Clostridium_Q,s__,75.57,4.113,3512054
+AH1_2nd_11_bin.33,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Odoribacter,s__,93.71,2.419,4394059
+AH1_2nd_11_bin.34,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Erysipelotrichaceae,g__,s__,83.91,3.773,3584597
+AH1_2nd_11_bin.35,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,73.79,7.758,5256169
+AH1_2nd_11_bin.36,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__Bacteroides ovatus,89.14,2.891,6216071
+AH1_2nd_11_bin.39,d__Bacteria,p__Proteobacteria,c__Alphaproteobacteria,o__RF32,f__CAG-239,g__Scatocola,s__,96.77,0,1834519
+AH1_2nd_11_bin.41,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Hungatella,s__,72.21,1.184,3776450
+AH1_2nd_11_bin.44,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Odoribacter,s__,70.14,0.862,3335932
+AH1_2nd_11_bin.5,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Kineothrix,s__,97.7,1.149,4028424
+AH1_2nd_11_bin.6,d__Bacteria,p__Fusobacteriota,c__Fusobacteriia,o__Fusobacteriales,f__Fusobacteriaceae,g__Fusobacterium_A,s__Fusobacterium_A ulcerans,100,1.123,3482798
+AH1_2nd_11_bin.9,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Erysipelotrichaceae,g__Dielma,s__,100,2.83,3535305
+AH1_2nd_12_bin.10,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Christensenellales,f__UBA3700,g__,s__,96.37,0,2048944
+AH1_2nd_12_bin.11,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Rikenellaceae,g__Alistipes,s__,73.36,1.201,2460946
+AH1_2nd_12_bin.4,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Odoribacter,s__,93.52,2.419,4335071
+AH1_2nd_12_bin.8,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Rikenellaceae,g__Alistipes,s__,97.83,0.689,3329514
+AH1_2nd_13_bin.1,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Odoribacter,s__,77.58,0.376,3328287
+AH1_2nd_13_bin.10,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Ruminococcaceae,g__Negativibacillus,s__,98.65,0.894,3790301
+AH1_2nd_13_bin.13,d__Bacteria,p__Firmicutes_C,c__Negativicutes,o__Selenomonadales,f__,g__,s__,86.03,2.267,2728865
+AH1_2nd_13_bin.16,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Christensenellales,f__UBA3700,g__,s__,96.1,0,2035450
+AH1_2nd_13_bin.6,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Ruminococcaceae,g__,s__,75.58,7.214,2651332
+AH1_2nd_13_bin.7,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Ruminococcaceae,g__Anaerotruncus,s__,72.58,2.968,3924007
+AH1_2nd_13_bin.8,d__Bacteria,p__Proteobacteria,c__Alphaproteobacteria,o__RUG11792,f__,g__,s__,90.32,0,943723
+AH1_2nd_14_bin.1,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Anaerotignaceae,g__,s__,95.74,1.342,2911865
+AH1_2nd_14_bin.12,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Hungatella_A,s__,98.1,0.039,4762115
+AH1_2nd_14_bin.13,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Oscillospiraceae,g__Marseille-P3106,s__,94.97,2.684,2707062
+AH1_2nd_14_bin.15,d__Bacteria,p__Proteobacteria,c__Alphaproteobacteria,o__UBA3830,f__UBA3830,g__,s__,92.2,0,1105460
+AH1_2nd_14_bin.16,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Acutalibacteraceae,g__RUG14215,s__,78.55,0,1199722
+AH1_2nd_14_bin.17,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,72.48,3.691,4561990
+AH1_2nd_14_bin.18,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__CAJMNU01,s__,89.08,1.582,3737259
+AH1_2nd_14_bin.22,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Ruminococcaceae,g__Fournierella,s__,98.63,0,3058013
+AH1_2nd_14_bin.23,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__,s__,99.61,0.076,4650897
+AH1_2nd_14_bin.25,d__Bacteria,p__Campylobacterota,c__Campylobacteria,o__Campylobacterales,f__Helicobacteraceae,g__Helicobacter_J,s__,99.58,0,1712525
+AH1_2nd_14_bin.26,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Peptostreptococcales,f__Anaerovoracaceae,g__Emergencia,s__,76.46,1.44,2852570
+AH1_2nd_14_bin.3,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__Parabacteroides,s__,90.89,1.602,4657662
+AH1_2nd_14_bin.31,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,96.64,0.671,4240316
+AH1_2nd_14_bin.33,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__Parabacteroides,s__,99.23,0.384,4013944
+AH1_2nd_14_bin.35,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__,g__,s__,85.52,1.23,2828249
+AH1_2nd_14_bin.5,d__Bacteria,p__Firmicutes_C,c__Negativicutes,o__Selenomonadales,f__Massilibacillaceae,g__,s__,95.55,2.237,3308814
+AH1_2nd_14_bin.7,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,97.98,1.517,5246502
+AH1_2nd_14_bin.9,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Odoribacter,s__,79.3,2.199,3229985
+AH1_2nd_15_bin.10,d__Bacteria,p__Cyanobacteria,c__Vampirovibrionia,o__Gastranaerophilales,f__Gastranaerophilaceae,g__Scatousia,s__,89.74,0.949,1949425
+AH1_2nd_15_bin.12,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__Parabacteroides,s__,71.98,0.256,3980623
+AH1_2nd_15_bin.17,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Erysipelotrichaceae,g__Clostridium_AQ,s__,99.73,0.943,4532285
+AH1_2nd_15_bin.18,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Odoribacter,s__,94.91,0.878,4508102
+AH1_2nd_15_bin.2,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Acutalibacteraceae,g__,s__,76.37,1.342,2057977
+AH1_2nd_15_bin.20,d__Bacteria,p__Cyanobacteria,c__Vampirovibrionia,o__Gastranaerophilales,f__Gastranaerophilaceae,g__Limenecus,s__,89.74,0.854,2111702
+AH1_2nd_15_bin.22,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,71.06,7.228,4361175
+AH1_2nd_15_bin.23,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__OM05-12,s__,98.12,0.422,2825983
+AH1_2nd_15_bin.24,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__Parabacteroides,s__,87.89,4.947,6052118
+AH1_2nd_15_bin.25,d__Bacteria,p__Actinobacteriota,c__Coriobacteriia,o__Coriobacteriales,f__Eggerthellaceae,g__Eggerthella,s__,79.13,4.545,2652316
+AH1_2nd_15_bin.26,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Ventrimonas,s__,98.73,1.343,4120846
+AH1_2nd_15_bin.28,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Erysipelotrichaceae,g__C-19,s__,80.81,3.144,3210700
+AH1_2nd_15_bin.30,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,87.33,3.379,4870649
+AH1_2nd_15_bin.33,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,89.37,5.145,5209330
+AH1_2nd_15_bin.34,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,99.15,0.652,4709255
+AH1_2nd_15_bin.36,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Blautia,s__,76.24,1.273,3728989
+AH1_2nd_15_bin.37,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Erysipelotrichaceae,g__,s__,88.07,2.201,4196831
+AH1_2nd_15_bin.40,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Eisenbergiella,s__,96.55,0.306,4102031
+AH1_2nd_15_bin.44,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Clostridium_Q,s__,90.13,0.632,4252405
+AH1_2nd_15_bin.46,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,77.22,0.862,4530756
+AH1_2nd_15_bin.48,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,98.33,0.929,3969531
+AH1_2nd_15_bin.8,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Christensenellales,f__DTU072,g__,s__,93.52,0.806,2052426
+AH1_2nd_15_bin.9,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Erysipelotrichaceae,g__NSJ-61,s__,94.58,8.254,3916931
+AH1_2nd_16_bin.100,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,72.24,5.172,6394271
+AH1_2nd_16_bin.101,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__Parabacteroides,s__,89.04,4.391,4160832
+AH1_2nd_16_bin.102,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,70.53,5.283,2879378
+AH1_2nd_16_bin.11,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Enterocloster,s__,77.61,2.531,3678542
+AH1_2nd_16_bin.13,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__Parabacteroides,s__,76.64,1.025,3906197
+AH1_2nd_16_bin.2,d__Bacteria,p__Cyanobacteria,c__Vampirovibrionia,o__Gastranaerophilales,f__Gastranaerophilaceae,g__Limenecus,s__,89.74,0.854,2108809
+AH1_2nd_16_bin.22,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Rikenellaceae,g__Alistipes,s__,97.2,6.891,3398790
+AH1_2nd_16_bin.23,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,89.08,3.605,4637845
+AH1_2nd_16_bin.25,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Odoribacter,s__,71.31,1.724,2635581
+AH1_2nd_16_bin.3,d__Bacteria,p__Desulfobacterota_I,c__Desulfovibrionia,o__Desulfovibrionales,f__Desulfovibrionaceae,g__Bilophila,s__,98.22,0.953,3764769
+AH1_2nd_16_bin.31,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Anaerotignaceae,g__,s__,93.91,2.013,2590249
+AH1_2nd_16_bin.33,d__Bacteria,p__Proteobacteria,c__Gammaproteobacteria,o__Enterobacterales,f__Enterobacteriaceae,g__Plesiomonas,s__Plesiomonas shigelloides,95.19,1.977,3686204
+AH1_2nd_16_bin.35,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Oscillospiraceae,g__,s__,81.75,1.901,2357317
+AH1_2nd_16_bin.36,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Erysipelotrichaceae,g__,s__,84.8,3.867,3212802
+AH1_2nd_16_bin.37,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Anaerotignaceae,g__,s__,97.31,0.671,3125124
+AH1_2nd_16_bin.41,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Rikenellaceae,g__Alistipes,s__,92.78,1.201,2945597
+AH1_2nd_16_bin.43,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__Bacteroides ovatus,82.81,1.293,5430460
+AH1_2nd_16_bin.45,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Odoribacter,s__,84.94,1.612,3319941
+AH1_2nd_16_bin.46,d__Bacteria,p__Firmicutes,c__Bacilli,o__Mycoplasmatales,f__Mycoplasmoidaceae,g__Ureaplasma,s__,99.07,2.435,993434
+AH1_2nd_16_bin.48,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Ruminococcaceae,g__Harryflintia,s__,75.8,0.223,2948841
+AH1_2nd_16_bin.5,d__Bacteria,p__Desulfobacterota_I,c__Desulfovibrionia,o__Desulfovibrionales,f__Desulfovibrionaceae,g__Desulfovibrio,s__,97.92,1.577,2868825
+AH1_2nd_16_bin.50,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Velocimicrobium,s__,76.68,0.391,3130763
+AH1_2nd_16_bin.53,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Roseburia,s__,97.97,1.771,3783605
+AH1_2nd_16_bin.54,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Enterocloster,s__,92.78,0,4591199
+AH1_2nd_16_bin.55,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Ventrimonas,s__,99.36,0.632,3767885
+AH1_2nd_16_bin.57,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__UMGS1251,s__,98.24,0.389,4941188
+AH1_2nd_16_bin.58,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,97.96,1.565,5145878
+AH1_2nd_16_bin.64,d__Bacteria,p__Firmicutes_C,c__Negativicutes,o__Acidaminococcales,f__Acidaminococcaceae,g__Phascolarctobacterium,s__Phascolarctobacterium sp900544795,99.98,1.551,2333796
+AH1_2nd_16_bin.69,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Copromonas,s__,84.9,7.99,3020065
+AH1_2nd_16_bin.70,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Erysipelotrichaceae,g__Holdemania,s__,87.84,0.476,2623362
+AH1_2nd_16_bin.77,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,77.7,1.898,2906004
+AH1_2nd_16_bin.78,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Blautia,s__,84.87,4.67,4284106
+AH1_2nd_16_bin.8,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Odoribacter,s__,95.37,1.209,3606549
+AH1_2nd_16_bin.85,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Christensenellales,f__UBA3700,g__,s__,94.63,0.244,1841666
+AH1_2nd_16_bin.87,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Butyricimonas,s__,99.44,0.806,4972564
+AH1_2nd_16_bin.88,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Rikenellaceae,g__Rikenella,s__,96.65,1.913,2550432
+AH1_2nd_16_bin.9,d__Bacteria,p__Verrucomicrobiota,c__Verrucomicrobiae,o__Opitutales,f__,g__,s__,79.47,0,977884
+AH1_2nd_16_bin.91,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,95.14,1.425,4967724
+AH1_2nd_16_bin.94,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Enterocloster,s__,72.43,2.215,4245259
+AH1_2nd_16_bin.97,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Christensenellales,f__UBA3700,g__,s__,94.75,0.026,1890552
+AH1_2nd_16_bin.98,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Ruminococcaceae,g__Ruthenibacterium,s__,83.44,5.292,2497999
+AH1_2nd_18_bin.10,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Coprobacillaceae,g__Erysipelatoclostridium,s__,72.88,0,2719247
+AH1_2nd_18_bin.4,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,89.55,0.21,4150566
+AH1_2nd_18_bin.7,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,97.39,4.182,5656168
+AH1_2nd_18_bin.8,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Erysipelotrichaceae,g__,s__,78.68,3.899,3562475
+AH1_2nd_2_bin.4,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__JAAYNV01,s__,98.85,0.369,4069842
+AH1_2nd_2_bin.6,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__Parabacteroides,s__,73.18,3.269,4161870
+AH1_2nd_20_bin.1,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__CAG-274,g__JAHALF01,s__,71.47,1.445,1386513
+AH1_2nd_20_bin.11,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Rikenellaceae,g__Alistipes,s__,97.59,0.961,2206114
+AH1_2nd_20_bin.16,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Christensenellales,f__MGBC116941,g__MGBC116941,s__,72.34,1.708,2273024
+AH1_2nd_20_bin.2,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Erysipelotrichaceae,g__NSJ-61,s__,89.62,5.896,3517912
+AH1_2nd_20_bin.20,d__Bacteria,p__Cyanobacteria,c__Vampirovibrionia,o__Gastranaerophilales,f__Gastranaerophilaceae,g__Limenecus,s__,86.32,0.854,2205398
+AH1_2nd_20_bin.3,d__Bacteria,p__Spirochaetota,c__Brevinematia,o__Brevinematales,f__Brevinemataceae,g__Brevinema,s__,93.25,0,1533245
+AH1_2nd_20_bin.30,d__Bacteria,p__Desulfobacterota_I,c__Desulfovibrionia,o__Desulfovibrionales,f__Desulfovibrionaceae,g__Lawsonia,s__,92.01,0,1895392
+AH1_2nd_20_bin.34,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Christensenellales,f__,g__,s__,91.12,0.806,1625687
+AH1_2nd_20_bin.42,d__Bacteria,p__Firmicutes,c__Bacilli,o__Lactobacillales,f__Enterococcaceae,g__Enterococcus,s__Enterococcus sp002174455,88.2,2.446,3263496
+AH1_2nd_20_bin.48,d__Bacteria,p__Proteobacteria,c__Alphaproteobacteria,o__UBA3830,f__,g__,s__,93.3,0,993107
+AH1_2nd_20_bin.5,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Hungatella,s__,99.2,1.265,5893012
+AH1_2nd_20_bin.51,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Odoribacter,s__,73.82,5.107,4236187
+AH1_2nd_20_bin.53,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,70.07,6.689,2827959
+AH1_2nd_20_bin.55,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,82.37,2.094,3918172
+AH1_2nd_20_bin.56,d__Bacteria,p__Proteobacteria,c__Alphaproteobacteria,o__RF32,f__CAG-239,g__CAZU01,s__,93.9,0,1604793
+AH1_2nd_20_bin.58,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Butyricimonas,s__Butyricimonas sp900184685,91.12,0.555,4394393
+AH1_2nd_20_bin.59,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Ruminococcaceae,g__Anaerotruncus,s__,94.66,3.42,4066232
+AH1_2nd_20_bin.60,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Christensenellales,f__UBA1242,g__,s__,88.67,1.332,1269499
+AH1_2nd_20_bin.65,d__Bacteria,p__Proteobacteria,c__Alphaproteobacteria,o__RF32,f__CAG-239,g__CAJLXD01,s__,85.02,0.097,1781362
+AH1_2nd_20_bin.67,d__Bacteria,p__Desulfobacterota_I,c__Desulfovibrionia,o__Desulfovibrionales,f__Desulfovibrionaceae,g__WRHT01,s__,79,0,2571514
+AH1_2nd_20_bin.68,d__Bacteria,p__Desulfobacterota_I,c__Desulfovibrionia,o__Desulfovibrionales,f__Desulfovibrionaceae,g__Bilophila,s__Bilophila wadsworthia,97.09,1.205,3961854
+AH1_2nd_20_bin.73,d__Bacteria,p__Desulfobacterota_I,c__Desulfovibrionia,o__Desulfovibrionales,f__Desulfovibrionaceae,g__Bilophila,s__,98.22,0.295,3956932
+AH1_2nd_20_bin.74,d__Bacteria,p__Firmicutes,c__Bacilli,o__Lactobacillales,f__Enterococcaceae,g__Enterococcus,s__,95.92,2.512,4071704
+AH1_2nd_20_bin.8,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__CAG-274,g__,s__,92.12,1.86,2805446
+AH1_2nd_20_bin.82,d__Bacteria,p__Verrucomicrobiota,c__Verrucomicrobiae,o__Opitutales,f__,g__,s__,79.5,0,862406
+AH1_2nd_20_bin.83,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__Parabacteroides,s__,97.08,0,4378182
+AH1_2nd_20_bin.9,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,95.81,0,4471041
+AH1_2nd_5_bin.13,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Rikenellaceae,g__Rikenella,s__,94.97,0.956,2497100
+AH1_2nd_5_bin.18,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Odoribacter,s__,99.46,5.376,4959381
+AH1_2nd_5_bin.20,d__Bacteria,p__Firmicutes_B,c__Peptococcia,o__Peptococcales,f__Peptococcaceae,g__UBA7185,s__,72.41,1.724,3951143
+AH1_2nd_5_bin.21,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,96.36,0.371,5553828
+AH1_2nd_5_bin.23,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,98.27,5.015,5519166
+AH1_2nd_5_bin.3,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__,g__,s__,94.83,1.18,3369431
+AH1_2nd_5_bin.7,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Christensenellales,f__UBA3700,g__,s__,96.37,0,2024543
+AH1_2nd_5_bin.8,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,97.12,0.679,4959767
+AH1_2nd_5_bin.9,d__Bacteria,p__Verrucomicrobiota,c__Verrucomicrobiae,o__Verrucomicrobiales,f__Akkermansiaceae,g__Akkermansia,s__,78.92,1.7,2325155
+AH1_2nd_6_bin.12,d__Bacteria,p__Firmicutes,c__Bacilli,o__RF39,f__UBA660,g__Faecisoma,s__,93.82,2.247,1295315
+AH1_2nd_6_bin.14,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__,s__,91.82,1.666,4422804
+AH1_2nd_6_bin.17,d__Bacteria,p__Proteobacteria,c__Alphaproteobacteria,o__UBA3830,f__UBA3830,g__,s__,91.2,0,1154191
+AH1_2nd_6_bin.19,d__Bacteria,p__Firmicutes,c__Bacilli,o__RF39,f__UBA660,g__,s__,89.88,2.247,1208791
+AH1_2nd_6_bin.2,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Sphingobacteriales,f__Sphingobacteriaceae,g__Sphingobacterium,s__,72.79,1.92,2726590
+AH1_2nd_6_bin.22,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,97.31,0.671,3539925
+AH1_2nd_6_bin.25,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__UBA932,g__Egerieousia,s__,81.86,1.19,2381443
+AH1_2nd_6_bin.29,d__Bacteria,p__Fusobacteriota,c__Fusobacteriia,o__Fusobacteriales,f__Fusobacteriaceae,g__Fusobacterium_A,s__Fusobacterium_A ulcerans,100,4.494,3657748
+AH1_2nd_6_bin.31,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Oscillospiraceae,g__Intestinimonas,s__,81.1,2.404,2118638
+AH1_2nd_6_bin.33,d__Bacteria,p__Proteobacteria,c__Alphaproteobacteria,o__RF32,f__CAG-239,g__CAAFZY01,s__,80.67,0,1238301
+AH1_2nd_6_bin.34,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__Parabacteroides,s__,72.28,5.675,4627868
+AH1_2nd_6_bin.38,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Flavobacteriales,f__Weeksellaceae,g__Moheibacter,s__,98.87,0,3337424
+AH1_2nd_6_bin.40,d__Bacteria,p__Firmicutes,c__Bacilli,o__Mycoplasmatales,f__Mycoplasmoidaceae,g__Ureaplasma,s__,99.84,2.435,980624
+AH1_2nd_6_bin.44,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Phocaeicola,s__,97.35,1.586,5252180
+AH1_2nd_6_bin.46,d__Bacteria,p__Proteobacteria,c__Gammaproteobacteria,o__Enterobacterales,f__Enterobacteriaceae,g__Salmonella,s__Salmonella enterica,80.32,0.862,4301231
+AH1_2nd_6_bin.5,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Odoribacter,s__,99.89,0,3840915
+AH1_2nd_6_bin.50,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Ruminococcaceae,g__Fournierella,s__,87.27,0,2537720
+AH1_2nd_6_bin.54,d__Bacteria,p__Proteobacteria,c__Gammaproteobacteria,o__Enterobacterales,f__Enterobacteriaceae,g__Proteus,s__Proteus cibarius,100,0.54,3890433
+AH1_2nd_6_bin.56,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Odoribacter,s__,97.86,0,3548492
+AH1_2nd_6_bin.61,d__Bacteria,p__Proteobacteria,c__Gammaproteobacteria,o__Enterobacterales,f__Enterobacteriaceae,g__Citrobacter_A,s__Citrobacter_A amalonaticus,84.47,0.854,4022154
+AH1_2nd_6_bin.65,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Oscillospiraceae,g__,s__,93.22,0.659,2165608
+AH1_2nd_6_bin.66,d__Bacteria,p__Cyanobacteria,c__Vampirovibrionia,o__Gastranaerophilales,f__RUG14156,g__,s__,93.16,1.424,1766408
+AH1_2nd_6_bin.67,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Rikenellaceae,g__Rikenella,s__,74.69,7.049,1893052
+AH1_2nd_6_bin.7,d__Bacteria,p__Firmicutes,c__Bacilli,o__RF39,f__UBA660,g__Caccenecus,s__,91.01,0.561,1198279
+AH1_2nd_6_bin.70,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Anaerotignaceae,g__Anaerotignum,s__,70.1,2.013,1982176
+AH1_2nd_6_bin.72,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Odoribacter,s__,77.31,5.689,3839256
+AH1_2nd_7_bin.10,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__,g__,s__,97.31,0.671,3121068
+AH1_2nd_7_bin.11,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,86.06,3.438,4309624
+AH1_2nd_7_bin.3,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,72.32,8.086,5715445
+AH1_2nd_7_bin.8,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__,g__,s__,98.65,1.342,3195408
+AH1_2nd_8_bin.10,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Erysipelotrichaceae,g__,s__,99.05,2.444,3529502
+AH1_2nd_8_bin.12,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,95.04,0.21,4122791
+AH1_2nd_8_bin.14,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Phocaeicola,s__,96.32,0.185,5085887
+AH1_2nd_8_bin.16,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,98.33,1.239,5139029
+AH1_2nd_8_bin.20,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Odoribacter,s__,93.54,2.15,4289539
+AH1_2nd_8_bin.21,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__Parabacteroides,s__,98.84,1.025,5621844
+AH1_2nd_8_bin.23,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Rikenellaceae,g__Rikenella,s__,94.89,0.637,2374653
+AH1_2nd_8_bin.3,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,72.27,3.375,3140029
+AH1_2nd_8_bin.4,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Rikenellaceae,g__Alistipes,s__,97.86,1.469,2844374
+AH1_2nd_8_bin.6,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,73.62,0.862,4916354
+AH1_2nd_8_bin.7,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Erysipelotrichaceae,g__Dielma,s__,100,3.773,3519888
+AH1_2nd_8_bin.9,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Roseburia,s__,98.79,1.111,3922461
+AH1_2nd_9_bin.10,d__Bacteria,p__Proteobacteria,c__Gammaproteobacteria,o__Enterobacterales,f__Enterobacteriaceae,g__Citrobacter,s__Citrobacter portucalensis,96.99,0.272,4504142
+AH1_2nd_9_bin.12,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Erysipelotrichaceae,g__,s__,98.83,3.816,4511194
+AH1_2nd_9_bin.16,d__Bacteria,p__Firmicutes,c__Bacilli,o__Lactobacillales,f__Enterococcaceae,g__Enterococcus_A,s__,81.42,1.224,1850509
+AH1_2nd_9_bin.17,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Acetatifactor,s__,96.82,1.724,4109719
+AH1_2nd_9_bin.18,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,94.07,0.913,4632513
+AH1_2nd_9_bin.2,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__Parabacteroides,s__,86.56,4.287,4406722
+AH1_2nd_9_bin.20,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__Parabacteroides,s__,71,3.141,4040151
+AH1_2nd_9_bin.22,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,87.51,4.888,5393616
+AH1_2nd_9_bin.26,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Christensenellales,f__UBA3700,g__,s__,93.54,0.806,2041363
+AH1_2nd_9_bin.28,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Rikenellaceae,g__Alistipes,s__,99.51,1.554,2683535
+AH1_2nd_9_bin.30,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Odoribacter,s__,96.97,0.179,3918232
+AH1_2nd_9_bin.31,d__Bacteria,p__Proteobacteria,c__Alphaproteobacteria,o__Rhizobiales,f__Devosiaceae,g__Devosia,s__Devosia sp001899045,96.55,1.229,4131386
+AH1_2nd_9_bin.32,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Oscillospiraceae,g__Intestinimonas,s__,82.17,1.342,2618289
+AH1_2nd_9_bin.33,d__Bacteria,p__Cyanobacteria,c__Vampirovibrionia,o__Gastranaerophilales,f__Gastranaerophilaceae,g__,s__,79.37,1.994,1918879
+AH1_2nd_9_bin.34,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Erysipelotrichaceae,g__Dielma,s__,100,3.773,3480259
+AH1_2nd_9_bin.35,d__Bacteria,p__Firmicutes,c__Bacilli,o__RFN20,f__CAG-288,g__,s__,71.91,0,918922
+AH1_2nd_9_bin.37,d__Bacteria,p__Proteobacteria,c__Alphaproteobacteria,o__Rhizobiales,f__Rhizobiaceae,g__Agrobacterium,s__Agrobacterium tumefaciens_H,100,0.612,5043679
+AH1_2nd_9_bin.38,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Acetatifactor,s__,93.71,1.915,4202183
+AH1_2nd_9_bin.4,d__Bacteria,p__Proteobacteria,c__Gammaproteobacteria,o__Enterobacterales,f__Enterobacteriaceae,g__Rahnella,s__Rahnella variigena,96.59,1.869,4899227
+AH1_2nd_9_bin.40,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Erysipelotrichaceae,g__Breznakia,s__,99.05,0,2661471
+AH1_2nd_9_bin.41,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Erysipelotrichaceae,g__Clostridium_AQ,s__,98.32,0.943,4178439
+AH1_2nd_9_bin.43,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Acutalibacteraceae,g__,s__,98.65,0.671,2715336
+AH1_2nd_9_bin.46,d__Bacteria,p__Proteobacteria,c__Gammaproteobacteria,o__Burkholderiales,f__Burkholderiaceae,g__Alcaligenes,s__Alcaligenes faecalis,92.92,2.382,4111116
+AH1_2nd_9_bin.47,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Coprobacillaceae,g__Erysipelatoclostridium,s__,86.65,0.471,3106716
+AH1_2nd_9_bin.5,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Coprobacillaceae,g__Coprobacillus,s__,100,0.471,3563416
+AH1_2nd_9_bin.50,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Oscillospiraceae,g__Oscillibacter,s__,70.12,0.864,2329248
+AH1_2nd_9_bin.51,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Odoribacter,s__,74.92,3.005,2786578
+AH1_2nd_9_bin.52,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,88.23,8.221,5414158
+AH1_2nd_9_bin.53,d__Bacteria,p__Proteobacteria,c__Gammaproteobacteria,o__Enterobacterales,f__Enterobacteriaceae,g__Serratia_A,s__Serratia_A fonticola,94.74,0.286,5618373
+AH1_2nd_9_bin.54,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Velocimicrobium,s__,97.73,1.565,4178062
+AH1_2nd_9_bin.56,d__Bacteria,p__Desulfobacterota_I,c__Desulfovibrionia,o__Desulfovibrionales,f__Desulfovibrionaceae,g__,s__,95.56,0.624,3492457
+AH1_2nd_9_bin.6,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,85.87,2.225,4779023
+AH1_2nd_9_bin.7,d__Bacteria,p__Desulfobacterota_I,c__Desulfovibrionia,o__Desulfovibrionales,f__Desulfovibrionaceae,g__Desulfovibrio,s__,98.75,0,2958580
+LI1_2nd_1_bin.10,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,99.32,0.167,4459251
+LI1_2nd_1_bin.11,d__Bacteria,p__Desulfobacterota_I,c__Desulfovibrionia,o__Desulfovibrionales,f__Desulfovibrionaceae,g__,s__,99.11,0.131,3549104
+LI1_2nd_1_bin.13,d__Bacteria,p__Proteobacteria,c__Alphaproteobacteria,o__WRAU01,f__WRAU01,g__,s__,96.63,1.098,1381904
+LI1_2nd_1_bin.16,d__Bacteria,p__Firmicutes,c__Bacilli,o__Mycoplasmatales,f__Hepatoplasmataceae,g__Hepatoplasma,s__Hepatoplasma crinochetorum_B,80.98,3.258,525819
+LI1_2nd_1_bin.19,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__,g__,s__,74.32,0,962404
+LI1_2nd_1_bin.20,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__MGBC131033,s__,70.8,3.864,2636572
+LI1_2nd_1_bin.21,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Ruminococcaceae,g__,s__,70.34,2.572,3328767
+LI1_2nd_1_bin.4,d__Bacteria,p__Cyanobacteria,c__Vampirovibrionia,o__Gastranaerophilales,f__Gastranaerophilaceae,g__Scatenecus,s__,74.47,2.279,1457714
+LI1_2nd_1_bin.5,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__MGBC165282,s__,72.3,1.582,2942503
+LI1_2nd_1_bin.7,d__Bacteria,p__Proteobacteria,c__Gammaproteobacteria,o__Enterobacterales,f__Enterobacteriaceae,g__Enterobacter,s__Enterobacter hormaechei_A,99.96,0.426,4633021
+LI1_2nd_2_bin.1,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Erysipelotrichaceae,g__RGIG1896,s__,100,0,2716948
+LI1_2nd_2_bin.10,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Christensenellales,f__MGBC116941,g__MGBC116941,s__,97,0.174,1875605
+LI1_2nd_2_bin.11,d__Bacteria,p__Proteobacteria,c__Alphaproteobacteria,o__Rhodobacterales,f__Rhodobacteraceae,g__Paracoccus,s__,99.01,1.333,3644451
+LI1_2nd_2_bin.3,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Coprobacillaceae,g__Coprobacillus,s__,70.17,4.323,2087111
+LI1_2nd_2_bin.4,d__Bacteria,p__Firmicutes,c__Bacilli,o__RF39,f__UBA660,g__Faecimonas,s__,94.1,0,1640880
+LI1_2nd_2_bin.6,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Roseburia,s__,99.03,1.288,3945783
+LI1_2nd_2_bin.7,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Ruminococcaceae,g__Ruthenibacterium,s__,93.87,1.7,2837559
+LI1_2nd_2_bin.8,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__TANB77,f__CAG-508,g__CAG-269,s__,72.52,3.856,1740298
+LI1_2nd_2_bin.9,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Ruminococcaceae,g__UBA866,s__,97.98,0,2374076
+LI1_2nd_4_bin.1,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Christensenellales,f__UBA3700,g__,s__,89.09,0.403,1698627
+LI1_2nd_4_bin.10,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,78.89,2.531,3550528
+LI1_2nd_4_bin.12,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,98.58,1.641,5378932
+LI1_2nd_4_bin.13,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,95.68,0.867,3965758
+LI1_2nd_4_bin.14,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Erysipelotrichaceae,g__Breznakia,s__,99.05,0,2828587
+LI1_2nd_4_bin.16,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Peptostreptococcales,f__Anaerovoracaceae,g__IOR16,s__,72.38,1.085,1969231
+LI1_2nd_4_bin.17,d__Bacteria,p__Proteobacteria,c__Gammaproteobacteria,o__Enterobacterales,f__Aeromonadaceae,g__Aeromonas,s__Aeromonas rivipollensis,83.88,3.933,3950579
+LI1_2nd_4_bin.18,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,97.58,0.495,4786314
+LI1_2nd_4_bin.20,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Christensenellales,f__MGBC116941,g__,s__,81,0,1616933
+LI1_2nd_4_bin.21,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Phocaeicola,s__,89.24,0.913,4690825
+LI1_2nd_4_bin.27,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Enterocloster,s__,74.76,0.71,4366331
+LI1_2nd_4_bin.30,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Roseburia,s__,99.03,1.61,4206469
+LI1_2nd_4_bin.33,d__Bacteria,p__Firmicutes,c__Bacilli,o__Lactobacillales,f__Streptococcaceae,g__Lactococcus,s__Lactococcus formosensis,73.27,7.818,1613324
+LI1_2nd_4_bin.34,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,83.1,6.108,4882387
+LI1_2nd_4_bin.37,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Clostridiales,f__Clostridiaceae,g__Clostridium,s__Clostridium baratii,96.22,2.5,3073509
+LI1_2nd_4_bin.38,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Enterocloster,s__,87.23,0.077,5048413
+LI1_2nd_4_bin.39,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,95.58,2.695,5212815
+LI1_2nd_4_bin.42,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Acutalibacteraceae,g__,s__,94.28,2.034,2750045
+LI1_2nd_4_bin.44,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Peptostreptococcales,f__Peptostreptococcaceae,g__Paraclostridium,s__Paraclostridium bifermentans,95.45,3.846,3346074
+LI1_2nd_4_bin.45,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__Parabacteroides,s__Parabacteroides gordonii,95.88,1.881,6361640
+LI1_2nd_4_bin.46,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Clostridium_Q,s__,85.79,0.126,3306198
+LI1_2nd_4_bin.49,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,70.17,0,4345616
+LI1_2nd_4_bin.5,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,86.6,2.8,5149426
+LI1_2nd_4_bin.54,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Velocimicrobium,s__,75.84,0.671,3316049
+LI1_2nd_4_bin.56,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__Bacteroides nordii,98.3,0.557,5380309
+LI1_2nd_4_bin.58,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Erysipelotrichaceae,g__NSJ-61,s__,98.24,1.886,3938494
+LI1_2nd_4_bin.59,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Coprobacillaceae,g__Stoquefichus,s__,91.98,0,2595508
+LI1_2nd_4_bin.6,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,97.12,0.679,4744116
+LI1_2nd_4_bin.60,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__UMGS1251,s__,91.85,9.629,4378349
+LI1_2nd_4_bin.62,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__Bacteroides thetaiotaomicron,94.64,5.359,7018365
+LI1_2nd_4_bin.64,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Christensenellales,f__,g__,s__,98.79,0.026,2256950
+LI1_2nd_4_bin.68,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__Parabacteroides,s__Parabacteroides goldsteinii,88.96,0,5889908
+LI1_2nd_4_bin.71,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Clostridium_Q,s__,96.28,2.399,4861072
+LI1_2nd_4_bin.72,d__Bacteria,p__Proteobacteria,c__Gammaproteobacteria,o__Enterobacterales,f__Enterobacteriaceae,g__Citrobacter,s__Citrobacter braakii,91.23,2.907,5164402
+LI1_2nd_4_bin.73,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__Bacteroides sp900552405,96.06,0.963,6461132
+LI1_2nd_4_bin.74,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,81.37,1.724,4822316
+LI1_2nd_4_bin.77,d__Bacteria,p__Firmicutes,c__Bacilli,o__Lactobacillales,f__Enterococcaceae,g__Enterococcus_B,s__Enterococcus_B pernyi,99.25,0.636,3035877
+LI1_2nd_4_bin.78,d__Bacteria,p__Campylobacterota,c__Campylobacteria,o__Campylobacterales,f__Helicobacteraceae,g__NHYM01,s__,98.69,0,1602389
+LI1_2nd_4_bin.8,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__Parabacteroides,s__,70.17,2.82,4023351
+LI1_2nd_4_bin.80,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,71.19,0,4721598
+LI1_2nd_5_bin.1,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Peptostreptococcales,f__Peptostreptococcaceae,g__Romboutsia_C,s__Romboutsia_C hominis,88.57,0.704,1623598
+LI1_2nd_5_bin.13,d__Bacteria,p__Campylobacterota,c__Campylobacteria,o__Campylobacterales,f__Helicobacteraceae,g__Helicobacter_J,s__,98.57,0.422,1706469
+LI1_2nd_5_bin.24,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,71.03,0.862,3916047
+LI1_2nd_5_bin.6,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Kineothrix,s__,98.27,0.689,3495496
+LI1_2nd_5_bin.7,d__Bacteria,p__Proteobacteria,c__Gammaproteobacteria,o__Enterobacterales,f__Vibrionaceae,g__Vibrio,s__,70.16,1.512,2541939
+LI1_2nd_6_bin.1,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Christensenellales,f__MGBC116941,g__MGBC116941,s__,70.04,1.245,1472639
+LI1_2nd_7_bin.100,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Anaerosporobacter,s__Anaerosporobacter sp018372435,80.74,2.684,4325819
+LI1_2nd_7_bin.101,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Ruminococcaceae,g__,s__,91.94,0.223,2346725
+LI1_2nd_7_bin.104,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Enterocloster,s__,73.41,5.097,3889823
+LI1_2nd_7_bin.107,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Copromonas,s__,87.61,1.476,3005930
+LI1_2nd_7_bin.109,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__14-2,s__,97.5,3.352,3572204
+LI1_2nd_7_bin.112,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__Bacteroides thetaiotaomicron,87.91,4.18,6099757
+LI1_2nd_7_bin.121,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Odoribacter,s__,70.68,8.62,3772030
+LI1_2nd_7_bin.122,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Odoribacter,s__,75.82,1.344,3052031
+LI1_2nd_7_bin.13,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Blautia,s__,71.8,2.229,3436137
+LI1_2nd_7_bin.16,d__Bacteria,p__Proteobacteria,c__Alphaproteobacteria,o__RF32,f__CAG-239,g__CAZU01,s__,97.84,1.075,1532722
+LI1_2nd_7_bin.18,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,72.05,3.855,3644832
+LI1_2nd_7_bin.21,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,97.12,1.423,4053609
+LI1_2nd_7_bin.22,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__Parabacteroides_B,s__,93.29,2.482,4213667
+LI1_2nd_7_bin.23,d__Bacteria,p__Elusimicrobiota,c__Elusimicrobia,o__Elusimicrobiales,f__Elusimicrobiaceae,g__UBA1436,s__,96.62,0,1856812
+LI1_2nd_7_bin.24,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Rikenellaceae,g__Alistipes,s__,95.64,1.282,2084530
+LI1_2nd_7_bin.25,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,75.09,1.898,3355141
+LI1_2nd_7_bin.26,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Velocimicrobium,s__,80.17,1.174,3126827
+LI1_2nd_7_bin.27,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Acutalibacteraceae,g__UBA945,s__,83.99,0.915,3004474
+LI1_2nd_7_bin.28,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Ruminococcaceae,g__Fournierella,s__,83.82,1.36,2582367
+LI1_2nd_7_bin.29,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Odoribacter,s__,79.32,8.041,4642002
+LI1_2nd_7_bin.3,d__Bacteria,p__Firmicutes,c__Bacilli,o__RF39,f__UBA660,g__Ventrenecus,s__,86.96,1.685,1354920
+LI1_2nd_7_bin.30,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Rikenellaceae,g__Rikenella,s__,99.04,0,2779651
+LI1_2nd_7_bin.33,d__Bacteria,p__Firmicutes,c__Bacilli,o__RF39,f__UBA660,g__MGBC162581,s__,77.62,1.123,1114042
+LI1_2nd_7_bin.36,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Coprobacillaceae,g__Erysipelatoclostridium,s__,100,0.539,3942138
+LI1_2nd_7_bin.38,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Clostridium_Q,s__,97.23,0.949,3214005
+LI1_2nd_7_bin.4,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Flavobacteriales,f__UBA1820,g__Merdimorpha,s__,99.26,0,2222178
+LI1_2nd_7_bin.41,d__Bacteria,p__Cyanobacteria,c__Vampirovibrionia,o__Gastranaerophilales,f__Gastranaerophilaceae,g__Scatousia,s__,85.84,0.854,1922939
+LI1_2nd_7_bin.44,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Ruminococcaceae,g__Anaerotruncus,s__,95.3,1.006,3936741
+LI1_2nd_7_bin.45,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Oscillospiraceae,g__Intestinimonas,s__,79.31,6.676,2708357
+LI1_2nd_7_bin.47,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Oscillospiraceae,g__Dysosmobacter,s__,82.66,0.973,2274878
+LI1_2nd_7_bin.48,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Oscillospiraceae,g__UBA2658,s__,89.53,1.789,1875098
+LI1_2nd_7_bin.51,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Copromonas,s__,94.2,1.582,3961834
+LI1_2nd_7_bin.56,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__OM05-12,s__,96.61,1.127,2602286
+LI1_2nd_7_bin.59,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__Parabacteroides,s__,78.38,0.807,4633262
+LI1_2nd_7_bin.6,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Rikenellaceae,g__Alistipes,s__,99,1.201,2295323
+LI1_2nd_7_bin.61,d__Bacteria,p__Firmicutes,c__Bacilli,o__Mycoplasmatales,f__Hepatoplasmataceae,g__Hepatoplasma,s__,93.23,0.751,702323
+LI1_2nd_7_bin.63,d__Bacteria,p__Chlamydiota,c__Chlamydiia,o__Chlamydiales,f__Chlamydiaceae,g__,s__,95.27,0,1063857
+LI1_2nd_7_bin.68,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Christensenellales,f__UBA3700,g__,s__,95.96,0,2163195
+LI1_2nd_7_bin.69,d__Bacteria,p__Firmicutes_B,c__Peptococcia,o__Peptococcales,f__Peptococcaceae,g__,s__,92.47,1.7,3544432
+LI1_2nd_7_bin.70,d__Bacteria,p__Cyanobacteria,c__Vampirovibrionia,o__Gastranaerophilales,f__Gastranaerophilaceae,g__Limenecus,s__,71.36,2.136,1587979
+LI1_2nd_7_bin.71,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Clostridiales,f__Clostridiaceae,g__Clostridium_P,s__,98.87,2.891,4132168
+LI1_2nd_7_bin.76,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Christensenellales,f__MGBC116941,g__MGBC116941,s__,84.78,0.563,1477729
+LI1_2nd_7_bin.77,d__Bacteria,p__Proteobacteria,c__Alphaproteobacteria,o__UBA3830,f__,g__,s__,94.5,0,834951
+LI1_2nd_7_bin.8,d__Bacteria,p__Desulfobacterota_I,c__Desulfovibrionia,o__Desulfovibrionales,f__Desulfovibrionaceae,g__Bilophila,s__,94.97,2.123,3475220
+LI1_2nd_7_bin.83,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__CHK158-818,g__Gallibacteroides,s__,96.03,0,3919440
+LI1_2nd_7_bin.86,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Oscillospiraceae,g__Pseudoflavonifractor,s__,74.89,5.201,2550093
+LI1_2nd_7_bin.87,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__Parabacteroides_B,s__,98.56,0.961,3685944
+LI1_2nd_7_bin.88,d__Bacteria,p__Firmicutes_B,c__Peptococcia,o__Peptococcales,f__Peptococcaceae,g__,s__,90.3,1.19,2789945
+LI1_2nd_7_bin.9,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,71.02,2.009,3268850
+LI1_2nd_7_bin.91,d__Bacteria,p__Proteobacteria,c__Gammaproteobacteria,o__Enterobacterales,f__Enterobacteriaceae,g__Escherichia,s__Escherichia coli,92.13,0.925,4324565
+LI1_2nd_7_bin.92,d__Bacteria,p__Proteobacteria,c__Alphaproteobacteria,o__RF32,f__CAG-239,g__MGBC133411,s__,97.84,0,1954571
+LI1_2nd_7_bin.93,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Phocaeicola,s__,71.24,0.867,4235792
+LI1_2nd_7_bin.95,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Rikenellaceae,g__WRDF01,s__,90.79,1.602,1973209
+LI1_2nd_7_bin.96,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__,75,0.862,4239376
+LI1_2nd_7_bin.99,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Oscillospiraceae,g__Evtepia,s__,84.25,2.775,2575728
+LI1_2nd_8_bin.105,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Roseburia,s__,98.49,1.779,3596387
+LI1_2nd_8_bin.106,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Erysipelotrichaceae,g__Clostridium_AQ,s__,100,0.943,4411725
+LI1_2nd_8_bin.13,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Erysipelotrichaceae,g__,s__,100,1.886,4239225
+LI1_2nd_8_bin.15,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Lacrimispora,s__,98.73,1.265,4214640
+LI1_2nd_8_bin.16,d__Bacteria,p__Firmicutes,c__Bacilli,o__Mycoplasmatales,f__Mycoplasmoidaceae,g__Mycoplasmoides,s__,100,1.253,993697
+LI1_2nd_8_bin.17,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__,s__,99.15,1.102,4180690
+LI1_2nd_8_bin.19,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Christensenellales,f__MGBC116941,g__MGBC116941,s__,80.58,0.616,1484522
+LI1_2nd_8_bin.2,d__Bacteria,p__Firmicutes,c__Bacilli,o__Erysipelotrichales,f__Erysipelotrichaceae,g__C-19,s__,99.05,3.066,3611188
+LI1_2nd_8_bin.21,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__JAAYNV01,s__,98.11,0.878,3472740
+LI1_2nd_8_bin.22,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Kineothrix,s__,97.12,0.642,3611648
+LI1_2nd_8_bin.23,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,93.25,2.584,4026878
+LI1_2nd_8_bin.25,d__Bacteria,p__Verrucomicrobiota,c__Verrucomicrobiae,o__Verrucomicrobiales,f__Akkermansiaceae,g__Akkermansia,s__,97.95,0,3066433
+LI1_2nd_8_bin.27,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Christensenellales,f__UBA1242,g__,s__,91.57,0,1361765
+LI1_2nd_8_bin.28,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Odoribacter,s__,94.61,2.15,3827152
+LI1_2nd_8_bin.37,d__Bacteria,p__Fusobacteriota,c__Fusobacteriia,o__Fusobacteriales,f__Fusobacteriaceae,g__Cetobacterium_A,s__Cetobacterium_A somerae,81.93,0.374,2437848
+LI1_2nd_8_bin.39,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Enterocloster,s__,72.69,3.955,3645925
+LI1_2nd_8_bin.40,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__UMGS1251,s__,84.77,6.023,3509948
+LI1_2nd_8_bin.43,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Marinifilaceae,g__Odoribacter,s__,78.76,2.614,3766993
+LI1_2nd_8_bin.47,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Christensenellales,f__DTU072,g__,s__,93.52,0,2188557
+LI1_2nd_8_bin.48,d__Bacteria,p__Desulfobacterota_I,c__Desulfovibrionia,o__Desulfovibrionales,f__Desulfovibrionaceae,g__Mailhella,s__,70.46,2.366,2955492
+LI1_2nd_8_bin.50,d__Bacteria,p__Proteobacteria,c__Gammaproteobacteria,o__Enterobacterales,f__Enterobacteriaceae,g__Plesiomonas,s__Plesiomonas shigelloides,100,0.564,3763300
+LI1_2nd_8_bin.53,d__Bacteria,p__Firmicutes_C,c__Negativicutes,o__Selenomonadales,f__,g__,s__,82.96,1.265,2607634
+LI1_2nd_8_bin.54,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__Acetatifactor,s__,90.89,1.58,3281929
+LI1_2nd_8_bin.56,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,91.94,1.26,4464385
+LI1_2nd_8_bin.58,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__Parabacteroides,s__,89.41,3.333,4460261
+LI1_2nd_8_bin.6,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Ruminococcaceae,g__Negativibacillus,s__,94.51,1.901,3282373
+LI1_2nd_8_bin.65,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__Bacteroides thetaiotaomicron,86.63,2.837,5149682
+LI1_2nd_8_bin.71,d__Bacteria,p__Firmicutes,c__Bacilli,o__Lactobacillales,f__Streptococcaceae,g__Lactococcus,s__Lactococcus petauri,83.86,2.543,1822561
+LI1_2nd_8_bin.77,d__Bacteria,p__Proteobacteria,c__Alphaproteobacteria,o__UBA3830,f__UBA3830,g__,s__,90.1,0,1341826
+LI1_2nd_8_bin.84,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Tannerellaceae,g__Parabacteroides,s__Parabacteroides sp003480915,81.45,1.73,5837072
+LI1_2nd_8_bin.9,d__Bacteria,p__Actinobacteriota,c__Actinomycetia,o__Mycobacteriales,f__Mycobacteriaceae,g__Corynebacterium,s__,94.47,3.34,2494568
+LI1_2nd_8_bin.93,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Bacteroidaceae,g__Bacteroides,s__Bacteroides intestinalis,96.37,2.263,5624017
+LI1_2nd_8_bin.94,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Ruminococcaceae,g__Angelakisella,s__,76.88,0.671,2565313
+LI1_2nd_8_bin.96,d__Bacteria,p__Firmicutes,c__Bacilli,o__Staphylococcales,f__Salinicoccaceae,g__Jeotgalicoccus,s__Jeotgalicoccus nanhaiensis,72.56,1.986,1545066
+LI1_2nd_8_bin.97,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__,s__,97.31,2.237,3329193
+LI1_2nd_9_bin.1,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Christensenellales,f__UBA1242,g__Caccovivens,s__,84.26,0,1096838
+LI1_2nd_9_bin.15,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Christensenellales,f__UBA3700,g__,s__,95.16,0.403,2076053
+LI1_2nd_9_bin.16,d__Bacteria,p__Proteobacteria,c__Gammaproteobacteria,o__Enterobacterales,f__Enterobacteriaceae,g__Salmonella,s__Salmonella enterica,98.95,0.586,4988495
+LI1_2nd_9_bin.22,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Lachnospirales,f__Lachnospiraceae,g__JAAYNV01,s__,97.2,0.862,3868056
+LI1_2nd_9_bin.4,d__Bacteria,p__Bacteroidota,c__Bacteroidia,o__Bacteroidales,f__Rikenellaceae,g__Alistipes,s__,99.75,0.32,2960069
+LI1_2nd_9_bin.5,d__Bacteria,p__Firmicutes_A,c__Clostridia,o__Oscillospirales,f__Oscillospiraceae,g__Oscillibacter,s__,96.7,0.671,3444960
