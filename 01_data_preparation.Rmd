@@ -102,7 +102,7 @@ genome_tree <- keep.tip(genome_tree, tip=genome_taxonomy$genome) # keep only MAG
 ### Genome annotations
 
 ```{r load_genome_annotations, warning=FALSE, comments="", message=FALSE}
-genome_annotations <- read_tsv("data/annotations.tsv") %>%
+genome_annotations <- read_tsv("data/annotations.tsv.xz") %>%
     rename(gene=1, genome=2, contig=3)
 
 #Filter only the MAGs with over 70% completeness and less than 10% contamination
@@ -131,6 +131,30 @@ genome_hits <- genome_hits %>%
 genome_coverage <- genome_hits %>%
   mutate(across(where(is.numeric), ~ ./genome_metadata$length))
 ```
+
+## Filtering
+
+Four samples are removed from the analysis due to their low sequencing depth.
+
+```{r filterging, echo=TRUE, warning=FALSE}
+#Counts_raw
+columns_to_exclude <- c("AD23", "AD25", "AD69", "AD91") # Columns to exclude
+read_counts <- read_counts %>%
+  select(-columns_to_exclude)
+
+#Metadata
+sample_metadata <- sample_metadata %>%
+  filter(Tube_code != "AD23") %>%
+  filter(Tube_code != "AD25") %>%
+  filter(Tube_code != "AD69") %>%
+  filter(Tube_code != "AD91")
+
+#Coverage_table
+columns_to_exclude <- c("AD23", "AD25", "AD69", "AD91")  # Columns to exclude
+genome_coverage <- genome_coverage %>%
+  select(-columns_to_exclude)
+```
+
 
 ### Filter reads by coverage
 
@@ -258,8 +282,7 @@ host_mapped <-
 
 ```{r mag_mapping, warning=FALSE, comments="", message=FALSE}
 mag_mapping <-
-  "data/contig.count.tsv" %>%
-  read_tsv() %>%
+  read_tsv("data/contig.count.tsv.xz") %>%
   pivot_longer(-sequence_id) %>%
   summarise(value = sum(value), .by = "name") %>%
   rename(sample = name, mapped_mags = value)
