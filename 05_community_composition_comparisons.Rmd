@@ -35,7 +35,7 @@ nrow(wild)
 beta_div_richness_wild<-hillpair(data=wild.counts, q=0)
 beta_div_neutral_wild<-hillpair(data=wild.counts, q=1)
 beta_div_phylo_wild<-hillpair(data=wild.counts, q=1, tree=genome_tree)
-beta_div_func_wild<-hillpair(data=wild.counts_func, q=1, dist=dist)
+beta_div_func_wild<-hillpair(data=wild.counts, q=1, dist=dist)
 ```
 
 #### Richness
@@ -187,7 +187,7 @@ nrow(treat)
 beta_div_richness_treat<-hillpair(data=treat.counts, q=0)
 beta_div_neutral_treat<-hillpair(data=treat.counts, q=1)
 beta_div_phylo_treat<-hillpair(data=treat.counts, q=1, tree=genome_tree)
-beta_div_func_treat<-hillpair(data=treat.counts_func, q=1, dist=dist)
+beta_div_func_treat<-hillpair(data=treat.counts, q=1, dist=dist)
 ```
 
 ##### Richness
@@ -224,8 +224,7 @@ adonis2(formula=beta_div_func_treat$S ~ time_point+species+individual, data=trea
 ```
 
 
-```{r beta_neutral_nmds_treat, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
-
+```{r beta_neutral_nmds_treat, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide", eval=FALSE}
 beta_richness_nmds_treat <- beta_div_richness_treat$S %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
@@ -375,7 +374,7 @@ adonis2(formula=beta_div_func_transplant3$S ~ species+time_point+type+individual
 		kable()
 ```
 
-```{r beta_neutral_nmds_transplant3, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
+```{r beta_neutral_nmds_transplant3, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide", eval=FALSE}
 
 beta_richness_nmds_transplant3 <- beta_div_richness_transplant3$S %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
@@ -463,7 +462,154 @@ grid.arrange(arrangeGrob(p0,p1,p2,p3))
 
 ### 4. Are there differences between the control and the treatment group?
 
-#### Post-FMT2
+#### After 1 week --> Post-FMT1
+
+```{r beta_div_phylo_post1, echo=TRUE, results=FALSE}
+post1 <- meta %>%
+  filter(time_point == "5_Post-FMT1")
+
+post1.counts <- temp_genome_counts[,which(colnames(temp_genome_counts) %in% rownames(post1))]
+identical(sort(colnames(post1.counts)),sort(as.character(rownames(post1))))
+
+post1.counts_func <- temp_genome_counts[,which(colnames(temp_genome_counts) %in% rownames(post1))]
+identical(sort(colnames(post1.counts_func)),sort(as.character(rownames(post1))))
+
+post1_nmds <- sample_metadata %>%
+  filter(time_point == "5_Post-FMT1")
+```
+
+#### Number of samples used
+
+```{r beta_div_neutral_treat1_samples_2, echo=FALSE, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE}
+nrow(post1)
+```
+
+```{r beta_div_phylo_post1_1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE }
+beta_div_richness_post1<-hillpair(data=post1.counts, q=0)
+beta_div_neutral_post1<-hillpair(data=post1.counts, q=1)
+beta_div_phylo_post1<-hillpair(data=post1.counts, q=1, tree=genome_tree)
+beta_div_func_post1<-hillpair(data=post1.counts_func, q=1, dist=dist)
+```
+
+##### Richness
+
+```{r beta_richness_permanova_post1_1, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+adonis2(formula=beta_div_richness_post1$S ~ species+type, data=post1[labels(beta_div_richness_post1$S),], permutations=999) %>%
+		as.matrix() %>%
+		kable()
+```
+
+##### Neutral
+
+```{r beta_neutral_permanova_post1_1, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+adonis2(formula=beta_div_neutral_post1$S ~ species+type, data=post1[labels(beta_div_neutral_post1$S),], permutations=999) %>%
+		as.matrix() %>%
+		kable()
+```
+
+##### Phylogenetic
+
+```{r beta_phylo_permanova_post1_1, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+adonis2(formula=beta_div_phylo_post1$S ~ species+type, data=post1[labels(beta_div_phylo_post1$S),], permutations=999) %>%
+		as.matrix() %>%
+		kable()
+```
+
+##### Functional
+
+```{r beta_func_permanova_post1_1, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+adonis2(formula=beta_div_func_post1$S ~ species+type, data=post1[labels(beta_div_func_post1$S),], permutations=999) %>%
+		as.matrix() %>%
+		kable()
+```
+
+```{r beta_neutral_nmds_post1, echo=FALSE, warning=FALSE, comments="", message=FALSE, results="hide", eval=FALSE}
+
+beta_richness_nmds_post1 <- beta_div_richness_post1$S %>%
+				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+				scores() %>%
+				as_tibble(., rownames = "sample") %>%
+				left_join(post1_nmds, by = join_by(sample == Tube_code))
+
+beta_neutral_nmds_post1 <- beta_div_neutral_post1$S %>%
+				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+				scores() %>%
+				as_tibble(., rownames = "sample") %>%
+				left_join(post1_nmds, by = join_by(sample == Tube_code))
+
+beta_phylogenetic_nmds_post1 <- beta_div_phylo_post1$S %>%
+				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+				scores() %>%
+				as_tibble(., rownames = "sample") %>%
+				left_join(post1_nmds, by = join_by(sample == Tube_code))
+
+beta_functional_nmds_post1 <- beta_div_func_post1$S %>%
+				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+				scores() %>%
+				as_tibble(., rownames = "sample") %>%
+				left_join(post1_nmds, by = join_by(sample == Tube_code))
+```
+
+```{r beta_neutral_nmds_post1_plot, eho=FALSE, results=FALSE}
+p0<-beta_richness_nmds_post1 %>%
+			group_by(type) %>%
+			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+			ungroup() %>%
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+        scale_color_manual(values=c("#76b183","#d57d2c", "#4477AA")) +
+				geom_point(size=2) +
+				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+        labs(y = "NMDS2", x="NMDS1 \n Richness beta diversity") +
+				theme_classic() +
+				theme(legend.position="top")
+
+p1<-beta_neutral_nmds_post1 %>%
+			group_by(type) %>%
+			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+			ungroup() %>%
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+        scale_color_manual(values=c("#76b183","#d57d2c", "#4477AA")) +
+				geom_point(size=2) +
+				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+        labs(y = "NMDS2", x="NMDS1 \n Neutral beta diversity") +
+				theme_classic() +
+				theme(legend.position="none")
+  
+p2<-beta_phylogenetic_nmds_post1 %>%
+			group_by(type) %>%
+			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+			ungroup() %>%
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+				scale_color_manual(values=c("#76b183","#d57d2c", "#4477AA")) +
+				geom_point(size=2) +
+				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+        labs(y= element_blank (), x="NMDS1 \n Phylogenetic beta diversity") +
+				theme_classic() +
+				theme(legend.position="none")
+
+p3<-beta_functional_nmds_post1 %>%
+			group_by(type) %>%
+			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+			ungroup() %>%
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+				scale_color_manual(values=c("#76b183","#d57d2c", "#4477AA")) +
+				geom_point(size=2) +
+				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+        labs(y= element_blank (), x="NMDS1 \n Functional beta diversity") +
+				theme_classic()+
+				theme(legend.position="none")
+```
+
+```{r beta_neutral_nmds_plot_post1_final, fig.height=7, eho=FALSE, results=TRUE}
+grid.arrange(arrangeGrob(p0,p1,p2,p3))
+```
+
+
+#### After 2 weeks -->Post-FMT2
 
 ```{r beta_div_phylo_post2, echo=TRUE, results=FALSE}
 post2 <- meta %>%
@@ -485,7 +631,7 @@ post2_nmds <- sample_metadata %>%
 nrow(post2)
 ```
 
-```{r beta_div_phylo_post2_1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE }
+```{r beta_div_phylo_post2_1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE }
 beta_div_richness_post2<-hillpair(data=post2.counts, q=0)
 beta_div_neutral_post2<-hillpair(data=post2.counts, q=1)
 beta_div_phylo_post2<-hillpair(data=post2.counts, q=1, tree=genome_tree)
@@ -524,7 +670,7 @@ adonis2(formula=beta_div_func_post2$S ~ species+type, data=post2[labels(beta_div
 		kable()
 ```
 
-```{r beta_neutral_nmds_post2, echo=FALSE, warning=FALSE, comments="", message=FALSE, results="hide"}
+```{r beta_neutral_nmds_post2, echo=FALSE, warning=FALSE, comments="", message=FALSE, results="hide", eval=FALSE}
 
 beta_richness_nmds_post2 <- beta_div_richness_post2$S %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
