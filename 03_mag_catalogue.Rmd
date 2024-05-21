@@ -54,9 +54,9 @@ circular_tree <-  circular_tree +
 
 # Add text
 circular_tree <-  circular_tree +
-        annotate('text', x=2.7, y=0, label='            Phylum', family='arial', size=3.5) +
-        annotate('text', x=3.1, y=0, label='                         Genome quality', family='arial', size=3.5) +
-        annotate('text', x=3.5, y=0, label='                     Genome size', family='arial', size=3.5)
+        annotate('text', x=2.7, y=0, label='            Phylum', family='ArialMT', size=3.5) +
+        annotate('text', x=3.1, y=0, label='                         Genome quality', family='ArialMT', size=3.5) +
+        annotate('text', x=3.5, y=0, label='                     Genome size', family='ArialMT', size=3.5)
 
 #Plot circular tree
 circular_tree %>% open_tree(30) %>% rotate_tree(90)

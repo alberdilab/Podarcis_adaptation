@@ -14,6 +14,7 @@ genome-annotations
 create-working-objects
 merge-genome-taxonomy-and-quality
 calculate-genome-coverage
+filtering
 filter-reads-by-coverage
 transform-reads-into-genome-counts
 distill-annotations-into-gifts
@@ -71,12 +72,18 @@ neutral-2
 phylogenetic-2
 functional-2
 are-there-differences-between-the-control-and-the-treatment-group
-post-fmt2
+after-1-week-post-fmt1
 number-of-samples-used-3
 richness-3
 neutral-3
 phylogenetic-3
 functional-3
+after-2-weeks-post-fmt2
+number-of-samples-used-4
+richness-4
+neutral-4
+phylogenetic-4
+functional-4
 functional-differences
 function-level
 elements

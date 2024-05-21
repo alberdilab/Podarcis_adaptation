@@ -31,7 +31,7 @@ wild_nmds <- sample_metadata %>%
 nrow(wild)
 ```
 
-```{r beta_div_neutral_wild_1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE}
+```{r beta_div_neutral_wild_1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE}
 beta_div_richness_wild<-hillpair(data=wild.counts, q=0)
 beta_div_neutral_wild<-hillpair(data=wild.counts, q=1)
 beta_div_phylo_wild<-hillpair(data=wild.counts, q=1, tree=genome_tree)
@@ -72,8 +72,7 @@ adonis2(formula=beta_div_func_wild$S ~ species, data=wild[labels(beta_div_func_w
 ```
 
 
-```{r beta_neutral_nmds, echo=FALSE, warning=FALSE, comments="", message=FALSE, results=TRUE, eval=FALSE}
-
+```{r beta_neutral_nmds, echo=FALSE, warning=FALSE, comments="", message=FALSE, results=TRUE}
 beta_q0n_nmds_wild <- beta_div_richness_wild$S %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace=FALSE) %>%
 				vegan::scores() %>%
@@ -183,7 +182,7 @@ treat_nmds <- sample_metadata %>%
 nrow(treat)
 ```
 
-```{r beta_div_neutral_treat_1, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE}
+```{r beta_div_neutral_treat_1, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE}
 beta_div_richness_treat<-hillpair(data=treat.counts, q=0)
 beta_div_neutral_treat<-hillpair(data=treat.counts, q=1)
 beta_div_phylo_treat<-hillpair(data=treat.counts, q=1, tree=genome_tree)
@@ -224,7 +223,7 @@ adonis2(formula=beta_div_func_treat$S ~ time_point+species+individual, data=trea
 ```
 
 
-```{r beta_neutral_nmds_treat, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide", eval=FALSE}
+```{r beta_neutral_nmds_treat, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
 beta_richness_nmds_treat <- beta_div_richness_treat$S %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
@@ -321,9 +320,6 @@ transplant3 <- meta  %>%
 transplant3.counts <- temp_genome_counts[,which(colnames(temp_genome_counts) %in% rownames(transplant3))]
 identical(sort(colnames(transplant3.counts)),sort(as.character(rownames(transplant3))))
 
-transplant3.counts_func <- temp_genome_counts[,which(colnames(temp_genome_counts) %in% rownames(transplant3))]
-identical(sort(colnames(transplant3.counts_func)),sort(as.character(rownames(transplant3))))
-
 transplant3_nmds <- sample_metadata %>%
   filter(time_point == "4_Transplant2" | time_point == "6_Post-FMT2")
 ```
@@ -335,11 +331,11 @@ nrow(transplant3)
 ```
 
 
-```{r beta_div_neutral_transplant3_1, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE}
+```{r beta_div_neutral_transplant3_1, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE}
 beta_div_richness_transplant3<-hillpair(data=transplant3.counts, q=0)
 beta_div_neutral_transplant3<-hillpair(data=transplant3.counts, q=1)
 beta_div_phylo_transplant3<-hillpair(data=transplant3.counts, q=1, tree=genome_tree)
-beta_div_func_transplant3<-hillpair(data=transplant3.counts_func, q=1, dist=dist)
+beta_div_func_transplant3<-hillpair(data=transplant3.counts, q=1, dist=dist)
 ```
 
 ##### Richness
@@ -374,8 +370,7 @@ adonis2(formula=beta_div_func_transplant3$S ~ species+time_point+type+individual
 		kable()
 ```
 
-```{r beta_neutral_nmds_transplant3, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide", eval=FALSE}
-
+```{r beta_neutral_nmds_transplant3, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
 beta_richness_nmds_transplant3 <- beta_div_richness_transplant3$S %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
@@ -471,9 +466,6 @@ post1 <- meta %>%
 post1.counts <- temp_genome_counts[,which(colnames(temp_genome_counts) %in% rownames(post1))]
 identical(sort(colnames(post1.counts)),sort(as.character(rownames(post1))))
 
-post1.counts_func <- temp_genome_counts[,which(colnames(temp_genome_counts) %in% rownames(post1))]
-identical(sort(colnames(post1.counts_func)),sort(as.character(rownames(post1))))
-
 post1_nmds <- sample_metadata %>%
   filter(time_point == "5_Post-FMT1")
 ```
@@ -484,11 +476,11 @@ post1_nmds <- sample_metadata %>%
 nrow(post1)
 ```
 
-```{r beta_div_phylo_post1_1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE }
+```{r beta_div_phylo_post1_1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE}
 beta_div_richness_post1<-hillpair(data=post1.counts, q=0)
 beta_div_neutral_post1<-hillpair(data=post1.counts, q=1)
 beta_div_phylo_post1<-hillpair(data=post1.counts, q=1, tree=genome_tree)
-beta_div_func_post1<-hillpair(data=post1.counts_func, q=1, dist=dist)
+beta_div_func_post1<-hillpair(data=post1.counts, q=1, dist=dist)
 ```
 
 ##### Richness
@@ -523,8 +515,7 @@ adonis2(formula=beta_div_func_post1$S ~ species+type, data=post1[labels(beta_div
 		kable()
 ```
 
-```{r beta_neutral_nmds_post1, echo=FALSE, warning=FALSE, comments="", message=FALSE, results="hide", eval=FALSE}
-
+```{r beta_neutral_nmds_post1, echo=FALSE, warning=FALSE, comments="", message=FALSE, results="hide"}
 beta_richness_nmds_post1 <- beta_div_richness_post1$S %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
@@ -618,9 +609,6 @@ post2 <- meta %>%
 post2.counts <- temp_genome_counts[,which(colnames(temp_genome_counts) %in% rownames(post2))]
 identical(sort(colnames(post2.counts)),sort(as.character(rownames(post2))))
 
-post2.counts_func <- temp_genome_counts[,which(colnames(temp_genome_counts) %in% rownames(post2))]
-identical(sort(colnames(post2.counts_func)),sort(as.character(rownames(post2))))
-
 post2_nmds <- sample_metadata %>%
   filter(time_point == "6_Post-FMT2")
 ```
@@ -631,11 +619,11 @@ post2_nmds <- sample_metadata %>%
 nrow(post2)
 ```
 
-```{r beta_div_phylo_post2_1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE }
+```{r beta_div_phylo_post2_1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE}
 beta_div_richness_post2<-hillpair(data=post2.counts, q=0)
 beta_div_neutral_post2<-hillpair(data=post2.counts, q=1)
 beta_div_phylo_post2<-hillpair(data=post2.counts, q=1, tree=genome_tree)
-beta_div_func_post2<-hillpair(data=post2.counts_func, q=1, dist=dist)
+beta_div_func_post2<-hillpair(data=post2.counts, q=1, dist=dist)
 ```
 
 ##### Richness
@@ -670,8 +658,7 @@ adonis2(formula=beta_div_func_post2$S ~ species+type, data=post2[labels(beta_div
 		kable()
 ```
 
-```{r beta_neutral_nmds_post2, echo=FALSE, warning=FALSE, comments="", message=FALSE, results="hide", eval=FALSE}
-
+```{r beta_neutral_nmds_post2, echo=FALSE, warning=FALSE, comments="", message=FALSE, results="hide"}
 beta_richness_nmds_post2 <- beta_div_richness_post2$S %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
