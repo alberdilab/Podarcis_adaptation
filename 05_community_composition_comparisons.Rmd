@@ -72,7 +72,7 @@ adonis2(formula=beta_div_func_wild$S ~ species, data=wild[labels(beta_div_func_w
 ```
 
 
-```{r beta_neutral_nmds, echo=TRUE, warning=FALSE, comments="", message=FALSE, results=TRUE}
+```{r beta_neutral_nmds, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
 beta_q0n_nmds_wild <- beta_div_richness_wild$S %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace=FALSE) %>%
 				vegan::scores() %>%

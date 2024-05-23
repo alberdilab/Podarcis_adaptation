@@ -342,7 +342,7 @@ host_mapped <-
   pivot_wider()
 ```
 
-### Prokaryotic fraction (mising, not done by the server)
+### Prokaryotic fraction (missing, not done by the server)
 
 ```{r singlem, warning=FALSE, comments="", message=FALSE}
 #singlem <-
