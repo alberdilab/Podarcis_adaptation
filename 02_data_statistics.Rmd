@@ -1,0 +1,108 @@
+# Data statistics
+
+
+```{r load_data_stats}
+load("data/data.Rdata")
+```
+
+## Sequencing reads statistics
+
+```{r reads_stats}
+data_stats$raw_reads %>% sum()
+data_stats$raw_reads %>% mean()
+data_stats$raw_reads %>% sd()
+```
+
+## DNA fractions
+```{r data_fractions_stats}
+#Overall
+data_stats %>%
+    mutate(mapped_perc=mapped_mags/trimmed_reads) %>%
+    summarise(mean=mean(mapped_perc),sd=sd(mapped_perc))
+```
+
+
+```{r data_fractions_plot, message=FALSE, warning=FALSE, fig.height=6, fig.width=10, fig.fullwidth=TRUE}
+data_stats %>%
+  mutate(
+    low_quality = raw_reads - trimmed_reads,
+    unmapped_reads = trimmed_reads - mapped_lizard - mapped_mags
+  ) %>%
+  #left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
+  select(sample, low_quality, mapped_lizard, mapped_mags, unmapped_reads) %>%
+  pivot_longer(-sample) %>%
+  #pivot_longer(cols = c(low_quality, mapped_lizard, mapped_mags, unmapped_reads), 
+               #names_to = "metric", values_to = "value") %>%
+  mutate(name=factor(name,levels=c("low_quality","mapped_lizard","unmapped_reads","mapped_mags"))) %>%
+  #mutate(sample=factor(sample,levels=c("Sg1","Sg2","Sg3","Sg4","Sg5","Sg6","Sg7","Sg8","Sg9","Sg10"))) %>%
+  ggplot(aes(x = sample, y = value, fill = name)) +
+      geom_bar(stat = "identity", position = "fill") +
+      scale_fill_manual(name="Sequence type",
+                    breaks=c("low_quality","mapped_SceUnd","unmapped_reads","mapped_mags"),
+                    labels=c("Low quality","Mapped to host","Unmapped","Mapped to MAGs"),
+                    values=c("#CCCCCC", "#bcdee1", "#d8b8a3","#93655c"))+
+      #facet_wrap(~species, scales = "free") +
+      theme_minimal() +
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, size=4)) +
+      labs(y="DNA sequence fraction",x="Samples")
+```
+
+## Recovered microbial fraction
+
+```{r data_estimations_plot, message=FALSE, warning=FALSE, fig.height=6, fig.width=10, fig.fullwidth=TRUE}
+data_stats %>%
+  mutate(
+    unmapped_reads = trimmed_reads - mapped_lizard - mapped_mags,
+    mag_proportion = mapped_mags / (mapped_mags + unmapped_reads),
+    singlem_read_fraction = singlem_read_fraction
+  ) %>%
+  select(sample, mag_proportion, singlem_read_fraction) %>%
+  mutate(
+    mag_proportion = if_else(singlem_read_fraction == 0, 0, mag_proportion),
+    singlem_read_fraction = if_else(singlem_read_fraction == 0, NA, singlem_read_fraction),
+    singlem_read_fraction = if_else(singlem_read_fraction < mag_proportion, NA, singlem_read_fraction),
+    singlem_read_fraction = if_else(singlem_read_fraction > 1, 1, singlem_read_fraction)
+  ) %>%
+  pivot_longer(-sample, names_to = "proportion", values_to = "value") %>%
+  mutate(
+    proportion = factor(
+      proportion,
+      levels = c("mag_proportion", "singlem_read_fraction")
+    )
+  ) %>%
+  #separate(col = "sample", into = c("sample", "tissue"), sep = "\\.", remove = FALSE) %>%
+  #mutate(sample=factor(sample,levels=rev(c("Sg1","Sg2","Sg3","Sg4","Sg5","Sg6","Sg7","Sg8","Sg9","Sg10")))) %>%
+  ggplot(aes(x = value, y = sample, color = proportion)) +
+      geom_line(aes(group = sample), color = "#f8a538") +
+      geom_point() +
+      scale_color_manual(name="Proportion",
+                    breaks=c("mag_proportion","singlem_read_fraction"),
+                    labels=c("Recovered","Estimated"),
+                    values=c("#52e1e8", "#876b53"))+
+      #facet_wrap(tissue~., scales = "free", labeller = labeller(tissue = c(cloaca="Cloaca",feces="Feces"))) +
+      theme_minimal() +
+      labs(y = "Samples", x = "Prokaryotic fraction") +
+      scale_x_continuous(limits = c(0, 1)) +
+      theme(
+        axis.text.y = element_text(size = 4),
+        axis.text.x = element_text( angle = 90, vjust = 0.5, hjust = 1, size = 6),
+        legend.position = "right"
+      )
+```
+
+### Domain-adjusted mapping rate (DAMR)
+
+```{r damr}
+data_stats %>%
+  mutate(
+    unmapped_reads = trimmed_reads - mapped_lizard - mapped_mags,
+    mag_proportion = mapped_mags / (mapped_mags + unmapped_reads),
+    singlem_read_fraction = singlem_read_fraction
+  ) %>%
+  mutate(damr=pmin(1, mag_proportion/singlem_read_fraction)) %>%
+  left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
+  select(sample,damr, time_point, species, type) %>%
+  #group_by(type) %>%
+  #summarise(mean=mean(damr),sd=sd(damr)) %>%
+  tt()
+```

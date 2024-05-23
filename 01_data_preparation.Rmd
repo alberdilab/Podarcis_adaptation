@@ -134,7 +134,7 @@ genome_coverage <- genome_hits %>%
 
 ## Filtering
 
-Four samples are removed from the analysis due to their low sequencing depth.
+5 samples are removed from the analysis due to their low sequencing depth.
 
 ```{r filterging, echo=TRUE, warning=FALSE}
 #Counts_raw
@@ -144,6 +144,7 @@ read_counts <- read_counts %>%
 
 #Metadata
 sample_metadata <- sample_metadata %>%
+  filter(Tube_code != "AD16") %>%
   filter(Tube_code != "AD23") %>%
   filter(Tube_code != "AD25") %>%
   filter(Tube_code != "AD69") %>%
@@ -201,10 +202,11 @@ raw_reads <-
     sample = Sample,
     raw_reads = `total_sequences`
   ) %>%
-  mutate(
-    sample = sample %>% str_remove_all("_1$") %>% str_remove_all("_2$")
-  ) %>%
-  summarise(raw_reads = sum(raw_reads), .by = sample)
+  mutate(sample_prefix = str_extract(sample, "^[^_]+")) %>%
+  group_by(sample_prefix) %>%
+  summarize(raw_reads = sum(raw_reads, na.rm = TRUE)) %>%
+  rename(sample = sample_prefix)  %>%
+  mutate(sample = str_remove(sample, "^fastp \\|\\s*"))
 ```
 
 ### Quality-filtered reads
@@ -213,18 +215,18 @@ raw_reads <-
 fastp_reads <-
   "data/multiqc_general_stats.txt" %>%
   read_tsv() %>%
-  filter(str_detect(Sample, "fastp")) %>%
   select(
     sample = Sample,
     trimmed_reads = `total_sequences`
   ) %>%
-  mutate(
-    sample =
-      sample %>%
-        str_remove_all("_[u12]+$") %>%
-        str_remove_all("^fastp \\| ")
-  ) %>%
-  summarise(trimmed_reads = sum(trimmed_reads), .by = sample)
+  mutate(sample_prefix = str_extract(sample, "^[^_]+")) %>%
+  group_by(sample_prefix) %>%
+  summarize(trimmed_reads = sum(trimmed_reads, na.rm = TRUE)) %>%
+  rename(sample = sample_prefix) %>% 
+  filter(!str_detect(sample, "nonlizard \\|")) %>%
+  filter(!str_detect(sample, "lizard \\|")) %>%
+  filter(!str_detect(sample, "refseq500 \\|"))  %>%
+  mutate(sample = str_remove(sample, "^fastp \\|\\s*"))
 ```
 
 ### Host-mapped reads
@@ -233,7 +235,7 @@ fastp_reads <-
 host_mapped <-
   "data/multiqc_general_stats.txt" %>%
   read_tsv() %>%
-  filter(!str_detect(Sample, "fastp")) %>%
+  filter(str_detect(Sample, "lizard")) %>%
   select(
     sample = Sample,
     host_mapped = `reads_mapped`,
@@ -255,27 +257,41 @@ host_mapped <-
     name = str_glue("{name}_{host_name}")
   ) %>%
   select(-host_name) %>%
-  pivot_wider()
+  pivot_wider() %>%
+  mutate(sample = str_extract(sample, "^[^_]+")) %>%
+  group_by(sample) %>%
+  summarize(
+    mapped_lizard = sum(mapped_lizard),
+    unmapped_lizard = sum(mapped_lizard)
+  ) 
 ```
 
-### Prokaryotic fraction (missing, not done by the server)
+### Prokaryotic fraction
 
 ```{r singlem, warning=FALSE, comments="", message=FALSE}
-#singlem <-
-  #"data/microbial_fraction.tsv" %>%
-  #read_tsv() %>%
-  #distinct() %>%
-  #mutate(
-    #sample = sample %>% str_remove_all("_1$"),
-    #read_fraction = read_fraction %>% str_remove("%") %>% as.numeric(),
-    #read_fraction = read_fraction / 100
-  #) %>%
-  #select(
-    #sample,
-    #singlem_prokaryotic_bases = bacterial_archaeal_bases,
-    #singlem_metagenome_size = metagenome_size,
-    #singlem_read_fraction = read_fraction,
-  #)
+singlem <-
+  "data/singleM.tsv" %>%
+  read_tsv() %>%
+  distinct() %>%
+  mutate(
+    sample = sample %>% str_remove_all("_1$"),
+   read_fraction = read_fraction %>% str_remove("%") %>% as.numeric(),
+   read_fraction = read_fraction / 100
+  ) %>%
+  select(
+   sample,
+   singlem_prokaryotic_bases = bacterial_archaeal_bases,
+   singlem_metagenome_size = metagenome_size,
+   singlem_read_fraction = read_fraction,
+  ) %>%
+mutate(sample_prefix = str_extract(sample, "^[^_]+")) %>%
+  group_by(sample_prefix) %>%
+  summarize(
+    singlem_prokaryotic_bases = sum(singlem_prokaryotic_bases),
+    singlem_metagenome_size = sum(singlem_metagenome_size),
+    singlem_read_fraction = mean(singlem_read_fraction)
+  ) %>%
+  rename(sample = sample_prefix)
 ```
 
 ### MAG-mapped reads
@@ -285,7 +301,13 @@ mag_mapping <-
   read_tsv("data/contig.count.tsv.xz") %>%
   pivot_longer(-sequence_id) %>%
   summarise(value = sum(value), .by = "name") %>%
-  rename(sample = name, mapped_mags = value)
+  rename(sample = name, mapped_mags = value) %>%
+  mutate(sample_prefix = str_extract(sample, "^[^_]+")) %>%
+    group_by(sample_prefix) %>%
+    summarize(
+      mapped_mags = sum(mapped_mags)
+    ) %>%
+    rename(sample = sample_prefix)
 ```
 
 ### Wrap data statistics
@@ -294,8 +316,13 @@ mag_mapping <-
 data_stats <- raw_reads %>%
   left_join(fastp_reads) %>%
   left_join(host_mapped) %>%
-  #left_join(singlem) %>% #try to create this file
+  left_join(singlem) %>%
   left_join(mag_mapping)
+
+data_stats<- data_stats %>%
+  filter(!str_detect(sample, "nonlizard \\|")) %>%
+  filter(!str_detect(sample, "lizard \\|")) %>%
+  filter(!str_detect(sample, "refseq500 \\|"))
 ```
 
 ## Prepare color scheme
