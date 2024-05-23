@@ -72,7 +72,7 @@ adonis2(formula=beta_div_func_wild$S ~ species, data=wild[labels(beta_div_func_w
 ```
 
 
-```{r beta_neutral_nmds, echo=FALSE, warning=FALSE, comments="", message=FALSE, results=TRUE}
+```{r beta_neutral_nmds, echo=TRUE, warning=FALSE, comments="", message=FALSE, results=TRUE}
 beta_q0n_nmds_wild <- beta_div_richness_wild$S %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace=FALSE) %>%
 				vegan::scores() %>%
@@ -110,7 +110,7 @@ p0<-beta_q0n_nmds_wild %>%
 				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
         labs(y = "NMDS2", x="NMDS1 \n Richness beta diversity") +
 				theme_classic() +
-				theme(legend.position="top")
+				theme(legend.position="none")
 
 p1<-beta_q1n_nmds_wild %>%
 			group_by(species) %>%
@@ -154,7 +154,7 @@ p3<-beta_q1f_nmds_wild %>%
 ```
 
 ```{r beta_neutral_nmds_plot_final, echo=FALSE, results=TRUE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
-grid.arrange(arrangeGrob(p0,p1,p2,p3))
+ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 ```
 
 
@@ -230,7 +230,6 @@ beta_richness_nmds_treat <- beta_div_richness_treat$S %>%
 				as_tibble(., rownames = "sample") %>%
 				left_join(treat_nmds, by = c("sample" = "Tube_code"))
 
-
 beta_neutral_nmds_treat <- beta_div_neutral_treat$S %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
@@ -262,7 +261,7 @@ p0<-beta_richness_nmds_treat %>%
 				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
         labs(y = "NMDS2", x="NMDS1 \n Richness beta diversity") +
 				theme_classic() +
-				theme(legend.position="top")
+				theme(legend.position="none")
 
 p1<-beta_neutral_nmds_treat %>%
 			group_by(individual) %>%
@@ -305,7 +304,7 @@ p3<-beta_func_nmds_treat %>%
 ```
 
 ```{r beta_neutral_nmds_plot_treat_final, echo=FALSE, results=TRUE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
-grid.arrange(arrangeGrob(p0,p1,p2,p3))
+ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 ```
 
 
@@ -408,7 +407,7 @@ p0<-beta_richness_nmds_transplant3 %>%
 				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
         labs(y = "NMDS2", x="NMDS1 \n Richness beta diversity") +
 				theme_classic() +
-				theme(legend.position="top")
+				theme(legend.position="none")
 
 p1<-beta_neutral_nmds_transplant3 %>%
 			group_by(individual) %>%
@@ -451,7 +450,7 @@ p3<-beta_func_nmds_transplant3 %>%
 ```
 
 ```{r beta_neutral_nmds_plot_transplant3_final, echo=FALSE, results=TRUE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
-grid.arrange(arrangeGrob(p0,p1,p2,p3))
+ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 ```
 
 
@@ -515,7 +514,7 @@ adonis2(formula=beta_div_func_post1$S ~ species+type, data=post1[labels(beta_div
 		kable()
 ```
 
-```{r beta_neutral_nmds_post1, echo=FALSE, warning=FALSE, comments="", message=FALSE, results="hide"}
+```{r beta_neutral_nmds_post1, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
 beta_richness_nmds_post1 <- beta_div_richness_post1$S %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
@@ -553,7 +552,7 @@ p0<-beta_richness_nmds_post1 %>%
 				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
         labs(y = "NMDS2", x="NMDS1 \n Richness beta diversity") +
 				theme_classic() +
-				theme(legend.position="top")
+				theme(legend.position="none")
 
 p1<-beta_neutral_nmds_post1 %>%
 			group_by(type) %>%
@@ -596,7 +595,7 @@ p3<-beta_functional_nmds_post1 %>%
 ```
 
 ```{r beta_neutral_nmds_plot_post1_final, fig.height=7, eho=FALSE, results=TRUE}
-grid.arrange(arrangeGrob(p0,p1,p2,p3))
+ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 ```
 
 
@@ -658,7 +657,7 @@ adonis2(formula=beta_div_func_post2$S ~ species+type, data=post2[labels(beta_div
 		kable()
 ```
 
-```{r beta_neutral_nmds_post2, echo=FALSE, warning=FALSE, comments="", message=FALSE, results="hide"}
+```{r beta_neutral_nmds_post2, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
 beta_richness_nmds_post2 <- beta_div_richness_post2$S %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
@@ -740,5 +739,5 @@ p3<-beta_functional_nmds_post2 %>%
 ```
 
 ```{r beta_neutral_nmds_plot_post2_final, fig.height=7, eho=FALSE, results=TRUE}
-grid.arrange(arrangeGrob(p0,p1,p2,p3))
+ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 ```
