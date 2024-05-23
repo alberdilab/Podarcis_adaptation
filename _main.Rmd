@@ -269,7 +269,7 @@ genome_counts_filt <- read_counts_filt %>%
 
 ### Distill annotations into GIFTs 
 
-```{r distill_annotations, warning=FALSE, comments="", message=FALSE}
+```{r distill_annotations, warning=FALSE, comments="", message=FALSE, results='hide'}
 genome_gifts <- distill(genome_annotations,GIFT_db,genomecol=2,annotcol=c(9,10,19))
 ```
 
@@ -1178,7 +1178,7 @@ adonis2(formula=beta_div_func_wild$S ~ species, data=wild[labels(beta_div_func_w
 ```
 
 
-```{r beta_neutral_nmds, echo=TRUE, warning=FALSE, comments="", message=FALSE, results=TRUE}
+```{r beta_neutral_nmds, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
 beta_q0n_nmds_wild <- beta_div_richness_wild$S %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace=FALSE) %>%
 				vegan::scores() %>%
@@ -1956,7 +1956,7 @@ ggplot(GIFTs_elements_community_merged,aes(x=interaction_var,y=trait,fill=gift))
 
 ### GIFTs Functional community
 
-```{r gitfs_functional_wild, echo=TRUE,results=FALSE}
+```{r gitfs_functional_wild, echo=TRUE,results=TRUE}
 GIFTs_functions_community %>%
   rowMeans() %>%
   as_tibble(., rownames = "sample") %>%
@@ -1968,7 +1968,7 @@ GIFTs_functions_community %>%
 
 #### GIFT test visualisation
 
-```{r gift_test_function_plot_wild, message=FALSE, warning=FALSE, fig.height=12, fig.width=10, fig.fullwidth=TRUE, eval=FALSE}
+```{r gift_test_function_plot_wild, message=FALSE, warning=FALSE, fig.height=12, fig.width=10, fig.fullwidth=TRUE, eval=TRUE}
 GIFTs_functions_community %>%
   as.data.frame() %>%
   rownames_to_column("sample") %>%
@@ -1999,7 +1999,7 @@ GIFTs_functions_community %>%
 
 ### GIFTs Domain community
 
-```{r gitfs_domain_wild, echo=TRUE,results=FALSE}
+```{r gitfs_domain_wild, echo=TRUE,results=TRUE}
 GIFTs_domains_community %>%
   rowMeans() %>%
   as_tibble(., rownames = "sample") %>%
@@ -2011,7 +2011,7 @@ GIFTs_domains_community %>%
 
 ### GIFTs Elements community
 
-```{r gitfs_elements_wild, echo=TRUE,results=FALSE}
+```{r gitfs_elements_wild, echo=TRUE,results=TRUE}
 GIFTs_elements_community %>%
   rowMeans() %>%
   as_tibble(., rownames = "sample") %>%
@@ -2119,7 +2119,7 @@ for(i in colNames){
 
 ### GIFTs Functional community
 
-```{r gitfs_functional_tm6, echo=TRUE,results=FALSE}
+```{r gitfs_functional_tm6, echo=TRUE,results=TRUE}
 GIFTs_functions_community %>%
   rowMeans() %>%
   as_tibble(., rownames = "sample") %>%
@@ -2131,7 +2131,7 @@ GIFTs_functions_community %>%
 
 #### GIFT test visualisation
 
-```{r gift_test_function_plot, message=FALSE, warning=FALSE, fig.height=12, fig.width=10, fig.fullwidth=TRUE, eval=FALSE}
+```{r gift_test_function_plot, message=FALSE, warning=FALSE, fig.height=12, fig.width=10, fig.fullwidth=TRUE, eval=TRUE}
 GIFTs_functions_community %>%
   as.data.frame() %>%
   rownames_to_column("sample") %>%
@@ -2162,7 +2162,7 @@ GIFTs_functions_community %>%
 
 ### GIFTs Domain community
 
-```{r gitfs_domain_tm6, echo=TRUE,results=FALSE}
+```{r gitfs_domain_tm6, echo=TRUE,results=TRUE}
 GIFTs_domains_community %>%
   rowMeans() %>%
   as_tibble(., rownames = "sample") %>%
@@ -2174,7 +2174,7 @@ GIFTs_domains_community %>%
 
 ### GIFTs Elements community
 
-```{r gitfs_elements_tm6, echo=TRUE,results=FALSE}
+```{r gitfs_elements_tm6, echo=TRUE,results=TRUE}
 GIFTs_elements_community %>%
   rowMeans() %>%
   as_tibble(., rownames = "sample") %>%
@@ -2382,7 +2382,7 @@ grid.arrange(arrangeGrob(p1, p2,p3, p4, ncol = 2))
 ```
 
 
-## Comparison of samples from the 6th Time_point (6_Post-FMT2)
+### Comparison of samples from the 6th Time_point (6_Post-FMT2)
 
 ```{r gitfs_merge, echo=TRUE,results=FALSE}
 #Merge the functional domains with the metadata

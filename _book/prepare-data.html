@@ -2061,7 +2061,7 @@ color: #a52929;
 <li class="chapter" data-level="2.4.1" data-path="prepare-data.html"><a href="prepare-data.html#raw-reads"><i class="fa fa-check"></i><b>2.4.1</b> Raw reads</a></li>
 <li class="chapter" data-level="2.4.2" data-path="prepare-data.html"><a href="prepare-data.html#quality-filtered-reads"><i class="fa fa-check"></i><b>2.4.2</b> Quality-filtered reads</a></li>
 <li class="chapter" data-level="2.4.3" data-path="prepare-data.html"><a href="prepare-data.html#host-mapped-reads"><i class="fa fa-check"></i><b>2.4.3</b> Host-mapped reads</a></li>
-<li class="chapter" data-level="2.4.4" data-path="prepare-data.html"><a href="prepare-data.html#prokaryotic-fraction-mising-not-done-by-the-server"><i class="fa fa-check"></i><b>2.4.4</b> Prokaryotic fraction (mising, not done by the server)</a></li>
+<li class="chapter" data-level="2.4.4" data-path="prepare-data.html"><a href="prepare-data.html#prokaryotic-fraction-missing-not-done-by-the-server"><i class="fa fa-check"></i><b>2.4.4</b> Prokaryotic fraction (missing, not done by the server)</a></li>
 <li class="chapter" data-level="2.4.5" data-path="prepare-data.html"><a href="prepare-data.html#mag-mapped-reads"><i class="fa fa-check"></i><b>2.4.5</b> MAG-mapped reads</a></li>
 <li class="chapter" data-level="2.4.6" data-path="prepare-data.html"><a href="prepare-data.html#wrap-data-statistics"><i class="fa fa-check"></i><b>2.4.6</b> Wrap data statistics</a></li>
 </ul></li>
@@ -2127,8 +2127,8 @@ color: #a52929;
 <li class="chapter" data-level="5.7" data-path="functional-differences.html"><a href="functional-differences.html#domain-level"><i class="fa fa-check"></i><b>5.7</b> Domain level</a>
 <ul>
 <li class="chapter" data-level="5.7.1" data-path="functional-differences.html"><a href="functional-differences.html#comparison-of-samples-from-the-0-time_point-0_wild-1"><i class="fa fa-check"></i><b>5.7.1</b> Comparison of samples from the 0 Time_point (0_Wild)</a></li>
+<li class="chapter" data-level="5.7.2" data-path="functional-differences.html"><a href="functional-differences.html#comparison-of-samples-from-the-6th-time_point-6_post-fmt2-1"><i class="fa fa-check"></i><b>5.7.2</b> Comparison of samples from the 6th Time_point (6_Post-FMT2)</a></li>
 </ul></li>
-<li class="chapter" data-level="5.8" data-path="functional-differences.html"><a href="functional-differences.html#comparison-of-samples-from-the-6th-time_point-6_post-fmt2-1"><i class="fa fa-check"></i><b>5.8</b> Comparison of samples from the 6th Time_point (6_Post-FMT2)</a></li>
 </ul></li>
 <li class="divider"></li>
 <li><a href="https://www.alberdilab.dk" target="blank"><b>www.alberdilab.dk</b></a></li>
@@ -2310,450 +2310,130 @@ color: #a52929;
 <div id="distill-annotations-into-gifts" class="section level3 hasAnchor" number="2.3.3">
 <h3><span class="header-section-number">2.3.3</span> Distill annotations into GIFTs<a href="prepare-data.html#distill-annotations-into-gifts" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r script-source"><code class="sourceCode r"><span id="cb16-1"><a href="prepare-data.html#cb16-1" tabindex="-1"></a>genome_gifts <span class="ot">&lt;-</span> <span class="fu">distill</span>(genome_annotations,GIFT_db,<span class="at">genomecol=</span><span class="dv">2</span>,<span class="at">annotcol=</span><span class="fu">c</span>(<span class="dv">9</span>,<span class="dv">10</span>,<span class="dv">19</span>))</span></code></pre></div>
-<pre class="script-output"><code>Calculating GIFTs for 313 genomes:
-    AH1_2nd_10:bin_000001 (1/313)
-    AH1_2nd_10:bin_000007 (2/313)
-    AH1_2nd_10:bin_000009 (3/313)
-    AH1_2nd_10:bin_000010 (4/313)
-    AH1_2nd_10:bin_000018 (5/313)
-    AH1_2nd_10:bin_000025 (6/313)
-    AH1_2nd_10:bin_000040 (7/313)
-    AH1_2nd_10:bin_000041 (8/313)
-    AH1_2nd_10:bin_000042 (9/313)
-    AH1_2nd_10:bin_000044 (10/313)
-    AH1_2nd_10:bin_000049 (11/313)
-    AH1_2nd_10:bin_000050 (12/313)
-    AH1_2nd_10:bin_000051 (13/313)
-    AH1_2nd_10:bin_000060 (14/313)
-    AH1_2nd_10:bin_000069 (15/313)
-    AH1_2nd_10:bin_000084 (16/313)
-    AH1_2nd_10:bin_000097 (17/313)
-    AH1_2nd_11:bin_000004 (18/313)
-    AH1_2nd_11:bin_000005 (19/313)
-    AH1_2nd_11:bin_000008 (20/313)
-    AH1_2nd_11:bin_000009 (21/313)
-    AH1_2nd_11:bin_000028 (22/313)
-    AH1_2nd_12:bin_000001 (23/313)
-    AH1_2nd_12:bin_000007 (24/313)
-    AH1_2nd_12:bin_000008 (25/313)
-    AH1_2nd_12:bin_000009 (26/313)
-    AH1_2nd_12:bin_000012 (27/313)
-    AH1_2nd_12:bin_000014 (28/313)
-    AH1_2nd_12:bin_000015 (29/313)
-    AH1_2nd_12:bin_000018 (30/313)
-    AH1_2nd_12:bin_000019 (31/313)
-    AH1_2nd_12:bin_000041 (32/313)
-    AH1_2nd_12:bin_000044 (33/313)
-    AH1_2nd_12:bin_000056 (34/313)
-    AH1_2nd_12:bin_000059 (35/313)
-    AH1_2nd_12:bin_000063 (36/313)
-    AH1_2nd_13:bin_000004 (37/313)
-    AH1_2nd_13:bin_000011 (38/313)
-    AH1_2nd_13:bin_000025 (39/313)
-    AH1_2nd_13:bin_000029 (40/313)
-    AH1_2nd_13:bin_000037 (41/313)
-    AH1_2nd_13:bin_000049 (42/313)
-    AH1_2nd_13:bin_000050 (43/313)
-    AH1_2nd_13:bin_000055 (44/313)
-    AH1_2nd_14:bin_000003 (45/313)
-    AH1_2nd_14:bin_000005 (46/313)
-    AH1_2nd_14:bin_000014 (47/313)
-    AH1_2nd_14:bin_000015 (48/313)
-    AH1_2nd_14:bin_000020 (49/313)
-    AH1_2nd_14:bin_000027 (50/313)
-    AH1_2nd_14:bin_000032 (51/313)
-    AH1_2nd_14:bin_000047 (52/313)
-    AH1_2nd_14:bin_000052 (53/313)
-    AH1_2nd_14:bin_000063 (54/313)
-    AH1_2nd_15:bin_000001 (55/313)
-    AH1_2nd_15:bin_000002 (56/313)
-    AH1_2nd_15:bin_000004 (57/313)
-    AH1_2nd_15:bin_000009 (58/313)
-    AH1_2nd_15:bin_000013 (59/313)
-    AH1_2nd_15:bin_000021 (60/313)
-    AH1_2nd_15:bin_000025 (61/313)
-    AH1_2nd_15:bin_000043 (62/313)
-    AH1_2nd_16:bin_000008 (63/313)
-    AH1_2nd_16:bin_000011 (64/313)
-    AH1_2nd_16:bin_000018 (65/313)
-    AH1_2nd_16:bin_000019 (66/313)
-    AH1_2nd_16:bin_000020 (67/313)
-    AH1_2nd_16:bin_000023 (68/313)
-    AH1_2nd_16:bin_000025 (69/313)
-    AH1_2nd_16:bin_000033 (70/313)
-    AH1_2nd_16:bin_000044 (71/313)
-    AH1_2nd_16:bin_000045 (72/313)
-    AH1_2nd_16:bin_000047 (73/313)
-    AH1_2nd_16:bin_000058 (74/313)
-    AH1_2nd_16:bin_000064 (75/313)
-    AH1_2nd_16:bin_000096 (76/313)
-    AH1_2nd_16:bin_000100 (77/313)
-    AH1_2nd_17:bin_000010 (78/313)
-    AH1_2nd_17:bin_000015 (79/313)
-    AH1_2nd_17:bin_000019 (80/313)
-    AH1_2nd_17:bin_000020 (81/313)
-    AH1_2nd_17:bin_000023 (82/313)
-    AH1_2nd_17:bin_000029 (83/313)
-    AH1_2nd_17:bin_000030 (84/313)
-    AH1_2nd_17:bin_000038 (85/313)
-    AH1_2nd_17:bin_000040 (86/313)
-    AH1_2nd_18:bin_000011 (87/313)
-    AH1_2nd_18:bin_000013 (88/313)
-    AH1_2nd_18:bin_000024 (89/313)
-    AH1_2nd_18:bin_000033 (90/313)
-    AH1_2nd_18:bin_000039 (91/313)
-    AH1_2nd_18:bin_000040 (92/313)
-    AH1_2nd_18:bin_000041 (93/313)
-    AH1_2nd_18:bin_000047 (94/313)
-    AH1_2nd_19:bin_000001 (95/313)
-    AH1_2nd_19:bin_000005 (96/313)
-    AH1_2nd_19:bin_000011 (97/313)
-    AH1_2nd_19:bin_000017 (98/313)
-    AH1_2nd_19:bin_000024 (99/313)
-    AH1_2nd_19:bin_000031 (100/313)
-    AH1_2nd_19:bin_000032 (101/313)
-    AH1_2nd_19:bin_000037 (102/313)
-    AH1_2nd_19:bin_000038 (103/313)
-    AH1_2nd_19:bin_000043 (104/313)
-    AH1_2nd_19:bin_000050 (105/313)
-    AH1_2nd_19:bin_000052 (106/313)
-    AH1_2nd_19:bin_000053 (107/313)
-    AH1_2nd_19:bin_000055 (108/313)
-    AH1_2nd_19:bin_000067 (109/313)
-    AH1_2nd_19:bin_000072 (110/313)
-    AH1_2nd_1:bin_000001 (111/313)
-    AH1_2nd_1:bin_000002 (112/313)
-    AH1_2nd_1:bin_000003 (113/313)
-    AH1_2nd_1:bin_000005 (114/313)
-    AH1_2nd_1:bin_000006 (115/313)
-    AH1_2nd_1:bin_000015 (116/313)
-    AH1_2nd_1:bin_000023 (117/313)
-    AH1_2nd_1:bin_000028 (118/313)
-    AH1_2nd_1:bin_000034 (119/313)
-    AH1_2nd_1:bin_000039 (120/313)
-    AH1_2nd_1:bin_000048 (121/313)
-    AH1_2nd_20:bin_000002 (122/313)
-    AH1_2nd_20:bin_000003 (123/313)
-    AH1_2nd_20:bin_000004 (124/313)
-    AH1_2nd_20:bin_000006 (125/313)
-    AH1_2nd_20:bin_000008 (126/313)
-    AH1_2nd_20:bin_000009 (127/313)
-    AH1_2nd_20:bin_000014 (128/313)
-    AH1_2nd_20:bin_000016 (129/313)
-    AH1_2nd_20:bin_000024 (130/313)
-    AH1_2nd_20:bin_000025 (131/313)
-    AH1_2nd_20:bin_000027 (132/313)
-    AH1_2nd_20:bin_000031 (133/313)
-    AH1_2nd_20:bin_000037 (134/313)
-    AH1_2nd_20:bin_000040 (135/313)
-    AH1_2nd_20:bin_000041 (136/313)
-    AH1_2nd_20:bin_000042 (137/313)
-    AH1_2nd_20:bin_000046 (138/313)
-    AH1_2nd_20:bin_000053 (139/313)
-    AH1_2nd_20:bin_000054 (140/313)
-    AH1_2nd_20:bin_000061 (141/313)
-    AH1_2nd_20:bin_000073 (142/313)
-    AH1_2nd_20:bin_000075 (143/313)
-    AH1_2nd_20:bin_000087 (144/313)
-    AH1_2nd_20:bin_000089 (145/313)
-    AH1_2nd_2:bin_000001 (146/313)
-    AH1_2nd_2:bin_000003 (147/313)
-    AH1_2nd_2:bin_000017 (148/313)
-    AH1_2nd_2:bin_000018 (149/313)
-    AH1_2nd_2:bin_000034 (150/313)
-    AH1_2nd_5:bin_000001 (151/313)
-    AH1_2nd_5:bin_000002 (152/313)
-    AH1_2nd_5:bin_000004 (153/313)
-    AH1_2nd_5:bin_000005 (154/313)
-    AH1_2nd_5:bin_000006 (155/313)
-    AH1_2nd_5:bin_000016 (156/313)
-    AH1_2nd_5:bin_000023 (157/313)
-    AH1_2nd_5:bin_000037 (158/313)
-    AH1_2nd_5:bin_000051 (159/313)
-    AH1_2nd_5:bin_000054 (160/313)
-    AH1_2nd_5:bin_000069 (161/313)
-    AH1_2nd_5:bin_000073 (162/313)
-    AH1_2nd_6:bin_000001 (163/313)
-    AH1_2nd_6:bin_000002 (164/313)
-    AH1_2nd_6:bin_000003 (165/313)
-    AH1_2nd_6:bin_000004 (166/313)
-    AH1_2nd_6:bin_000006 (167/313)
-    AH1_2nd_6:bin_000017 (168/313)
-    AH1_2nd_6:bin_000024 (169/313)
-    AH1_2nd_6:bin_000030 (170/313)
-    AH1_2nd_6:bin_000031 (171/313)
-    AH1_2nd_6:bin_000035 (172/313)
-    AH1_2nd_6:bin_000037 (173/313)
-    AH1_2nd_6:bin_000043 (174/313)
-    AH1_2nd_6:bin_000046 (175/313)
-    AH1_2nd_6:bin_000058 (176/313)
-    AH1_2nd_6:bin_000060 (177/313)
-    AH1_2nd_6:bin_000062 (178/313)
-    AH1_2nd_7:bin_000003 (179/313)
-    AH1_2nd_7:bin_000004 (180/313)
-    AH1_2nd_7:bin_000005 (181/313)
-    AH1_2nd_7:bin_000006 (182/313)
-    AH1_2nd_7:bin_000010 (183/313)
-    AH1_2nd_7:bin_000011 (184/313)
-    AH1_2nd_7:bin_000015 (185/313)
-    AH1_2nd_7:bin_000017 (186/313)
-    AH1_2nd_7:bin_000023 (187/313)
-    AH1_2nd_7:bin_000027 (188/313)
-    AH1_2nd_7:bin_000028 (189/313)
-    AH1_2nd_7:bin_000036 (190/313)
-    AH1_2nd_7:bin_000038 (191/313)
-    AH1_2nd_7:bin_000041 (192/313)
-    AH1_2nd_7:bin_000055 (193/313)
-    AH1_2nd_7:bin_000060 (194/313)
-    AH1_2nd_7:bin_000065 (195/313)
-    AH1_2nd_7:bin_000070 (196/313)
-    AH1_2nd_8:bin_000006 (197/313)
-    AH1_2nd_8:bin_000007 (198/313)
-    AH1_2nd_8:bin_000020 (199/313)
-    AH1_2nd_8:bin_000022 (200/313)
-    AH1_2nd_8:bin_000027 (201/313)
-    AH1_2nd_8:bin_000042 (202/313)
-    AH1_2nd_8:bin_000051 (203/313)
-    AH1_2nd_8:bin_000056 (204/313)
-    AH1_2nd_9:bin_000002 (205/313)
-    AH1_2nd_9:bin_000006 (206/313)
-    AH1_2nd_9:bin_000015 (207/313)
-    AH1_2nd_9:bin_000023 (208/313)
-    AH1_2nd_9:bin_000025 (209/313)
-    AH1_2nd_9:bin_000035 (210/313)
-    AH1_2nd_9:bin_000037 (211/313)
-    AH1_2nd_9:bin_000039 (212/313)
-    AH1_2nd_9:bin_000047 (213/313)
-    AH1_2nd_9:bin_000061 (214/313)
-    LI1_2nd_10:bin_000001 (215/313)
-    LI1_2nd_10:bin_000017 (216/313)
-    LI1_2nd_10:bin_000018 (217/313)
-    LI1_2nd_10:bin_000026 (218/313)
-    LI1_2nd_1:bin_000006 (219/313)
-    LI1_2nd_1:bin_000010 (220/313)
-    LI1_2nd_1:bin_000014 (221/313)
-    LI1_2nd_1:bin_000022 (222/313)
-    LI1_2nd_1:bin_000032 (223/313)
-    LI1_2nd_1:bin_000052 (224/313)
-    LI1_2nd_1:bin_000055 (225/313)
-    LI1_2nd_2:bin_000001 (226/313)
-    LI1_2nd_2:bin_000002 (227/313)
-    LI1_2nd_2:bin_000004 (228/313)
-    LI1_2nd_2:bin_000006 (229/313)
-    LI1_2nd_2:bin_000007 (230/313)
-    LI1_2nd_2:bin_000009 (231/313)
-    LI1_2nd_2:bin_000019 (232/313)
-    LI1_2nd_2:bin_000027 (233/313)
-    LI1_2nd_2:bin_000030 (234/313)
-    LI1_2nd_2:bin_000039 (235/313)
-    LI1_2nd_2:bin_000048 (236/313)
-    LI1_2nd_3:bin_000003 (237/313)
-    LI1_2nd_3:bin_000005 (238/313)
-    LI1_2nd_3:bin_000007 (239/313)
-    LI1_2nd_3:bin_000015 (240/313)
-    LI1_2nd_3:bin_000017 (241/313)
-    LI1_2nd_4:bin_000001 (242/313)
-    LI1_2nd_4:bin_000003 (243/313)
-    LI1_2nd_4:bin_000010 (244/313)
-    LI1_2nd_4:bin_000022 (245/313)
-    LI1_2nd_4:bin_000024 (246/313)
-    LI1_2nd_4:bin_000026 (247/313)
-    LI1_2nd_4:bin_000034 (248/313)
-    LI1_2nd_4:bin_000035 (249/313)
-    LI1_2nd_4:bin_000036 (250/313)
-    LI1_2nd_4:bin_000037 (251/313)
-    LI1_2nd_4:bin_000041 (252/313)
-    LI1_2nd_4:bin_000045 (253/313)
-    LI1_2nd_4:bin_000052 (254/313)
-    LI1_2nd_4:bin_000071 (255/313)
-    LI1_2nd_5:bin_000007 (256/313)
-    LI1_2nd_5:bin_000013 (257/313)
-    LI1_2nd_5:bin_000023 (258/313)
-    LI1_2nd_5:bin_000026 (259/313)
-    LI1_2nd_5:bin_000031 (260/313)
-    LI1_2nd_5:bin_000032 (261/313)
-    LI1_2nd_5:bin_000037 (262/313)
-    LI1_2nd_5:bin_000069 (263/313)
-    LI1_2nd_6:bin_000001 (264/313)
-    LI1_2nd_7:bin_000001 (265/313)
-    LI1_2nd_7:bin_000005 (266/313)
-    LI1_2nd_7:bin_000008 (267/313)
-    LI1_2nd_7:bin_000009 (268/313)
-    LI1_2nd_7:bin_000011 (269/313)
-    LI1_2nd_7:bin_000012 (270/313)
-    LI1_2nd_7:bin_000014 (271/313)
-    LI1_2nd_7:bin_000016 (272/313)
-    LI1_2nd_7:bin_000019 (273/313)
-    LI1_2nd_7:bin_000020 (274/313)
-    LI1_2nd_7:bin_000033 (275/313)
-    LI1_2nd_7:bin_000038 (276/313)
-    LI1_2nd_7:bin_000040 (277/313)
-    LI1_2nd_7:bin_000042 (278/313)
-    LI1_2nd_7:bin_000045 (279/313)
-    LI1_2nd_7:bin_000051 (280/313)
-    LI1_2nd_7:bin_000053 (281/313)
-    LI1_2nd_7:bin_000056 (282/313)
-    LI1_2nd_7:bin_000058 (283/313)
-    LI1_2nd_7:bin_000060 (284/313)
-    LI1_2nd_7:bin_000064 (285/313)
-    LI1_2nd_7:bin_000070 (286/313)
-    LI1_2nd_7:bin_000074 (287/313)
-    LI1_2nd_7:bin_000078 (288/313)
-    LI1_2nd_7:bin_000083 (289/313)
-    LI1_2nd_8:bin_000001 (290/313)
-    LI1_2nd_8:bin_000006 (291/313)
-    LI1_2nd_8:bin_000013 (292/313)
-    LI1_2nd_8:bin_000016 (293/313)
-    LI1_2nd_8:bin_000019 (294/313)
-    LI1_2nd_8:bin_000030 (295/313)
-    LI1_2nd_8:bin_000033 (296/313)
-    LI1_2nd_8:bin_000035 (297/313)
-    LI1_2nd_8:bin_000038 (298/313)
-    LI1_2nd_8:bin_000044 (299/313)
-    LI1_2nd_8:bin_000045 (300/313)
-    LI1_2nd_8:bin_000047 (301/313)
-    LI1_2nd_8:bin_000048 (302/313)
-    LI1_2nd_8:bin_000064 (303/313)
-    LI1_2nd_8:bin_000065 (304/313)
-    LI1_2nd_8:bin_000070 (305/313)
-    LI1_2nd_8:bin_000077 (306/313)
-    LI1_2nd_8:bin_000079 (307/313)
-    LI1_2nd_9:bin_000002 (308/313)
-    LI1_2nd_9:bin_000004 (309/313)
-    LI1_2nd_9:bin_000007 (310/313)
-    LI1_2nd_9:bin_000022 (311/313)
-    LI1_2nd_9:bin_000023 (312/313)
-    LI1_2nd_9:bin_000032 (313/313)
-
-Identifiers in the annotation table: 764 
-Identifiers in the database: 1547 
-Identifiers in both: 69 
-Percentage of annotation table identifiers used for distillation: 9.03%
-Percentage of database identifiers used for distillation: 4.46%</code></pre>
 </div>
 </div>
 <div id="load-data-statistics" class="section level2 hasAnchor" number="2.4">
 <h2><span class="header-section-number">2.4</span> Load data statistics<a href="prepare-data.html#load-data-statistics" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <div id="raw-reads" class="section level3 hasAnchor" number="2.4.1">
 <h3><span class="header-section-number">2.4.1</span> Raw reads<a href="prepare-data.html#raw-reads" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r script-source"><code class="sourceCode r"><span id="cb18-1"><a href="prepare-data.html#cb18-1" tabindex="-1"></a>raw_reads <span class="ot">&lt;-</span></span>
-<span id="cb18-2"><a href="prepare-data.html#cb18-2" tabindex="-1"></a>  <span class="st">&quot;data/multiqc_general_stats.txt&quot;</span> <span class="sc">%&gt;%</span></span>
-<span id="cb18-3"><a href="prepare-data.html#cb18-3" tabindex="-1"></a>  <span class="fu">read_tsv</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb18-4"><a href="prepare-data.html#cb18-4" tabindex="-1"></a>  <span class="fu">select</span>(</span>
-<span id="cb18-5"><a href="prepare-data.html#cb18-5" tabindex="-1"></a>    <span class="at">sample =</span> Sample,</span>
-<span id="cb18-6"><a href="prepare-data.html#cb18-6" tabindex="-1"></a>    <span class="at">raw_reads =</span> <span class="st">`</span><span class="at">total_sequences</span><span class="st">`</span></span>
-<span id="cb18-7"><a href="prepare-data.html#cb18-7" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb18-8"><a href="prepare-data.html#cb18-8" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb18-9"><a href="prepare-data.html#cb18-9" tabindex="-1"></a>    <span class="at">sample =</span> sample <span class="sc">%&gt;%</span> <span class="fu">str_remove_all</span>(<span class="st">&quot;_1$&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">str_remove_all</span>(<span class="st">&quot;_2$&quot;</span>)</span>
-<span id="cb18-10"><a href="prepare-data.html#cb18-10" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb18-11"><a href="prepare-data.html#cb18-11" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">raw_reads =</span> <span class="fu">sum</span>(raw_reads), <span class="at">.by =</span> sample)</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r script-source"><code class="sourceCode r"><span id="cb17-1"><a href="prepare-data.html#cb17-1" tabindex="-1"></a>raw_reads <span class="ot">&lt;-</span></span>
+<span id="cb17-2"><a href="prepare-data.html#cb17-2" tabindex="-1"></a>  <span class="st">&quot;data/multiqc_general_stats.txt&quot;</span> <span class="sc">%&gt;%</span></span>
+<span id="cb17-3"><a href="prepare-data.html#cb17-3" tabindex="-1"></a>  <span class="fu">read_tsv</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb17-4"><a href="prepare-data.html#cb17-4" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb17-5"><a href="prepare-data.html#cb17-5" tabindex="-1"></a>    <span class="at">sample =</span> Sample,</span>
+<span id="cb17-6"><a href="prepare-data.html#cb17-6" tabindex="-1"></a>    <span class="at">raw_reads =</span> <span class="st">`</span><span class="at">total_sequences</span><span class="st">`</span></span>
+<span id="cb17-7"><a href="prepare-data.html#cb17-7" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb17-8"><a href="prepare-data.html#cb17-8" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb17-9"><a href="prepare-data.html#cb17-9" tabindex="-1"></a>    <span class="at">sample =</span> sample <span class="sc">%&gt;%</span> <span class="fu">str_remove_all</span>(<span class="st">&quot;_1$&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">str_remove_all</span>(<span class="st">&quot;_2$&quot;</span>)</span>
+<span id="cb17-10"><a href="prepare-data.html#cb17-10" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb17-11"><a href="prepare-data.html#cb17-11" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">raw_reads =</span> <span class="fu">sum</span>(raw_reads), <span class="at">.by =</span> sample)</span></code></pre></div>
 </div>
 <div id="quality-filtered-reads" class="section level3 hasAnchor" number="2.4.2">
 <h3><span class="header-section-number">2.4.2</span> Quality-filtered reads<a href="prepare-data.html#quality-filtered-reads" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r script-source"><code class="sourceCode r"><span id="cb19-1"><a href="prepare-data.html#cb19-1" tabindex="-1"></a>fastp_reads <span class="ot">&lt;-</span></span>
-<span id="cb19-2"><a href="prepare-data.html#cb19-2" tabindex="-1"></a>  <span class="st">&quot;data/multiqc_general_stats.txt&quot;</span> <span class="sc">%&gt;%</span></span>
-<span id="cb19-3"><a href="prepare-data.html#cb19-3" tabindex="-1"></a>  <span class="fu">read_tsv</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb19-4"><a href="prepare-data.html#cb19-4" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(Sample, <span class="st">&quot;fastp&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb19-5"><a href="prepare-data.html#cb19-5" tabindex="-1"></a>  <span class="fu">select</span>(</span>
-<span id="cb19-6"><a href="prepare-data.html#cb19-6" tabindex="-1"></a>    <span class="at">sample =</span> Sample,</span>
-<span id="cb19-7"><a href="prepare-data.html#cb19-7" tabindex="-1"></a>    <span class="at">trimmed_reads =</span> <span class="st">`</span><span class="at">total_sequences</span><span class="st">`</span></span>
-<span id="cb19-8"><a href="prepare-data.html#cb19-8" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb19-9"><a href="prepare-data.html#cb19-9" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb19-10"><a href="prepare-data.html#cb19-10" tabindex="-1"></a>    <span class="at">sample =</span></span>
-<span id="cb19-11"><a href="prepare-data.html#cb19-11" tabindex="-1"></a>      sample <span class="sc">%&gt;%</span></span>
-<span id="cb19-12"><a href="prepare-data.html#cb19-12" tabindex="-1"></a>        <span class="fu">str_remove_all</span>(<span class="st">&quot;_[u12]+$&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb19-13"><a href="prepare-data.html#cb19-13" tabindex="-1"></a>        <span class="fu">str_remove_all</span>(<span class="st">&quot;^fastp </span><span class="sc">\\</span><span class="st">| &quot;</span>)</span>
-<span id="cb19-14"><a href="prepare-data.html#cb19-14" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb19-15"><a href="prepare-data.html#cb19-15" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">trimmed_reads =</span> <span class="fu">sum</span>(trimmed_reads), <span class="at">.by =</span> sample)</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r script-source"><code class="sourceCode r"><span id="cb18-1"><a href="prepare-data.html#cb18-1" tabindex="-1"></a>fastp_reads <span class="ot">&lt;-</span></span>
+<span id="cb18-2"><a href="prepare-data.html#cb18-2" tabindex="-1"></a>  <span class="st">&quot;data/multiqc_general_stats.txt&quot;</span> <span class="sc">%&gt;%</span></span>
+<span id="cb18-3"><a href="prepare-data.html#cb18-3" tabindex="-1"></a>  <span class="fu">read_tsv</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb18-4"><a href="prepare-data.html#cb18-4" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">str_detect</span>(Sample, <span class="st">&quot;fastp&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb18-5"><a href="prepare-data.html#cb18-5" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb18-6"><a href="prepare-data.html#cb18-6" tabindex="-1"></a>    <span class="at">sample =</span> Sample,</span>
+<span id="cb18-7"><a href="prepare-data.html#cb18-7" tabindex="-1"></a>    <span class="at">trimmed_reads =</span> <span class="st">`</span><span class="at">total_sequences</span><span class="st">`</span></span>
+<span id="cb18-8"><a href="prepare-data.html#cb18-8" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb18-9"><a href="prepare-data.html#cb18-9" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb18-10"><a href="prepare-data.html#cb18-10" tabindex="-1"></a>    <span class="at">sample =</span></span>
+<span id="cb18-11"><a href="prepare-data.html#cb18-11" tabindex="-1"></a>      sample <span class="sc">%&gt;%</span></span>
+<span id="cb18-12"><a href="prepare-data.html#cb18-12" tabindex="-1"></a>        <span class="fu">str_remove_all</span>(<span class="st">&quot;_[u12]+$&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb18-13"><a href="prepare-data.html#cb18-13" tabindex="-1"></a>        <span class="fu">str_remove_all</span>(<span class="st">&quot;^fastp </span><span class="sc">\\</span><span class="st">| &quot;</span>)</span>
+<span id="cb18-14"><a href="prepare-data.html#cb18-14" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb18-15"><a href="prepare-data.html#cb18-15" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">trimmed_reads =</span> <span class="fu">sum</span>(trimmed_reads), <span class="at">.by =</span> sample)</span></code></pre></div>
 </div>
 <div id="host-mapped-reads" class="section level3 hasAnchor" number="2.4.3">
 <h3><span class="header-section-number">2.4.3</span> Host-mapped reads<a href="prepare-data.html#host-mapped-reads" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r script-source"><code class="sourceCode r"><span id="cb20-1"><a href="prepare-data.html#cb20-1" tabindex="-1"></a>host_mapped <span class="ot">&lt;-</span></span>
-<span id="cb20-2"><a href="prepare-data.html#cb20-2" tabindex="-1"></a>  <span class="st">&quot;data/multiqc_general_stats.txt&quot;</span> <span class="sc">%&gt;%</span></span>
-<span id="cb20-3"><a href="prepare-data.html#cb20-3" tabindex="-1"></a>  <span class="fu">read_tsv</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb20-4"><a href="prepare-data.html#cb20-4" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">str_detect</span>(Sample, <span class="st">&quot;fastp&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb20-5"><a href="prepare-data.html#cb20-5" tabindex="-1"></a>  <span class="fu">select</span>(</span>
-<span id="cb20-6"><a href="prepare-data.html#cb20-6" tabindex="-1"></a>    <span class="at">sample =</span> Sample,</span>
-<span id="cb20-7"><a href="prepare-data.html#cb20-7" tabindex="-1"></a>    <span class="at">host_mapped =</span> <span class="st">`</span><span class="at">reads_mapped</span><span class="st">`</span>,</span>
-<span id="cb20-8"><a href="prepare-data.html#cb20-8" tabindex="-1"></a>    <span class="at">mapping_total =</span> <span class="st">`</span><span class="at">raw_total_sequences</span><span class="st">`</span></span>
-<span id="cb20-9"><a href="prepare-data.html#cb20-9" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb20-10"><a href="prepare-data.html#cb20-10" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb20-11"><a href="prepare-data.html#cb20-11" tabindex="-1"></a>    <span class="at">host_unmapped =</span> mapping_total <span class="sc">-</span> host_mapped</span>
-<span id="cb20-12"><a href="prepare-data.html#cb20-12" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb20-13"><a href="prepare-data.html#cb20-13" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(host_mapped)) <span class="sc">%&gt;%</span></span>
-<span id="cb20-14"><a href="prepare-data.html#cb20-14" tabindex="-1"></a>  <span class="fu">separate</span>(</span>
-<span id="cb20-15"><a href="prepare-data.html#cb20-15" tabindex="-1"></a>    <span class="at">col =</span> sample,</span>
-<span id="cb20-16"><a href="prepare-data.html#cb20-16" tabindex="-1"></a>    <span class="at">into =</span> <span class="fu">c</span>(<span class="st">&quot;host_name&quot;</span>, <span class="st">&quot;sample&quot;</span>),</span>
-<span id="cb20-17"><a href="prepare-data.html#cb20-17" tabindex="-1"></a>    <span class="at">sep =</span> <span class="st">&quot; </span><span class="sc">\\</span><span class="st">| &quot;</span></span>
-<span id="cb20-18"><a href="prepare-data.html#cb20-18" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb20-19"><a href="prepare-data.html#cb20-19" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">mapped =</span> host_mapped, <span class="at">unmapped =</span> host_unmapped) <span class="sc">%&gt;%</span></span>
-<span id="cb20-20"><a href="prepare-data.html#cb20-20" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>mapping_total) <span class="sc">%&gt;%</span></span>
-<span id="cb20-21"><a href="prepare-data.html#cb20-21" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>host_name<span class="sc">:-</span>sample) <span class="sc">%&gt;%</span></span>
-<span id="cb20-22"><a href="prepare-data.html#cb20-22" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb20-23"><a href="prepare-data.html#cb20-23" tabindex="-1"></a>    <span class="at">name =</span> <span class="fu">str_glue</span>(<span class="st">&quot;{name}_{host_name}&quot;</span>)</span>
-<span id="cb20-24"><a href="prepare-data.html#cb20-24" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb20-25"><a href="prepare-data.html#cb20-25" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>host_name) <span class="sc">%&gt;%</span></span>
-<span id="cb20-26"><a href="prepare-data.html#cb20-26" tabindex="-1"></a>  <span class="fu">pivot_wider</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r script-source"><code class="sourceCode r"><span id="cb19-1"><a href="prepare-data.html#cb19-1" tabindex="-1"></a>host_mapped <span class="ot">&lt;-</span></span>
+<span id="cb19-2"><a href="prepare-data.html#cb19-2" tabindex="-1"></a>  <span class="st">&quot;data/multiqc_general_stats.txt&quot;</span> <span class="sc">%&gt;%</span></span>
+<span id="cb19-3"><a href="prepare-data.html#cb19-3" tabindex="-1"></a>  <span class="fu">read_tsv</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb19-4"><a href="prepare-data.html#cb19-4" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">str_detect</span>(Sample, <span class="st">&quot;fastp&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb19-5"><a href="prepare-data.html#cb19-5" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb19-6"><a href="prepare-data.html#cb19-6" tabindex="-1"></a>    <span class="at">sample =</span> Sample,</span>
+<span id="cb19-7"><a href="prepare-data.html#cb19-7" tabindex="-1"></a>    <span class="at">host_mapped =</span> <span class="st">`</span><span class="at">reads_mapped</span><span class="st">`</span>,</span>
+<span id="cb19-8"><a href="prepare-data.html#cb19-8" tabindex="-1"></a>    <span class="at">mapping_total =</span> <span class="st">`</span><span class="at">raw_total_sequences</span><span class="st">`</span></span>
+<span id="cb19-9"><a href="prepare-data.html#cb19-9" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb19-10"><a href="prepare-data.html#cb19-10" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb19-11"><a href="prepare-data.html#cb19-11" tabindex="-1"></a>    <span class="at">host_unmapped =</span> mapping_total <span class="sc">-</span> host_mapped</span>
+<span id="cb19-12"><a href="prepare-data.html#cb19-12" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb19-13"><a href="prepare-data.html#cb19-13" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(host_mapped)) <span class="sc">%&gt;%</span></span>
+<span id="cb19-14"><a href="prepare-data.html#cb19-14" tabindex="-1"></a>  <span class="fu">separate</span>(</span>
+<span id="cb19-15"><a href="prepare-data.html#cb19-15" tabindex="-1"></a>    <span class="at">col =</span> sample,</span>
+<span id="cb19-16"><a href="prepare-data.html#cb19-16" tabindex="-1"></a>    <span class="at">into =</span> <span class="fu">c</span>(<span class="st">&quot;host_name&quot;</span>, <span class="st">&quot;sample&quot;</span>),</span>
+<span id="cb19-17"><a href="prepare-data.html#cb19-17" tabindex="-1"></a>    <span class="at">sep =</span> <span class="st">&quot; </span><span class="sc">\\</span><span class="st">| &quot;</span></span>
+<span id="cb19-18"><a href="prepare-data.html#cb19-18" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb19-19"><a href="prepare-data.html#cb19-19" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">mapped =</span> host_mapped, <span class="at">unmapped =</span> host_unmapped) <span class="sc">%&gt;%</span></span>
+<span id="cb19-20"><a href="prepare-data.html#cb19-20" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>mapping_total) <span class="sc">%&gt;%</span></span>
+<span id="cb19-21"><a href="prepare-data.html#cb19-21" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>host_name<span class="sc">:-</span>sample) <span class="sc">%&gt;%</span></span>
+<span id="cb19-22"><a href="prepare-data.html#cb19-22" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb19-23"><a href="prepare-data.html#cb19-23" tabindex="-1"></a>    <span class="at">name =</span> <span class="fu">str_glue</span>(<span class="st">&quot;{name}_{host_name}&quot;</span>)</span>
+<span id="cb19-24"><a href="prepare-data.html#cb19-24" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb19-25"><a href="prepare-data.html#cb19-25" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>host_name) <span class="sc">%&gt;%</span></span>
+<span id="cb19-26"><a href="prepare-data.html#cb19-26" tabindex="-1"></a>  <span class="fu">pivot_wider</span>()</span></code></pre></div>
 </div>
-<div id="prokaryotic-fraction-mising-not-done-by-the-server" class="section level3 hasAnchor" number="2.4.4">
-<h3><span class="header-section-number">2.4.4</span> Prokaryotic fraction (mising, not done by the server)<a href="prepare-data.html#prokaryotic-fraction-mising-not-done-by-the-server" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r script-source"><code class="sourceCode r"><span id="cb21-1"><a href="prepare-data.html#cb21-1" tabindex="-1"></a><span class="co">#singlem &lt;-</span></span>
-<span id="cb21-2"><a href="prepare-data.html#cb21-2" tabindex="-1"></a>  <span class="co">#&quot;data/microbial_fraction.tsv&quot; %&gt;%</span></span>
-<span id="cb21-3"><a href="prepare-data.html#cb21-3" tabindex="-1"></a>  <span class="co">#read_tsv() %&gt;%</span></span>
-<span id="cb21-4"><a href="prepare-data.html#cb21-4" tabindex="-1"></a>  <span class="co">#distinct() %&gt;%</span></span>
-<span id="cb21-5"><a href="prepare-data.html#cb21-5" tabindex="-1"></a>  <span class="co">#mutate(</span></span>
-<span id="cb21-6"><a href="prepare-data.html#cb21-6" tabindex="-1"></a>    <span class="co">#sample = sample %&gt;% str_remove_all(&quot;_1$&quot;),</span></span>
-<span id="cb21-7"><a href="prepare-data.html#cb21-7" tabindex="-1"></a>    <span class="co">#read_fraction = read_fraction %&gt;% str_remove(&quot;%&quot;) %&gt;% as.numeric(),</span></span>
-<span id="cb21-8"><a href="prepare-data.html#cb21-8" tabindex="-1"></a>    <span class="co">#read_fraction = read_fraction / 100</span></span>
-<span id="cb21-9"><a href="prepare-data.html#cb21-9" tabindex="-1"></a>  <span class="co">#) %&gt;%</span></span>
-<span id="cb21-10"><a href="prepare-data.html#cb21-10" tabindex="-1"></a>  <span class="co">#select(</span></span>
-<span id="cb21-11"><a href="prepare-data.html#cb21-11" tabindex="-1"></a>    <span class="co">#sample,</span></span>
-<span id="cb21-12"><a href="prepare-data.html#cb21-12" tabindex="-1"></a>    <span class="co">#singlem_prokaryotic_bases = bacterial_archaeal_bases,</span></span>
-<span id="cb21-13"><a href="prepare-data.html#cb21-13" tabindex="-1"></a>    <span class="co">#singlem_metagenome_size = metagenome_size,</span></span>
-<span id="cb21-14"><a href="prepare-data.html#cb21-14" tabindex="-1"></a>    <span class="co">#singlem_read_fraction = read_fraction,</span></span>
-<span id="cb21-15"><a href="prepare-data.html#cb21-15" tabindex="-1"></a>  <span class="co">#)</span></span></code></pre></div>
+<div id="prokaryotic-fraction-missing-not-done-by-the-server" class="section level3 hasAnchor" number="2.4.4">
+<h3><span class="header-section-number">2.4.4</span> Prokaryotic fraction (missing, not done by the server)<a href="prepare-data.html#prokaryotic-fraction-missing-not-done-by-the-server" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r script-source"><code class="sourceCode r"><span id="cb20-1"><a href="prepare-data.html#cb20-1" tabindex="-1"></a><span class="co">#singlem &lt;-</span></span>
+<span id="cb20-2"><a href="prepare-data.html#cb20-2" tabindex="-1"></a>  <span class="co">#&quot;data/microbial_fraction.tsv&quot; %&gt;%</span></span>
+<span id="cb20-3"><a href="prepare-data.html#cb20-3" tabindex="-1"></a>  <span class="co">#read_tsv() %&gt;%</span></span>
+<span id="cb20-4"><a href="prepare-data.html#cb20-4" tabindex="-1"></a>  <span class="co">#distinct() %&gt;%</span></span>
+<span id="cb20-5"><a href="prepare-data.html#cb20-5" tabindex="-1"></a>  <span class="co">#mutate(</span></span>
+<span id="cb20-6"><a href="prepare-data.html#cb20-6" tabindex="-1"></a>    <span class="co">#sample = sample %&gt;% str_remove_all(&quot;_1$&quot;),</span></span>
+<span id="cb20-7"><a href="prepare-data.html#cb20-7" tabindex="-1"></a>    <span class="co">#read_fraction = read_fraction %&gt;% str_remove(&quot;%&quot;) %&gt;% as.numeric(),</span></span>
+<span id="cb20-8"><a href="prepare-data.html#cb20-8" tabindex="-1"></a>    <span class="co">#read_fraction = read_fraction / 100</span></span>
+<span id="cb20-9"><a href="prepare-data.html#cb20-9" tabindex="-1"></a>  <span class="co">#) %&gt;%</span></span>
+<span id="cb20-10"><a href="prepare-data.html#cb20-10" tabindex="-1"></a>  <span class="co">#select(</span></span>
+<span id="cb20-11"><a href="prepare-data.html#cb20-11" tabindex="-1"></a>    <span class="co">#sample,</span></span>
+<span id="cb20-12"><a href="prepare-data.html#cb20-12" tabindex="-1"></a>    <span class="co">#singlem_prokaryotic_bases = bacterial_archaeal_bases,</span></span>
+<span id="cb20-13"><a href="prepare-data.html#cb20-13" tabindex="-1"></a>    <span class="co">#singlem_metagenome_size = metagenome_size,</span></span>
+<span id="cb20-14"><a href="prepare-data.html#cb20-14" tabindex="-1"></a>    <span class="co">#singlem_read_fraction = read_fraction,</span></span>
+<span id="cb20-15"><a href="prepare-data.html#cb20-15" tabindex="-1"></a>  <span class="co">#)</span></span></code></pre></div>
 </div>
 <div id="mag-mapped-reads" class="section level3 hasAnchor" number="2.4.5">
 <h3><span class="header-section-number">2.4.5</span> MAG-mapped reads<a href="prepare-data.html#mag-mapped-reads" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r script-source"><code class="sourceCode r"><span id="cb22-1"><a href="prepare-data.html#cb22-1" tabindex="-1"></a>mag_mapping <span class="ot">&lt;-</span></span>
-<span id="cb22-2"><a href="prepare-data.html#cb22-2" tabindex="-1"></a>  <span class="fu">read_tsv</span>(<span class="st">&quot;data/contig.count.tsv.xz&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb22-3"><a href="prepare-data.html#cb22-3" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>sequence_id) <span class="sc">%&gt;%</span></span>
-<span id="cb22-4"><a href="prepare-data.html#cb22-4" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">value =</span> <span class="fu">sum</span>(value), <span class="at">.by =</span> <span class="st">&quot;name&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb22-5"><a href="prepare-data.html#cb22-5" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">sample =</span> name, <span class="at">mapped_mags =</span> value)</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r script-source"><code class="sourceCode r"><span id="cb21-1"><a href="prepare-data.html#cb21-1" tabindex="-1"></a>mag_mapping <span class="ot">&lt;-</span></span>
+<span id="cb21-2"><a href="prepare-data.html#cb21-2" tabindex="-1"></a>  <span class="fu">read_tsv</span>(<span class="st">&quot;data/contig.count.tsv.xz&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb21-3"><a href="prepare-data.html#cb21-3" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="sc">-</span>sequence_id) <span class="sc">%&gt;%</span></span>
+<span id="cb21-4"><a href="prepare-data.html#cb21-4" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">value =</span> <span class="fu">sum</span>(value), <span class="at">.by =</span> <span class="st">&quot;name&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb21-5"><a href="prepare-data.html#cb21-5" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">sample =</span> name, <span class="at">mapped_mags =</span> value)</span></code></pre></div>
 </div>
 <div id="wrap-data-statistics" class="section level3 hasAnchor" number="2.4.6">
 <h3><span class="header-section-number">2.4.6</span> Wrap data statistics<a href="prepare-data.html#wrap-data-statistics" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r script-source"><code class="sourceCode r"><span id="cb23-1"><a href="prepare-data.html#cb23-1" tabindex="-1"></a>data_stats <span class="ot">&lt;-</span> raw_reads <span class="sc">%&gt;%</span></span>
-<span id="cb23-2"><a href="prepare-data.html#cb23-2" tabindex="-1"></a>  <span class="fu">left_join</span>(fastp_reads) <span class="sc">%&gt;%</span></span>
-<span id="cb23-3"><a href="prepare-data.html#cb23-3" tabindex="-1"></a>  <span class="fu">left_join</span>(host_mapped) <span class="sc">%&gt;%</span></span>
-<span id="cb23-4"><a href="prepare-data.html#cb23-4" tabindex="-1"></a>  <span class="co">#left_join(singlem) %&gt;% #try to create this file</span></span>
-<span id="cb23-5"><a href="prepare-data.html#cb23-5" tabindex="-1"></a>  <span class="fu">left_join</span>(mag_mapping)</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r script-source"><code class="sourceCode r"><span id="cb22-1"><a href="prepare-data.html#cb22-1" tabindex="-1"></a>data_stats <span class="ot">&lt;-</span> raw_reads <span class="sc">%&gt;%</span></span>
+<span id="cb22-2"><a href="prepare-data.html#cb22-2" tabindex="-1"></a>  <span class="fu">left_join</span>(fastp_reads) <span class="sc">%&gt;%</span></span>
+<span id="cb22-3"><a href="prepare-data.html#cb22-3" tabindex="-1"></a>  <span class="fu">left_join</span>(host_mapped) <span class="sc">%&gt;%</span></span>
+<span id="cb22-4"><a href="prepare-data.html#cb22-4" tabindex="-1"></a>  <span class="co">#left_join(singlem) %&gt;% #try to create this file</span></span>
+<span id="cb22-5"><a href="prepare-data.html#cb22-5" tabindex="-1"></a>  <span class="fu">left_join</span>(mag_mapping)</span></code></pre></div>
 </div>
 </div>
 <div id="prepare-color-scheme" class="section level2 hasAnchor" number="2.5">
 <h2><span class="header-section-number">2.5</span> Prepare color scheme<a href="prepare-data.html#prepare-color-scheme" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p><a href="www.alberdilab.dk">AlberdiLab</a> projects use unified color schemes developed for the <a href="www.earthhologenome.org">Earth Hologenome Initiative</a>, to facilitate figure interpretation.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r script-source"><code class="sourceCode r"><span id="cb24-1"><a href="prepare-data.html#cb24-1" tabindex="-1"></a>phylum_colors <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">&quot;https://raw.githubusercontent.com/earthhologenome/EHI_taxonomy_colour/main/ehi_phylum_colors.tsv&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb24-2"><a href="prepare-data.html#cb24-2" tabindex="-1"></a>    <span class="fu">right_join</span>(genome_metadata, <span class="at">by=</span><span class="fu">join_by</span>(phylum <span class="sc">==</span> phylum)) <span class="sc">%&gt;%</span></span>
-<span id="cb24-3"><a href="prepare-data.html#cb24-3" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="fu">match</span>(genome, genome_tree<span class="sc">$</span>tip.label)) <span class="sc">%&gt;%</span></span>
-<span id="cb24-4"><a href="prepare-data.html#cb24-4" tabindex="-1"></a>    <span class="fu">select</span>(phylum, colors) <span class="sc">%&gt;%</span> </span>
-<span id="cb24-5"><a href="prepare-data.html#cb24-5" tabindex="-1"></a>    <span class="fu">unique</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb24-6"><a href="prepare-data.html#cb24-6" tabindex="-1"></a>    <span class="fu">arrange</span>(phylum) <span class="sc">%&gt;%</span></span>
-<span id="cb24-7"><a href="prepare-data.html#cb24-7" tabindex="-1"></a>    <span class="fu">pull</span>(colors, <span class="at">name=</span>phylum)</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r script-source"><code class="sourceCode r"><span id="cb23-1"><a href="prepare-data.html#cb23-1" tabindex="-1"></a>phylum_colors <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">&quot;https://raw.githubusercontent.com/earthhologenome/EHI_taxonomy_colour/main/ehi_phylum_colors.tsv&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb23-2"><a href="prepare-data.html#cb23-2" tabindex="-1"></a>    <span class="fu">right_join</span>(genome_metadata, <span class="at">by=</span><span class="fu">join_by</span>(phylum <span class="sc">==</span> phylum)) <span class="sc">%&gt;%</span></span>
+<span id="cb23-3"><a href="prepare-data.html#cb23-3" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="fu">match</span>(genome, genome_tree<span class="sc">$</span>tip.label)) <span class="sc">%&gt;%</span></span>
+<span id="cb23-4"><a href="prepare-data.html#cb23-4" tabindex="-1"></a>    <span class="fu">select</span>(phylum, colors) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-5"><a href="prepare-data.html#cb23-5" tabindex="-1"></a>    <span class="fu">unique</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb23-6"><a href="prepare-data.html#cb23-6" tabindex="-1"></a>    <span class="fu">arrange</span>(phylum) <span class="sc">%&gt;%</span></span>
+<span id="cb23-7"><a href="prepare-data.html#cb23-7" tabindex="-1"></a>    <span class="fu">pull</span>(colors, <span class="at">name=</span>phylum)</span></code></pre></div>
 </div>
 <div id="wrap-working-objects" class="section level2 hasAnchor" number="2.6">
 <h2><span class="header-section-number">2.6</span> Wrap working objects<a href="prepare-data.html#wrap-working-objects" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>All working objects are wrapped into a single Rdata object to facilitate downstream usage.</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r script-source"><code class="sourceCode r"><span id="cb25-1"><a href="prepare-data.html#cb25-1" tabindex="-1"></a><span class="fu">save</span>(sample_metadata, </span>
-<span id="cb25-2"><a href="prepare-data.html#cb25-2" tabindex="-1"></a>     genome_metadata, </span>
-<span id="cb25-3"><a href="prepare-data.html#cb25-3" tabindex="-1"></a>     read_counts, </span>
-<span id="cb25-4"><a href="prepare-data.html#cb25-4" tabindex="-1"></a>     genome_counts, </span>
-<span id="cb25-5"><a href="prepare-data.html#cb25-5" tabindex="-1"></a>     genome_counts_filt, </span>
-<span id="cb25-6"><a href="prepare-data.html#cb25-6" tabindex="-1"></a>     genome_tree,</span>
-<span id="cb25-7"><a href="prepare-data.html#cb25-7" tabindex="-1"></a>     genome_gifts, </span>
-<span id="cb25-8"><a href="prepare-data.html#cb25-8" tabindex="-1"></a>     phylum_colors,</span>
-<span id="cb25-9"><a href="prepare-data.html#cb25-9" tabindex="-1"></a>     data_stats,</span>
-<span id="cb25-10"><a href="prepare-data.html#cb25-10" tabindex="-1"></a>     <span class="at">file =</span> <span class="st">&quot;data/data.Rdata&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r script-source"><code class="sourceCode r"><span id="cb24-1"><a href="prepare-data.html#cb24-1" tabindex="-1"></a><span class="fu">save</span>(sample_metadata, </span>
+<span id="cb24-2"><a href="prepare-data.html#cb24-2" tabindex="-1"></a>     genome_metadata, </span>
+<span id="cb24-3"><a href="prepare-data.html#cb24-3" tabindex="-1"></a>     read_counts, </span>
+<span id="cb24-4"><a href="prepare-data.html#cb24-4" tabindex="-1"></a>     genome_counts, </span>
+<span id="cb24-5"><a href="prepare-data.html#cb24-5" tabindex="-1"></a>     genome_counts_filt, </span>
+<span id="cb24-6"><a href="prepare-data.html#cb24-6" tabindex="-1"></a>     genome_tree,</span>
+<span id="cb24-7"><a href="prepare-data.html#cb24-7" tabindex="-1"></a>     genome_gifts, </span>
+<span id="cb24-8"><a href="prepare-data.html#cb24-8" tabindex="-1"></a>     phylum_colors,</span>
+<span id="cb24-9"><a href="prepare-data.html#cb24-9" tabindex="-1"></a>     data_stats,</span>
+<span id="cb24-10"><a href="prepare-data.html#cb24-10" tabindex="-1"></a>     <span class="at">file =</span> <span class="st">&quot;data/data.Rdata&quot;</span>)</span></code></pre></div>
 
 </div>
 </div>
