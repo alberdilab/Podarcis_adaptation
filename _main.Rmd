@@ -218,7 +218,7 @@ genome_coverage <- genome_hits %>%
 
 ## Filtering
 
-Four samples are removed from the analysis due to their low sequencing depth.
+5 samples are removed from the analysis due to their low sequencing depth.
 
 ```{r filterging, echo=TRUE, warning=FALSE}
 #Counts_raw
@@ -228,6 +228,7 @@ read_counts <- read_counts %>%
 
 #Metadata
 sample_metadata <- sample_metadata %>%
+  filter(Tube_code != "AD16") %>%
   filter(Tube_code != "AD23") %>%
   filter(Tube_code != "AD25") %>%
   filter(Tube_code != "AD69") %>%
@@ -285,10 +286,11 @@ raw_reads <-
     sample = Sample,
     raw_reads = `total_sequences`
   ) %>%
-  mutate(
-    sample = sample %>% str_remove_all("_1$") %>% str_remove_all("_2$")
-  ) %>%
-  summarise(raw_reads = sum(raw_reads), .by = sample)
+  mutate(sample_prefix = str_extract(sample, "^[^_]+")) %>%
+  group_by(sample_prefix) %>%
+  summarize(raw_reads = sum(raw_reads, na.rm = TRUE)) %>%
+  rename(sample = sample_prefix)  %>%
+  mutate(sample = str_remove(sample, "^fastp \\|\\s*"))
 ```
 
 ### Quality-filtered reads
@@ -297,18 +299,18 @@ raw_reads <-
 fastp_reads <-
   "data/multiqc_general_stats.txt" %>%
   read_tsv() %>%
-  filter(str_detect(Sample, "fastp")) %>%
   select(
     sample = Sample,
     trimmed_reads = `total_sequences`
   ) %>%
-  mutate(
-    sample =
-      sample %>%
-        str_remove_all("_[u12]+$") %>%
-        str_remove_all("^fastp \\| ")
-  ) %>%
-  summarise(trimmed_reads = sum(trimmed_reads), .by = sample)
+  mutate(sample_prefix = str_extract(sample, "^[^_]+")) %>%
+  group_by(sample_prefix) %>%
+  summarize(trimmed_reads = sum(trimmed_reads, na.rm = TRUE)) %>%
+  rename(sample = sample_prefix) %>% 
+  filter(!str_detect(sample, "nonlizard \\|")) %>%
+  filter(!str_detect(sample, "lizard \\|")) %>%
+  filter(!str_detect(sample, "refseq500 \\|"))  %>%
+  mutate(sample = str_remove(sample, "^fastp \\|\\s*"))
 ```
 
 ### Host-mapped reads
@@ -317,7 +319,7 @@ fastp_reads <-
 host_mapped <-
   "data/multiqc_general_stats.txt" %>%
   read_tsv() %>%
-  filter(!str_detect(Sample, "fastp")) %>%
+  filter(str_detect(Sample, "lizard")) %>%
   select(
     sample = Sample,
     host_mapped = `reads_mapped`,
@@ -339,27 +341,41 @@ host_mapped <-
     name = str_glue("{name}_{host_name}")
   ) %>%
   select(-host_name) %>%
-  pivot_wider()
+  pivot_wider() %>%
+  mutate(sample = str_extract(sample, "^[^_]+")) %>%
+  group_by(sample) %>%
+  summarize(
+    mapped_lizard = sum(mapped_lizard),
+    unmapped_lizard = sum(mapped_lizard)
+  ) 
 ```
 
-### Prokaryotic fraction (missing, not done by the server)
+### Prokaryotic fraction
 
 ```{r singlem, warning=FALSE, comments="", message=FALSE}
-#singlem <-
-  #"data/microbial_fraction.tsv" %>%
-  #read_tsv() %>%
-  #distinct() %>%
-  #mutate(
-    #sample = sample %>% str_remove_all("_1$"),
-    #read_fraction = read_fraction %>% str_remove("%") %>% as.numeric(),
-    #read_fraction = read_fraction / 100
-  #) %>%
-  #select(
-    #sample,
-    #singlem_prokaryotic_bases = bacterial_archaeal_bases,
-    #singlem_metagenome_size = metagenome_size,
-    #singlem_read_fraction = read_fraction,
-  #)
+singlem <-
+  "data/singleM.tsv" %>%
+  read_tsv() %>%
+  distinct() %>%
+  mutate(
+    sample = sample %>% str_remove_all("_1$"),
+   read_fraction = read_fraction %>% str_remove("%") %>% as.numeric(),
+   read_fraction = read_fraction / 100
+  ) %>%
+  select(
+   sample,
+   singlem_prokaryotic_bases = bacterial_archaeal_bases,
+   singlem_metagenome_size = metagenome_size,
+   singlem_read_fraction = read_fraction,
+  ) %>%
+mutate(sample_prefix = str_extract(sample, "^[^_]+")) %>%
+  group_by(sample_prefix) %>%
+  summarize(
+    singlem_prokaryotic_bases = sum(singlem_prokaryotic_bases),
+    singlem_metagenome_size = sum(singlem_metagenome_size),
+    singlem_read_fraction = mean(singlem_read_fraction)
+  ) %>%
+  rename(sample = sample_prefix)
 ```
 
 ### MAG-mapped reads
@@ -369,7 +385,13 @@ mag_mapping <-
   read_tsv("data/contig.count.tsv.xz") %>%
   pivot_longer(-sequence_id) %>%
   summarise(value = sum(value), .by = "name") %>%
-  rename(sample = name, mapped_mags = value)
+  rename(sample = name, mapped_mags = value) %>%
+  mutate(sample_prefix = str_extract(sample, "^[^_]+")) %>%
+    group_by(sample_prefix) %>%
+    summarize(
+      mapped_mags = sum(mapped_mags)
+    ) %>%
+    rename(sample = sample_prefix)
 ```
 
 ### Wrap data statistics
@@ -378,8 +400,13 @@ mag_mapping <-
 data_stats <- raw_reads %>%
   left_join(fastp_reads) %>%
   left_join(host_mapped) %>%
-  #left_join(singlem) %>% #try to create this file
+  left_join(singlem) %>%
   left_join(mag_mapping)
+
+data_stats<- data_stats %>%
+  filter(!str_detect(sample, "nonlizard \\|")) %>%
+  filter(!str_detect(sample, "lizard \\|")) %>%
+  filter(!str_detect(sample, "refseq500 \\|"))
 ```
 
 ## Prepare color scheme
@@ -414,6 +441,117 @@ save(sample_metadata,
 ```
 
 <!--chapter:end:01_data_preparation.Rmd-->
+
+# Data statistics
+
+
+```{r load_data_stats}
+load("data/data.Rdata")
+```
+
+## Sequencing reads statistics
+
+```{r reads_stats}
+data_stats$raw_reads %>% sum()
+data_stats$raw_reads %>% mean()
+data_stats$raw_reads %>% sd()
+```
+
+## DNA fractions
+```{r data_fractions_stats}
+#Overall
+data_stats %>%
+    mutate(mapped_perc=mapped_mags/trimmed_reads) %>%
+    summarise(mean=mean(mapped_perc),sd=sd(mapped_perc))
+```
+
+
+```{r data_fractions_plot, message=FALSE, warning=FALSE, fig.height=6, fig.width=10, fig.fullwidth=TRUE}
+data_stats %>%
+  mutate(
+    low_quality = raw_reads - trimmed_reads,
+    unmapped_reads = trimmed_reads - mapped_lizard - mapped_mags
+  ) %>%
+  #left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
+  select(sample, low_quality, mapped_lizard, mapped_mags, unmapped_reads) %>%
+  pivot_longer(-sample) %>%
+  #pivot_longer(cols = c(low_quality, mapped_lizard, mapped_mags, unmapped_reads), 
+               #names_to = "metric", values_to = "value") %>%
+  mutate(name=factor(name,levels=c("low_quality","mapped_lizard","unmapped_reads","mapped_mags"))) %>%
+  #mutate(sample=factor(sample,levels=c("Sg1","Sg2","Sg3","Sg4","Sg5","Sg6","Sg7","Sg8","Sg9","Sg10"))) %>%
+  ggplot(aes(x = sample, y = value, fill = name)) +
+      geom_bar(stat = "identity", position = "fill") +
+      scale_fill_manual(name="Sequence type",
+                    breaks=c("low_quality","mapped_SceUnd","unmapped_reads","mapped_mags"),
+                    labels=c("Low quality","Mapped to host","Unmapped","Mapped to MAGs"),
+                    values=c("#CCCCCC", "#bcdee1", "#d8b8a3","#93655c"))+
+      #facet_wrap(~species, scales = "free") +
+      theme_minimal() +
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, size=4)) +
+      labs(y="DNA sequence fraction",x="Samples")
+```
+
+## Recovered microbial fraction
+
+```{r data_estimations_plot, message=FALSE, warning=FALSE, fig.height=6, fig.width=10, fig.fullwidth=TRUE}
+data_stats %>%
+  mutate(
+    unmapped_reads = trimmed_reads - mapped_lizard - mapped_mags,
+    mag_proportion = mapped_mags / (mapped_mags + unmapped_reads),
+    singlem_read_fraction = singlem_read_fraction
+  ) %>%
+  select(sample, mag_proportion, singlem_read_fraction) %>%
+  mutate(
+    mag_proportion = if_else(singlem_read_fraction == 0, 0, mag_proportion),
+    singlem_read_fraction = if_else(singlem_read_fraction == 0, NA, singlem_read_fraction),
+    singlem_read_fraction = if_else(singlem_read_fraction < mag_proportion, NA, singlem_read_fraction),
+    singlem_read_fraction = if_else(singlem_read_fraction > 1, 1, singlem_read_fraction)
+  ) %>%
+  pivot_longer(-sample, names_to = "proportion", values_to = "value") %>%
+  mutate(
+    proportion = factor(
+      proportion,
+      levels = c("mag_proportion", "singlem_read_fraction")
+    )
+  ) %>%
+  #separate(col = "sample", into = c("sample", "tissue"), sep = "\\.", remove = FALSE) %>%
+  #mutate(sample=factor(sample,levels=rev(c("Sg1","Sg2","Sg3","Sg4","Sg5","Sg6","Sg7","Sg8","Sg9","Sg10")))) %>%
+  ggplot(aes(x = value, y = sample, color = proportion)) +
+      geom_line(aes(group = sample), color = "#f8a538") +
+      geom_point() +
+      scale_color_manual(name="Proportion",
+                    breaks=c("mag_proportion","singlem_read_fraction"),
+                    labels=c("Recovered","Estimated"),
+                    values=c("#52e1e8", "#876b53"))+
+      #facet_wrap(tissue~., scales = "free", labeller = labeller(tissue = c(cloaca="Cloaca",feces="Feces"))) +
+      theme_minimal() +
+      labs(y = "Samples", x = "Prokaryotic fraction") +
+      scale_x_continuous(limits = c(0, 1)) +
+      theme(
+        axis.text.y = element_text(size = 4),
+        axis.text.x = element_text( angle = 90, vjust = 0.5, hjust = 1, size = 6),
+        legend.position = "right"
+      )
+```
+
+### Domain-adjusted mapping rate (DAMR)
+
+```{r damr}
+data_stats %>%
+  mutate(
+    unmapped_reads = trimmed_reads - mapped_lizard - mapped_mags,
+    mag_proportion = mapped_mags / (mapped_mags + unmapped_reads),
+    singlem_read_fraction = singlem_read_fraction
+  ) %>%
+  mutate(damr=pmin(1, mag_proportion/singlem_read_fraction)) %>%
+  left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
+  select(sample,damr, time_point, species, type) %>%
+  #group_by(type) %>%
+  #summarise(mean=mean(damr),sd=sd(damr)) %>%
+  tt()
+```
+
+<!--chapter:end:02_data_statistics.Rmd-->
 
 # MAG catalogue
 
