@@ -22,11 +22,16 @@ load-data-statistics
 raw-reads
 quality-filtered-reads
 host-mapped-reads
-prokaryotic-fraction-missing-not-done-by-the-server
+prokaryotic-fraction
 mag-mapped-reads
 wrap-data-statistics
 prepare-color-scheme
 wrap-working-objects
+data-statistics
+sequencing-reads-statistics
+dna-fractions
+recovered-microbial-fraction
+domain-adjusted-mapping-rate-damr
 mag-catalogue
 genome-phylogeny
 genome-quality-1

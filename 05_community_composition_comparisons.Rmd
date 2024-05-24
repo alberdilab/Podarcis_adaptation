@@ -577,7 +577,7 @@ adonis2(formula=beta_div_func_post1$S ~ species+type, data=post1[labels(beta_div
 		kable()
 ```
 
-```{r beta_neutral_permanova_post1_3, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+```{r beta_func_permanova_post1_3, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 pairwise<-pairwise.adonis(beta_div_func_post1$S,post1$type, perm=999)
 pairwise
 ```
@@ -730,7 +730,7 @@ pairwise
 
 ##### Phylogenetic
 
-```{r beta_phylo_permanova_post2_1, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+```{r beta_phylo_permanova_post2_3, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 betadisper(beta_div_phylo_post2$S, post2$type) %>% permutest(., pairwise = TRUE)
 ```
 
