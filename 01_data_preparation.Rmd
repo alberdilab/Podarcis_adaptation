@@ -138,7 +138,7 @@ genome_coverage <- genome_hits %>%
 
 ```{r filterging, echo=TRUE, warning=FALSE}
 #Counts_raw
-columns_to_exclude <- c("AD23", "AD25", "AD69", "AD91") # Columns to exclude
+columns_to_exclude <- c("AD16","AD23", "AD25", "AD69", "AD91") # Columns to exclude
 read_counts <- read_counts %>%
   select(-columns_to_exclude)
 
@@ -151,7 +151,7 @@ sample_metadata <- sample_metadata %>%
   filter(Tube_code != "AD91")
 
 #Coverage_table
-columns_to_exclude <- c("AD23", "AD25", "AD69", "AD91")  # Columns to exclude
+columns_to_exclude <- c("AD16", "AD23", "AD25", "AD69", "AD91")  # Columns to exclude
 genome_coverage <- genome_coverage %>%
   select(-columns_to_exclude)
 ```
