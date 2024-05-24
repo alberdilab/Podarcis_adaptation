@@ -23,7 +23,7 @@ merged_data$interaction_var <- interaction(merged_data$sample, merged_data$time_
 ggplot(merged_data, aes(x=interaction_var,y=count, fill=phylum, group=phylum)) + #grouping enables keeping the same sorting of taxonomic units
     geom_bar(stat="identity", colour="white", linewidth=0.1) + #plot stacked bars with white borders
     scale_fill_manual(values=phylum_colors) +
-    facet_nested(. ~ type,  scales="free") + #facet per day and treatment
+    facet_nested(. ~ time_point + type ,  scales="free") + #facet per day and treatment
     guides(fill = guide_legend(ncol = 1)) +
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
           axis.title.x = element_blank(),
@@ -33,8 +33,7 @@ ggplot(merged_data, aes(x=interaction_var,y=count, fill=phylum, group=phylum)) +
           panel.grid.minor = element_blank(),
           axis.line = element_line(linewidth = 0.5, linetype = "solid", colour = "black")) +
    labs(fill="Phylum",y = "Relative abundance",x="Samples")+
-  scale_x_discrete(labels = function(x) gsub(".*\\.", "", x)) +
-  facet_wrap(~type, scales = "free", labeller = as_labeller(function(label) gsub(".*\\.", "", label))) #only show time_point label
+  scale_x_discrete(labels = function(x) gsub(".*\\.", "", x))
 ```
 
 
