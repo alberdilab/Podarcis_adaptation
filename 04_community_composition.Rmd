@@ -10,6 +10,10 @@ load("data/data.Rdata")
 
 ```{r taxonomy_barplot, fig.height=8, fig.width=18, fig.fullwidth=TRUE, warning=FALSE}
 # Merge data frames based on sample
+transplants_metadata<-sample_metadata%>%
+  mutate(Tube_code=str_remove_all(Tube_code, "_a"))
+transplants_metadata$newID <- paste(transplants_metadata$Tube_code, "_", transplants_metadata$individual)
+
 merged_data<-genome_counts_filt %>%
   mutate_at(vars(-genome),~./sum(.)) %>% #apply TSS normalisation
   pivot_longer(-genome, names_to = "sample", values_to = "count") %>% #reduce to minimum number of columns
