@@ -134,11 +134,11 @@ genome_coverage <- genome_hits %>%
 
 ## Filtering
 
-5 samples are removed from the analysis due to their low sequencing depth.
+4 samples are removed from the analysis due to their low sequencing depth.
 
 ```{r filterging, echo=TRUE, warning=FALSE}
 #Counts_raw
-columns_to_exclude <- c("AD16","AD23", "AD25", "AD69", "AD91") # Columns to exclude
+columns_to_exclude <- c("AD16","AD23", "AD25", "AD91") # Columns to exclude
 read_counts <- read_counts %>%
   select(-columns_to_exclude)
 
@@ -147,11 +147,31 @@ sample_metadata <- sample_metadata %>%
   filter(Tube_code != "AD16") %>%
   filter(Tube_code != "AD23") %>%
   filter(Tube_code != "AD25") %>%
-  filter(Tube_code != "AD69") %>%
   filter(Tube_code != "AD91")
 
 #Coverage_table
-columns_to_exclude <- c("AD16", "AD23", "AD25", "AD69", "AD91")  # Columns to exclude
+columns_to_exclude <- c("AD16", "AD23", "AD25", "AD91")  # Columns to exclude
+genome_coverage <- genome_coverage %>%
+  select(-columns_to_exclude)
+```
+
+```{r filterging_1, echo=TRUE, warning=FALSE}
+##Removal of samples of individual LI1_2nd_6
+#Counts_raw
+columns_to_exclude <- c("AFV13","AD06", "AD31", "AE03", "AF12") # Columns to exclude
+read_counts <- read_counts %>%
+  select(-columns_to_exclude)
+
+#Metadata
+sample_metadata <- sample_metadata %>%
+  filter(Tube_code != "AFV13") %>%
+  filter(Tube_code != "AD06") %>%
+  filter(Tube_code != "AD31") %>%
+  filter(Tube_code != "AE03") %>%
+  filter(Tube_code != "AF12") 
+
+#Coverage_table
+columns_to_exclude <- c("AFV13","AD06", "AD31", "AE03", "AF12")  # Columns to exclude
 genome_coverage <- genome_coverage %>%
   select(-columns_to_exclude)
 ```

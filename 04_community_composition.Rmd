@@ -18,7 +18,7 @@ merged_data<-genome_counts_filt %>%
   filter(count > 0) #filter 0 counts
 
 # Create an interaction variable for time_point and sample
-merged_data$interaction_var <- interaction(merged_data$sample, merged_data$time_point)
+merged_data$interaction_var <- interaction(merged_data$sample, merged_data$individual)
 
 ggplot(merged_data, aes(x=interaction_var,y=count, fill=phylum, group=phylum)) + #grouping enables keeping the same sorting of taxonomic units
     geom_bar(stat="identity", colour="white", linewidth=0.1) + #plot stacked bars with white borders
@@ -159,6 +159,8 @@ genus_summary %>%
         labs(y="Family", x="Relative abundance", color="Phylum")
 
 ```
+
+# Diversity analysis
 
 ## Alpha diversity
 
@@ -332,11 +334,11 @@ alpha_div %>%
       scale_color_manual(name="type",
           breaks=c("Control","Hot_control", "Treatment"),
           labels=c("Control","Hot control", "Treatment"),
-          values=c("#76b183","#d57d2c", "#4477AA")) +
+          values=c("#4477AA","#d57d2c", "#76b183")) +
       scale_fill_manual(name="type",
           breaks=c("Control","Hot_control", "Treatment"),
           labels=c("Control","Hot control", "Treatment"),
-          values=c("#76b18350","#d57d2c50", "#4477AA50")) +
+          values=c("#4477AA50","#d57d2c50","#76b18350")) +
       facet_wrap(. ~ metric) +
       coord_cartesian(xlim = c(1, NA)) +
       theme_classic() +
@@ -367,11 +369,11 @@ alpha_div %>%
       scale_color_manual(name="type",
           breaks=c("Control","Hot_control", "Treatment"),
           labels=c("Control","Hot control", "Treatment"),
-          values=c("#76b183","#d57d2c", "#4477AA")) +
+          values=c("#4477AA","#d57d2c", "#76b183")) +
       scale_fill_manual(name="type",
           breaks=c("Control","Hot_control", "Treatment"),
           labels=c("Control","Hot control", "Treatment"),
-          values=c("#76b18350","#d57d2c50", "#4477AA50")) +
+          values=c("#4477AA50","#d57d2c50","#76b18350")) +
       facet_wrap(. ~ metric) +
       coord_cartesian(xlim = c(1, NA)) +
       theme_classic() +
@@ -402,11 +404,11 @@ alpha_div %>%
       scale_color_manual(name="type",
           breaks=c("Control","Hot_control", "Treatment"),
           labels=c("Control","Hot control", "Treatment"),
-          values=c("#76b183","#d57d2c", "#4477AA")) +
+          values=c("#4477AA","#d57d2c", "#76b183")) +
       scale_fill_manual(name="type",
           breaks=c("Control","Hot_control", "Treatment"),
           labels=c("Control","Hot control", "Treatment"),
-          values=c("#76b18350","#d57d2c50", "#4477AA50")) +
+          values=c("#4477AA50","#d57d2c50","#76b18350")) +
       facet_wrap(. ~ metric) +
       coord_cartesian(xlim = c(1, NA)) +
       theme_classic() +
@@ -437,11 +439,11 @@ alpha_div %>%
       scale_color_manual(name="type",
           breaks=c("Control","Hot_control", "Treatment"),
           labels=c("Control","Hot control", "Treatment"),
-          values=c("#76b183","#d57d2c", "#4477AA")) +
+          values=c("#4477AA","#d57d2c", "#76b183")) +
       scale_fill_manual(name="type",
           breaks=c("Control","Hot_control", "Treatment"),
           labels=c("Control","Hot control", "Treatment"),
-          values=c("#76b18350","#d57d2c50", "#4477AA50")) +
+          values=c("#4477AA50","#d57d2c50","#76b18350")) +
       facet_wrap(. ~ metric) +
       coord_cartesian(xlim = c(1, NA)) +
       theme_classic() +

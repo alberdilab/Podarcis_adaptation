@@ -78,4 +78,6 @@ library(hilldiv2)
 library(distillR)
 library(broom.mixed)
 library(corrplot)
+library(nlme)
+library(pairwiseAdonis)
 ```

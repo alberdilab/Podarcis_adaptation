@@ -122,23 +122,23 @@ GIFTs_functions_community %>%
   rownames_to_column("sample") %>%
   left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
   filter(time_point=="0_Wild") %>%
-  select(c(1:21, 23)) %>%
-  pivot_longer(-c(sample,species),names_to = "trait", values_to = "value") %>%
+  select(c(1:21, 27)) %>%
+  pivot_longer(-c(sample,type),names_to = "trait", values_to = "value") %>%
   mutate(trait = case_when(
       trait %in% GIFT_db$Code_function ~ GIFT_db$Function[match(trait, GIFT_db$Code_function)],
       TRUE ~ trait
     )) %>%
   mutate(trait=factor(trait,levels=unique(GIFT_db$Function))) %>%
-  ggplot(aes(x=value, y=species, group=species, fill=species, color=species)) +
+  ggplot(aes(x=value, y=type, group=type, fill=type, color=type)) +
     geom_boxplot() +
-    scale_color_manual(name="species",
-          breaks=c("Podarcis_liolepis","Podarcis_muralis"),
-          labels=c("Podarcis liolepis","Podarcis muralis"),
-          values=c("#e5bd5b","#6b7398")) +
-      scale_fill_manual(name="species",
-          breaks=c("Podarcis_liolepis","Podarcis_muralis"),
-          labels=c("Podarcis liolepis","Podarcis muralis"),
-          values=c("#e5bd5b50","#6b739850")) +
+    scale_color_manual(name="type",
+          breaks=c("Control","Hot_control", "Treatment"),
+          labels=c("Cold control","Hot control", "Cold treatment"),
+          values=c("#76b183","#d57d2c", "#4477AA")) +
+      scale_fill_manual(name="type",
+          breaks=c("Control","Hot_control", "Treatment"),
+          labels=c("Cold control","Hot control", "Cold treatment"),
+          values=c("#76b18350","#d57d2c50", "#4477AA50")) +
     facet_grid(trait ~ ., space="free", scales="free") +
               theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
               strip.text.y = element_text(angle = 0)) + 
@@ -248,7 +248,7 @@ element_gift_names <- element_gift_filt%>%
 ```
 
 ```{r gitfs_plot_1, echo=TRUE,results=FALSE, warning=FALSE}
-colNames <- names(element_gift_names)[2:36] #always check names(element_gift_names) first to know were your traits finish
+colNames <- names(element_gift_names)[2:30] #always check names(element_gift_names) first to know were your traits finish
 for(i in colNames){
   plt <- ggplot(element_gift_names, aes(x=species, y=.data[[i]], color = species)) +
     geom_boxplot(alpha = 0.2, outlier.shape = NA, width = 0.3, show.legend = FALSE) +

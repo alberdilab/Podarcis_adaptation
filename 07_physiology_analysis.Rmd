@@ -1,0 +1,75 @@
+# Physiological analysis
+
+
+
+## Load data
+
+Load the original data files outputted from the different measurements.
+
+### Sample metadata
+
+```{r load_data_measurements, warning=FALSE, comments="", message=FALSE}
+#Respirometry measurements
+respirometry<- read_tsv("data/respirometry_rep2.tsv")
+
+#PHA assay
+phs<- read_tsv("data/phs_rep2.tsv")
+```
+
+## Respirometry
+
+### Linear mixed-effects model
+
+```{r lm, warning=FALSE, comments="", message=FALSE}
+respirometry<-respirometry %>%
+  filter(!is.na(o2_comsuption))
+
+respirometry$type<-as.factor(respirometry$type)
+respirometry$time_point<-as.factor(respirometry$time_point)
+
+
+formula <- formula(normalized_o2 ~ time_point*type) #create the linear mixed model
+model_respirometry <- lme(formula, data = respirometry) #fit the model
+```
+
+```{r lm_results, warning=FALSE, comments="", message=FALSE}
+summary(model_respirometry)
+```
+
+### Oxigen consumption change
+
+```{r respirometry_plot, warning=FALSE, comments="", message=FALSE}
+ggplot(respirometry, aes(x = time_point, y = o2_comsuption, color=time_point, fill=time_point, alpha=0.2 )) +
+  geom_violin()+
+  geom_jitter() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_wrap(~ factor(type))+
+  theme(legend.position="none")+
+  labs(x = "time_point", y= "o2 consumption")
+```
+
+## PHS assay
+
+### Linear mixed-effects model
+
+```{r lm_1, warning=FALSE, comments="", message=FALSE}
+formula <- formula(normalized ~ time_point*Type) #create the linear mixed model
+model_phs <- lm(formula, data = phs) #fit the model
+```
+
+```{r lm_results_1, warning=FALSE, comments="", message=FALSE}
+summary(model_phs)
+```
+
+### PHS measurement change
+
+```{r phs_plot, warning=FALSE, comments="", message=FALSE}
+phs$time_point<-as.factor(phs$time_point)
+ggplot(phs, aes(x = time_point, y = normalized, color=time_point, fill=time_point, alpha=0.2 )) +
+  geom_violin()+
+  geom_jitter() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  facet_wrap(~ factor(Type))+
+  theme(legend.position="none")+
+  labs(x = "time_point", y= "phs measurement")
+```
