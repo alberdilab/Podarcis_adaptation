@@ -133,12 +133,12 @@ GIFTs_functions_community %>%
     geom_boxplot() +
     scale_color_manual(name="type",
           breaks=c("Control","Hot_control", "Treatment"),
-          labels=c("Cold control","Hot control", "Cold treatment"),
-          values=c("#76b183","#d57d2c", "#4477AA")) +
+          labels=c("Cold-Cold","Hot-Hot", "Cold-Hot"),
+          values=c("#4477AA","#d57d2c","#76b183")) +
       scale_fill_manual(name="type",
           breaks=c("Control","Hot_control", "Treatment"),
-          labels=c("Cold control","Hot control", "Cold treatment"),
-          values=c("#76b18350","#d57d2c50", "#4477AA50")) +
+          labels=c("Cold-Cold","Hot-Hot", "Cold-Hot"),
+          values=c("#4477AA50","#d57d2c50","#76b18350")) +
     facet_grid(trait ~ ., space="free", scales="free") +
               theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
               strip.text.y = element_text(angle = 0)) + 
@@ -296,12 +296,12 @@ GIFTs_functions_community %>%
     geom_boxplot() +
     scale_color_manual(name="type",
           breaks=c("Control","Hot_control", "Treatment"),
-          labels=c("Control","Hot control", "Treatment"),
-          values=c("#76b183","#d57d2c", "#4477AA")) +
+          labels=c("Cold-Cold","Hot-Hot", "Cold-Hot"),
+          values=c("#4477AA","#d57d2c","#76b183")) +
       scale_fill_manual(name="type",
           breaks=c("Control","Hot_control", "Treatment"),
-          labels=c("Control","Hot control", "Treatment"),
-          values=c("#76b18350","#d57d2c50", "#4477AA50")) +
+          labels=c("Cold-Cold","Hot-Hot", "Cold-Hot"),
+          values=c("#4477AA50","#d57d2c50","#76b18350")) +
     facet_grid(trait ~ ., space="free", scales="free") +
               theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
               strip.text.y = element_text(angle = 0)) + 
