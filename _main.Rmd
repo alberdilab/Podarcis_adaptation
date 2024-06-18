@@ -793,6 +793,10 @@ load("data/data.Rdata")
 
 ```{r taxonomy_barplot, fig.height=8, fig.width=18, fig.fullwidth=TRUE, warning=FALSE}
 # Merge data frames based on sample
+transplants_metadata<-sample_metadata%>%
+  mutate(Tube_code=str_remove_all(Tube_code, "_a"))
+transplants_metadata$newID <- paste(transplants_metadata$Tube_code, "_", transplants_metadata$individual)
+
 merged_data<-genome_counts_filt %>%
   mutate_at(vars(-genome),~./sum(.)) %>% #apply TSS normalisation
   pivot_longer(-genome, names_to = "sample", values_to = "count") %>% #reduce to minimum number of columns
@@ -1643,7 +1647,6 @@ ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 #### Comparison between FMT2 vs Post-FMT2
 
 ```{r beta_div_neutral_transplant3, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE}
-
 #Create newID to identify duplicated samples
 transplants_metadata<-sample_metadata%>%
   mutate(Tube_code=str_remove_all(Tube_code, "_a"))

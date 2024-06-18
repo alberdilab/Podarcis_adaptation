@@ -385,7 +385,6 @@ ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 #### Comparison between FMT2 vs Post-FMT2
 
 ```{r beta_div_neutral_transplant3, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE}
-
 #Create newID to identify duplicated samples
 transplants_metadata<-sample_metadata%>%
   mutate(Tube_code=str_remove_all(Tube_code, "_a"))
