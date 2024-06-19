@@ -218,18 +218,18 @@ alpha_div %>%
   left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
   filter(time_point=="0_Wild") %>%
   mutate(metric=factor(metric,levels=c("richness","neutral","phylogenetic","functional"))) %>%
-      ggplot(aes(y = value, x = species, group=species, color=species, fill=species)) +
+      ggplot(aes(y = value, x = population, group=population, color=population, fill=population)) +
       geom_boxplot(outlier.shape = NA) +
       geom_jitter(alpha=0.5) +
-      scale_color_manual(name="species",
-          breaks=c("Podarcis_liolepis","Podarcis_muralis"),
-          labels=c("Podarcis liolepis","Podarcis muralis"),
-          values=c("#e5bd5b", "#6b7398")) +
-      scale_fill_manual(name="species",
-          breaks=c("Podarcis_liolepis","Podarcis_muralis"),
-          labels=c("Podarcis liolepis","Podarcis muralis"),
-          values=c("#e5bd5b50", "#6b739850")) +
-      facet_wrap(. ~ metric ) +
+      scale_color_manual(name="Population",
+          breaks=c("Cold_wet","Hot_dry"),
+          labels=c("Cold","Hot"),
+          values=c('#008080', "#d57d2c")) +
+      scale_fill_manual(name="Population",
+          breaks=c("Cold_wet","Hot_dry"),
+          labels=c("Cold","Hot"),
+          values=c('#00808050', "#d57d2c50")) +
+      facet_wrap(. ~ metric,scales = "free") +
       coord_cartesian(xlim = c(1, NA)) +
       theme_classic() +
         theme(
@@ -256,15 +256,15 @@ alpha_div %>%
       ggplot(aes(y = value, x = species, group=species, color=species, fill=species)) +
       geom_boxplot(outlier.shape = NA) +
       geom_jitter(alpha=0.5) +
-      scale_color_manual(name="species",
-          breaks=c("Podarcis_liolepis","Podarcis_muralis"),
-          labels=c("Podarcis liolepis","Podarcis muralis"),
-          values=c("#e5bd5b", "#6b7398")) +
-      scale_fill_manual(name="species",
-          breaks=c("Podarcis_liolepis","Podarcis_muralis"),
-          labels=c("Podarcis liolepis","Podarcis muralis"),
-          values=c("#e5bd5b50", "#6b739850")) +
-      facet_wrap(. ~ metric) +
+      scale_color_manual(name="Population",
+          breaks=c("Cold_wet","Hot_dry"),
+          labels=c("Cold","Hot"),
+          values=c('#008080', "#d57d2c")) +
+      scale_fill_manual(name="Population",
+          breaks=c("Cold_wet","Hot_dry"),
+          labels=c("Cold","Hot"),
+          values=c('#00808050', "#d57d2c50")) +
+      facet_wrap(. ~ metric,scales = "free") +
       coord_cartesian(xlim = c(1, NA)) +
       theme_classic() +
         theme(
@@ -291,15 +291,15 @@ alpha_div %>%
       ggplot(aes(y = value, x = species, group=species, color=species, fill=species)) +
       geom_boxplot(outlier.shape = NA) +
       geom_jitter(alpha=0.5) +
-      scale_color_manual(name="species",
-          breaks=c("Podarcis_liolepis","Podarcis_muralis"),
-          labels=c("Podarcis liolepis","Podarcis muralis"),
-          values=c("#e5bd5b", "#6b7398")) +
-      scale_fill_manual(name="species",
-          breaks=c("Podarcis_liolepis","Podarcis_muralis"),
-          labels=c("Podarcis liolepis","Podarcis muralis"),
-          values=c("#e5bd5b50", "#6b739850")) +
-      facet_wrap(. ~ metric) +
+      scale_color_manual(name="Population",
+          breaks=c("Cold_wet","Hot_dry"),
+          labels=c("Cold","Hot"),
+          values=c('#008080', "#d57d2c")) +
+      scale_fill_manual(name="Population",
+          breaks=c("Cold_wet","Hot_dry"),
+          labels=c("Cold","Hot"),
+          values=c('#00808050', "#d57d2c50")) +
+      facet_wrap(. ~ metric,scales = "free") +
       coord_cartesian(xlim = c(1, NA)) +
       theme_classic() +
         theme(
@@ -326,15 +326,15 @@ alpha_div %>%
       ggplot(aes(y = value, x = type, group=type, color=type, fill=type)) +
       geom_boxplot(outlier.shape = NA) +
       geom_jitter(alpha=0.5) +
-      scale_color_manual(name="type",
+      scale_color_manual(name="Type",
           breaks=c("Control","Hot_control", "Treatment"),
           labels=c("Cold-Cold","Hot-Hot", "Cold-Hot"),
           values=c("#4477AA","#d57d2c", "#76b183")) +
-      scale_fill_manual(name="type",
+      scale_fill_manual(name="Type",
           breaks=c("Control","Hot_control", "Treatment"),
           labels=c("Cold-Cold","Hot-Hot", "Cold-Hot"),
           values=c("#4477AA50","#d57d2c50","#76b18350")) +
-      facet_wrap(. ~ metric) +
+      facet_wrap(. ~ metric,scales = "free") +
       coord_cartesian(xlim = c(1, NA)) +
       theme_classic() +
         theme(
@@ -361,15 +361,15 @@ alpha_div %>%
       ggplot(aes(y = value, x = type, group=type, color=type, fill=type)) +
       geom_boxplot(outlier.shape = NA) +
       geom_jitter(alpha=0.5) +
-      scale_color_manual(name="type",
+      scale_color_manual(name="Type",
           breaks=c("Control","Hot_control", "Treatment"),
           labels=c("Cold-Cold","Hot-Hot", "Cold-Hot"),
           values=c("#4477AA","#d57d2c", "#76b183")) +
-      scale_fill_manual(name="type",
+      scale_fill_manual(name="Type",
           breaks=c("Control","Hot_control", "Treatment"),
           labels=c("Cold-Cold","Hot-Hot", "Cold-Hot"),
           values=c("#4477AA50","#d57d2c50","#76b18350")) +
-      facet_wrap(. ~ metric) +
+      facet_wrap(. ~ metric,scales = "free") +
       coord_cartesian(xlim = c(1, NA)) +
       theme_classic() +
         theme(
@@ -396,15 +396,15 @@ alpha_div %>%
       ggplot(aes(y = value, x = type, group=type, color=type, fill=type)) +
       geom_boxplot(outlier.shape = NA) +
       geom_jitter(alpha=0.5) +
-      scale_color_manual(name="type",
+      scale_color_manual(name="Type",
           breaks=c("Control","Hot_control", "Treatment"),
           labels=c("Cold-Cold","Hot-Hot", "Cold-Hot"),
           values=c("#4477AA","#d57d2c", "#76b183")) +
-      scale_fill_manual(name="type",
+      scale_fill_manual(name="Type",
           breaks=c("Control","Hot_control", "Treatment"),
           labels=c("Cold-Cold","Hot-Hot", "Cold-Hot"),
           values=c("#4477AA50","#d57d2c50","#76b18350")) +
-      facet_wrap(. ~ metric) +
+      facet_wrap(. ~ metric,scales = "free") +
       coord_cartesian(xlim = c(1, NA)) +
       theme_classic() +
         theme(
@@ -431,15 +431,15 @@ alpha_div %>%
       ggplot(aes(y = value, x = type, group=type, color=type, fill=type)) +
       geom_boxplot(outlier.shape = NA) +
       geom_jitter(alpha=0.5) +
-      scale_color_manual(name="type",
+      scale_color_manual(name="Type",
           breaks=c("Control","Hot_control", "Treatment"),
           labels=c("Control","Hot control", "Treatment"),
           values=c("#4477AA","#d57d2c", "#76b183")) +
-      scale_fill_manual(name="type",
+      scale_fill_manual(name="Type",
           breaks=c("Control","Hot_control", "Treatment"),
           labels=c("Cold-Cold","Hot-Hot", "Cold-Hot"),
           values=c("#4477AA50","#d57d2c50","#76b18350")) +
-      facet_wrap(. ~ metric) +
+      facet_wrap(. ~ metric,scales = "free") +
       coord_cartesian(xlim = c(1, NA)) +
       theme_classic() +
         theme(

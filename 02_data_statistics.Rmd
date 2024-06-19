@@ -1,6 +1,5 @@
 # Data statistics
 
-
 ```{r load_data_stats}
 load("data/data.Rdata")
 ```
@@ -39,9 +38,11 @@ data_stats %>%
                     breaks=c("low_quality","mapped_lizard","unmapped_reads","mapped_mags"),
                     labels=c("Low quality","Mapped to host","Unmapped","Mapped to MAGs"),
                     values=c("#CCCCCC", "#bcdee1", "#d8b8a3","#93655c"))+
-      facet_grid(~time_point, scales = "free") +
+      facet_grid(~time_point, scales = "free", labeller = labeller(time_point=c("0_Wild"="Wild", "1_Acclimation"="Acclimation", "2_Antibiotics"="Antibiotics",
+                                                                                "3_Transplant1"="Transplant1", "4_Transplant2"="Transplant2", "5_Post-FMT1"="Post1",
+                                                                                "6_Post-FMT2"="Post2"))) +
       theme_minimal() +
-      theme(axis.text.x = element_text(angle = 90, hjust = 1, size=4)) +
+      theme(axis.text.x = element_text(angle = 90, hjust = 1, size=0)) +
       labs(y="DNA sequence fraction",x="Samples")
 ```
 
@@ -77,14 +78,15 @@ data_stats %>%
                     breaks=c("mag_proportion","singlem_read_fraction"),
                     labels=c("Recovered","Estimated"),
                     values=c("#52e1e8", "#876b53"))+
-      #facet_wrap(tissue~., scales = "free", labeller = labeller(tissue = c(cloaca="Cloaca",feces="Feces"))) +
       theme_minimal() +
-      facet_grid(~time_point, scales = "free", space="free")+
+      facet_grid(~time_point, scales = "free", space="free", labeller = labeller(time_point=c("0_Wild"="Wild", "1_Acclimation"="Acclimation", "2_Antibiotics"="Antibiotics",
+                                                                                "3_Transplant1"="Transplant1", "4_Transplant2"="Transplant2", "5_Post-FMT1"="Post1",
+                                                                                "6_Post-FMT2"="Post2")))+
       labs(y = "Samples", x = "Prokaryotic fraction") +
       scale_y_continuous(limits = c(0, 1)) +
       theme(
         axis.text.y = element_text(size = 4),
-        axis.text.x = element_text( angle = 90, vjust = 0.5, hjust = 1, size = 6),
+        axis.text.x = element_text( angle = 90, vjust = 0.5, hjust = 1, size = 0),
         legend.position = "right"
       )
 ```
