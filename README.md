@@ -13,7 +13,7 @@ Data processing to generate annotated metagenome-assembled genomes and genome co
 
 ## 3. Data analysis
 
-Samples from the four transects were analysed together and the code used can be found in the Rmd files stored in the root directory of this repository, while the bookdown-rendered webbook is available at:
+Samples from both species were analysed together and the code used can be found in the Rmd files stored in the root directory of this repository, while the bookdown-rendered webbook is available at:
 
 [alberdilab.github.io/Podarcis_adaptation](https://alberdilab.github.io/Podarcis_adaptation)
 
