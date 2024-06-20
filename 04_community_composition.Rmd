@@ -218,7 +218,7 @@ alpha_div %>%
   left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
   filter(time_point=="0_Wild") %>%
   mutate(metric=factor(metric,levels=c("richness","neutral","phylogenetic","functional"))) %>%
-      ggplot(aes(y = value, x = population, group=population, color=population, fill=population)) +
+      ggplot(aes(y = value, x = Population, group=Population, color=Population, fill=Population)) +
       geom_boxplot(outlier.shape = NA) +
       geom_jitter(alpha=0.5) +
       scale_color_manual(name="Population",
@@ -253,7 +253,7 @@ alpha_div %>%
   left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
   filter(time_point=="1_Acclimation") %>%
   mutate(metric=factor(metric,levels=c("richness","neutral","phylogenetic","functional"))) %>%
-      ggplot(aes(y = value, x = species, group=species, color=species, fill=species)) +
+      ggplot(aes(y = value, x = Population, group=Population, color=Population, fill=Population)) +
       geom_boxplot(outlier.shape = NA) +
       geom_jitter(alpha=0.5) +
       scale_color_manual(name="Population",
@@ -288,7 +288,7 @@ alpha_div %>%
   left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
   filter(time_point=="2_Antibiotics") %>%
   mutate(metric=factor(metric,levels=c("richness","neutral","phylogenetic","functional"))) %>%
-      ggplot(aes(y = value, x = species, group=species, color=species, fill=species)) +
+      ggplot(aes(y = value, x = Population, group=Population, color=Population, fill=Population)) +
       geom_boxplot(outlier.shape = NA) +
       geom_jitter(alpha=0.5) +
       scale_color_manual(name="Population",
