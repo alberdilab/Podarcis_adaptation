@@ -231,6 +231,7 @@ alpha_div %>%
           values=c('#00808050', "#d57d2c50")) +
       facet_wrap(. ~ metric,scales = "free") +
       coord_cartesian(xlim = c(1, NA)) +
+      stat_compare_means() +
       theme_classic() +
         theme(
     strip.background = element_blank(),
@@ -266,6 +267,7 @@ alpha_div %>%
           values=c('#00808050', "#d57d2c50")) +
       facet_wrap(. ~ metric,scales = "free") +
       coord_cartesian(xlim = c(1, NA)) +
+      stat_compare_means() +
       theme_classic() +
         theme(
     strip.background = element_blank(),
@@ -301,6 +303,7 @@ alpha_div %>%
           values=c('#00808050', "#d57d2c50")) +
       facet_wrap(. ~ metric,scales = "free") +
       coord_cartesian(xlim = c(1, NA)) +
+      stat_compare_means() +
       theme_classic() +
         theme(
     strip.background = element_blank(),
@@ -336,6 +339,7 @@ alpha_div %>%
           values=c("#4477AA50","#d57d2c50","#76b18350")) +
       facet_wrap(. ~ metric,scales = "free") +
       coord_cartesian(xlim = c(1, NA)) +
+      stat_compare_means() +
       theme_classic() +
         theme(
     strip.background = element_blank(),
@@ -371,6 +375,7 @@ alpha_div %>%
           values=c("#4477AA50","#d57d2c50","#76b18350")) +
       facet_wrap(. ~ metric,scales = "free") +
       coord_cartesian(xlim = c(1, NA)) +
+      stat_compare_means() +
       theme_classic() +
         theme(
     strip.background = element_blank(),
@@ -406,6 +411,7 @@ alpha_div %>%
           values=c("#4477AA50","#d57d2c50","#76b18350")) +
       facet_wrap(. ~ metric,scales = "free") +
       coord_cartesian(xlim = c(1, NA)) +
+      stat_compare_means() +
       theme_classic() +
         theme(
     strip.background = element_blank(),
@@ -441,6 +447,7 @@ alpha_div %>%
           values=c("#4477AA50","#d57d2c50","#76b18350")) +
       facet_wrap(. ~ metric,scales = "free") +
       coord_cartesian(xlim = c(1, NA)) +
+      stat_compare_means() +
       theme_classic() +
         theme(
     strip.background = element_blank(),
