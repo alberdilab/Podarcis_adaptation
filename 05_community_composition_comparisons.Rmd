@@ -713,7 +713,7 @@ p0<-beta_richness_nmds_post1 %>%
 			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
 			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
 			ungroup() %>%
-			ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=type)) +
         scale_color_manual(name="Type",
                        breaks=c("Control", "Hot_control", "Treatment"),
                        labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
@@ -729,7 +729,7 @@ p1<-beta_neutral_nmds_post1 %>%
 			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
 			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
 			ungroup() %>%
-			ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=type)) +
         scale_color_manual(name="Type",
                        breaks=c("Control", "Hot_control", "Treatment"),
                        labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
@@ -745,7 +745,7 @@ p2<-beta_phylogenetic_nmds_post1 %>%
 			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
 			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
 			ungroup() %>%
-			ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=type)) +
 				scale_color_manual(name="Type",
                        breaks=c("Control", "Hot_control", "Treatment"),
                        labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
@@ -761,7 +761,7 @@ p3<-beta_functional_nmds_post1 %>%
 			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
 			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
 			ungroup() %>%
-			ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=type)) +
 				scale_color_manual(name="Type",
                        breaks=c("Control", "Hot_control", "Treatment"),
                        labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),

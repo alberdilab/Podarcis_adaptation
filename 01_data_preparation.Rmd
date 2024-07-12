@@ -116,7 +116,7 @@ Transform the original data files into working objects for downstream analyses.
 
 ### Merge genome taxonomy and quality
 
-```{r generate_genome_metadata, warning=FALSE, comments="", message=FALSE}
+```{r generate_genome_metadata, warning=FALSE, comments="", message=FALSE, eval=FALSE}
 genome_metadata <- genome_taxonomy %>%
   inner_join(genome_quality,by=join_by(genome==genome)) #join quality
 ```

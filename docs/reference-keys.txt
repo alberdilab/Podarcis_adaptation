@@ -40,13 +40,14 @@ functional-ordination
 community-composition
 taxonomy-overview
 stacked-barplot
+wild-samples
 phylum-relative-abundances
 taxonomy-boxplot
 family
 genus
 diversity-analysis
 alpha-diversity
-wild-samples
+wild-samples-1
 acclimation-samples
 antibiotics-samples
 transplant_1-samples
