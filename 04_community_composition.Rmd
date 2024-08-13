@@ -61,8 +61,42 @@ phylum_summary <- genome_counts_filt %>%
 
 phylum_summary %>%
     group_by(phylum) %>%
-    summarise(mean=mean(relabun, na.rm=TRUE),sd=sd(relabun, na.rm=TRUE)) %>%
-    arrange(-mean) %>%
+    summarise(total_mean=mean(relabun*100, na.rm=T),
+              total_sd=sd(relabun*100, na.rm=T))  %>%
+    mutate(total=str_c(round(total_mean,2),"±",round(total_sd,2))) %>% 
+    arrange(-total_mean) %>% 
+    dplyr::select(phylum,total) %>% 
+    tt()
+
+```
+
+#### Wild samples
+
+```{r taxonomy_phylum_summary_wild, warning=FALSE, comments="", message=FALSE}
+#Cold and wet population
+phylum_summary %>%
+    left_join(sample_metadata, by = join_by(sample == Tube_code))  %>%
+    group_by(phylum, Population) %>%
+    filter(Population=="Cold_wet") %>%
+    filter(time_point=="0_Wild") %>%
+    summarise(total_mean=mean(relabun*100, na.rm=T),
+              total_sd=sd(relabun*100, na.rm=T))  %>%
+    mutate(total=str_c(round(total_mean,2),"±",round(total_sd,2))) %>% 
+    arrange(-total_mean) %>% 
+    dplyr::select(phylum,total, Population) %>% 
+    tt()
+
+#Hot and dry population
+phylum_summary %>%
+    left_join(sample_metadata, by = join_by(sample == Tube_code))  %>%
+    group_by(phylum, Population) %>%
+    filter(Population=="Hot_dry")%>%
+    filter(time_point=="0_Wild") %>%
+    summarise(total_mean=mean(relabun*100, na.rm=T),
+              total_sd=sd(relabun*100, na.rm=T))  %>%
+    mutate(total=str_c(round(total_mean,2),"±",round(total_sd,2))) %>% 
+    arrange(-total_mean) %>% 
+    dplyr::select(phylum,total, Population) %>% 
     tt()
 ```
 

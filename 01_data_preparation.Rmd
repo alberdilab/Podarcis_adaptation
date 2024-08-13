@@ -216,7 +216,7 @@ genome_gifts <- distill(genome_annotations,GIFT_db,genomecol=2,annotcol=c(9,10,1
 
 ```{r raw_reads, warning=FALSE, comments="", message=FALSE}
 raw_reads <-
-  "data/multiqc_general_stats.txt" %>%
+  "data/multiqc_general_stats_2.txt" %>%
   read_tsv() %>%
   select(
     sample = Sample,
