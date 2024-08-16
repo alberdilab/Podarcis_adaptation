@@ -96,7 +96,7 @@ ggplot(GIFTs_elements_community_merged,aes(x=interaction_var,y=trait,fill=gift))
         geom_tile(colour="white", linewidth=0.2)+
         scale_fill_gradientn(colours=rev(c("#d53e4f", "#f46d43", "#fdae61", "#fee08b", "#e6f598", "#abdda4", "#ddf1da")))+
         facet_grid(functionid ~ type, scales="free",space="free") +
-        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=5),
               strip.text.y = element_text(angle = 0)) + 
         labs(y="Traits",x="Time_point",fill="GIFT")+
   scale_x_discrete(labels = function(x) gsub(".*\\.", "", x))
@@ -246,13 +246,342 @@ element_gift_names <- element_gift_filt%>%
   as.data.frame() %>%
   mutate_if(is.character, as.numeric)  %>%
   rownames_to_column(., "Tube_code")%>% 
-  left_join(., sample_metadata_wild[c(1,3)], by = join_by(Tube_code == Tube_code))
+  left_join(., sample_metadata_wild[c(1,4)], by = join_by(Tube_code == Tube_code))
 ```
 
 ```{r gitfs_plot_1, echo=TRUE,results=FALSE, warning=FALSE}
-colNames <- names(element_gift_names)[2:30] #always check names(element_gift_names) first to know were your traits finish
+colNames <- names(element_gift_names)[2:30] #always check names(element_gift_names) first to know where your traits finish
 for(i in colNames){
-  plt <- ggplot(element_gift_names, aes(x=species, y=.data[[i]], color = species)) +
+  plt <- ggplot(element_gift_names, aes(x=Population, y=.data[[i]], color = Population)) +
+    geom_boxplot(alpha = 0.2, outlier.shape = NA, width = 0.3, show.legend = FALSE) +
+    geom_jitter(width = 0.1, show.legend = TRUE) +
+    theme_minimal() +
+    theme(
+      axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      panel.border = element_blank())
+  print(plt)
+}
+```
+
+## Comparison of samples from the 1st Time_point (1_Acclimation)
+
+### GIFTs Functional community
+
+```{r gitfs_functional_accli, echo=TRUE,results=TRUE}
+GIFTs_functions_community %>%
+  rowMeans() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point=="1_Acclimation") %>%
+  group_by(species) %>%
+  summarise(MCI = mean(value), sd = sd(value))
+```
+
+#### GIFT test visualisation
+
+```{r gift_test_function_plot_accli, message=FALSE, warning=FALSE, fig.height=12, fig.width=10, fig.fullwidth=TRUE, eval=TRUE}
+GIFTs_functions_community %>%
+  as.data.frame() %>%
+  rownames_to_column("sample") %>%
+  left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point=="1_Acclimation") %>%
+  select(c(1:21, 27)) %>%
+  pivot_longer(-c(sample,type),names_to = "trait", values_to = "value") %>%
+  mutate(trait = case_when(
+      trait %in% GIFT_db$Code_function ~ GIFT_db$Function[match(trait, GIFT_db$Code_function)],
+      TRUE ~ trait
+    )) %>%
+  mutate(trait=factor(trait,levels=unique(GIFT_db$Function))) %>%
+  ggplot(aes(x=value, y=type, group=type, fill=type, color=type)) +
+    geom_boxplot() +
+    scale_color_manual(name="type",
+          breaks=c("Control","Hot_control", "Treatment"),
+          labels=c("Cold-Cold","Hot-Hot", "Cold-Hot"),
+          values=c("#4477AA","#d57d2c","#76b183")) +
+      scale_fill_manual(name="type",
+          breaks=c("Control","Hot_control", "Treatment"),
+          labels=c("Cold-Cold","Hot-Hot", "Cold-Hot"),
+          values=c("#4477AA50","#d57d2c50","#76b18350")) +
+    facet_grid(trait ~ ., space="free", scales="free") +
+              theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
+              strip.text.y = element_text(angle = 0)) + 
+        labs(y="Traits",x="Metabolic capacity index")
+```
+
+### GIFTs Domain community
+
+```{r gitfs_domain_accli, echo=TRUE,results=TRUE}
+GIFTs_domains_community %>%
+  rowMeans() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point=="1_Acclimation") %>%
+  group_by(species) %>%
+  summarise(MCI = mean(value), sd = sd(value))
+```
+
+### GIFTs Elements community
+
+```{r gitfs_elements_accli, echo=TRUE,results=TRUE}
+GIFTs_elements_community %>%
+  rowMeans() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point=="1_Acclimation") %>%
+  group_by(species) %>%
+  summarise(MCI = mean(value), sd = sd(value))
+```
+
+```{r gitfs_filtering_4_1, echo=TRUE,results=FALSE}
+sample_metadata_accli <- sample_metadata%>% 
+  filter(time_point == "1_Acclimation")
+
+element_gift_accli <- GIFTs_elements_community %>% 
+  as.data.frame() %>% 
+  rownames_to_column(., "Tube_code") %>% 
+  inner_join(., sample_metadata_accli[c(1,3)], by="Tube_code")
+```
+
+```{r gitfs_filtering_5_1, echo=TRUE,results=FALSE}
+# Find numeric columns
+numeric_cols <- sapply(element_gift_accli, is.numeric)
+
+# Calculate column sums for numeric columns only
+col_sums_numeric <- colSums(element_gift_accli[, numeric_cols])
+
+# Identify numeric columns with sums not equal to zero
+nonzero_numeric_cols <- names(col_sums_numeric)[col_sums_numeric != 0]
+
+# Remove numeric columns with sums not equal to zero
+filtered_data <- element_gift_accli[, !numeric_cols | colnames(element_gift_accli) %in% nonzero_numeric_cols]
+```
+
+```{r gitfs_filtering_6_1, echo=TRUE,results=FALSE}
+significant_elements_accli <- filtered_data %>%
+  pivot_longer(-c(Tube_code,species), names_to = "trait", values_to = "value") %>%
+  group_by(trait) %>%
+  summarise(p_value = wilcox.test(value ~ species, exact=FALSE)$p.value) %>%
+  mutate(p_adjust=p.adjust(p_value, method="BH")) %>%
+  filter(p_adjust < 0.05)  %>%
+  left_join(.,uniqueGIFT_db[c(1,3)],by = join_by(trait == Code_element))
+
+element_gift_t <- element_gift_accli  %>% 
+  dplyr::select(-c(species))  %>% 
+  t() %>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric)  %>%
+  rownames_to_column(., "trait")
+
+element_gift_filt <- subset(element_gift_t, trait %in% significant_elements_accli$trait) %>% 
+  t() %>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric)  %>%
+  rownames_to_column(., "Tube_code")%>% 
+  left_join(., sample_metadata_accli[c(1,3)], by = join_by(Tube_code == Tube_code))
+
+element_gift_filt %>%
+  dplyr::select(-Tube_code)%>%
+  group_by(species)  %>%
+  summarise(across(everything(), mean))%>%
+  t() %>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric)  %>%
+  rownames_to_column(., "Elements")  %>%
+  left_join(.,uniqueGIFT_db[c(1,3)],by = join_by(Elements == Code_element))
+
+element_gift_names <- element_gift_filt%>%
+  dplyr::select(-species)%>%
+  t() %>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric)  %>%
+  rownames_to_column(., "Elements")  %>%
+  left_join(.,uniqueGIFT_db[c(1,3)],by = join_by(Elements == Code_element))%>%
+  dplyr::select(-Elements)%>%
+  dplyr::select(Function, everything())%>%
+  t()%>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric)  %>%
+  rownames_to_column(., "Tube_code")%>% 
+  left_join(., sample_metadata_accli[c(1,4)], by = join_by(Tube_code == Tube_code))
+```
+
+```{r gitfs_plot_1_1, echo=TRUE,results=FALSE, warning=FALSE}
+colNames <- names(element_gift_names)[2:14] #always check names(element_gift_names) first to know where your traits finish
+for(i in colNames){
+  plt <- ggplot(element_gift_names, aes(x=Population, y=.data[[i]], color = Population)) +
+    geom_boxplot(alpha = 0.2, outlier.shape = NA, width = 0.3, show.legend = FALSE) +
+    geom_jitter(width = 0.1, show.legend = TRUE) +
+    theme_minimal() +
+    theme(
+      axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      panel.border = element_blank())
+  print(plt)
+}
+```
+
+
+
+## Comparison of samples from the 5th Time_point (5_Post-FMT1)
+
+### GIFTs Functional community
+
+```{r gitfs_functional_tm5, echo=TRUE,results=TRUE}
+GIFTs_functions_community %>%
+  rowMeans() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point=="5_Post-FMT1") %>%
+  group_by(type) %>%
+  summarise(MCI = mean(value), sd = sd(value))
+```
+
+#### GIFT test visualisation
+
+```{r gift_test_function_plot_tm5, message=FALSE, warning=FALSE, fig.height=12, fig.width=10, fig.fullwidth=TRUE, eval=TRUE}
+GIFTs_functions_community %>%
+  as.data.frame() %>%
+  rownames_to_column("sample") %>%
+  left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point=="5_Post-FMT1") %>%
+  select(c(1:21, 27)) %>%
+  pivot_longer(-c(sample,type),names_to = "trait", values_to = "value") %>%
+  mutate(trait = case_when(
+      trait %in% GIFT_db$Code_function ~ GIFT_db$Function[match(trait, GIFT_db$Code_function)],
+      TRUE ~ trait
+    )) %>%
+  mutate(trait=factor(trait,levels=unique(GIFT_db$Function))) %>%
+  ggplot(aes(x=value, y=type, group=type, fill=type, color=type)) +
+    geom_boxplot() +
+    scale_color_manual(name="type",
+          breaks=c("Control","Hot_control", "Treatment"),
+          labels=c("Cold-Cold","Hot-Hot", "Cold-Hot"),
+          values=c("#4477AA","#d57d2c","#76b183")) +
+      scale_fill_manual(name="type",
+          breaks=c("Control","Hot_control", "Treatment"),
+          labels=c("Cold-Cold","Hot-Hot", "Cold-Hot"),
+          values=c("#4477AA50","#d57d2c50","#76b18350")) +
+    facet_grid(trait ~ ., space="free", scales="free") +
+              theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
+              strip.text.y = element_text(angle = 0)) + 
+        labs(y="Traits",x="Metabolic capacity index")
+```
+
+### GIFTs Domain community
+
+```{r gitfs_domain_tm5, echo=TRUE,results=TRUE}
+GIFTs_domains_community %>%
+  rowMeans() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point=="5_Post-FMT1") %>%
+  group_by(type) %>%
+  summarise(MCI = mean(value), sd = sd(value))
+```
+
+### GIFTs Elements community
+
+```{r gitfs_elements_tm5, echo=TRUE,results=TRUE}
+GIFTs_elements_community %>%
+  rowMeans() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point=="5_Post-FMT1") %>%
+  group_by(type) %>%
+  summarise(MCI = mean(value), sd = sd(value))
+```
+
+```{r data_tm5, echo=TRUE,results=FALSE}
+sample_metadata_tm5 <- sample_metadata%>% 
+  filter(time_point == "5_Post-FMT1")%>% 
+  filter(type != "Hot_control")
+
+element_gift_tm5 <- GIFTs_elements_community %>% 
+  as.data.frame() %>% 
+  rownames_to_column(., "Tube_code") %>% 
+  inner_join(sample_metadata_tm5 %>% select(1, 7), by = "Tube_code")
+```
+
+```{r gitfs_filtering_2, echo=TRUE,results=FALSE}
+# Find numeric columns
+numeric_cols <- sapply(element_gift_tm5, is.numeric)
+
+# Calculate column sums for numeric columns only
+col_sums_numeric <- colSums(element_gift_tm5[, numeric_cols])
+
+# Identify numeric columns with sums not equal to zero
+nonzero_numeric_cols <- names(col_sums_numeric)[col_sums_numeric != 0]
+
+# Remove numeric columns with sums not equal to zero
+filtered_data <- element_gift_tm5[, !numeric_cols | colnames(element_gift_tm5) %in% nonzero_numeric_cols]
+```
+
+```{r gitfs_filtering_3, echo=TRUE,results=FALSE}
+significant_elements_tm5 <- filtered_data %>%
+  pivot_longer(-c(Tube_code,type), names_to = "trait", values_to = "value") %>%
+  group_by(trait) %>%
+  summarise(p_value = wilcox.test(value ~ type, exact=FALSE)$p.value) %>%
+  mutate(p_adjust=p.adjust(p_value, method="BH")) %>%
+  filter(p_value < 0.05)  %>% #take into account that p_value is used and not p_adjust
+  left_join(.,uniqueGIFT_db[c(1,3)],by = join_by(trait == Code_element))
+
+element_gift_t <- element_gift_tm5  %>% 
+  dplyr::select(-c(type))  %>% 
+  t() %>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric)  %>%
+  rownames_to_column(., "trait")
+
+element_gift_filt <- subset(element_gift_t, trait %in% significant_elements_tm5$trait) %>% 
+  t() %>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric)  %>%
+  rownames_to_column(., "Tube_code")%>% 
+  left_join(., sample_metadata_tm5[c(1,7)], by = join_by(Tube_code == Tube_code))
+
+element_gift_filt %>%
+  dplyr::select(-Tube_code)%>%
+  group_by(type)  %>%
+  summarise(across(everything(), mean))%>%
+  t() %>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric)  %>%
+  rownames_to_column(., "Elements")  %>%
+  left_join(.,uniqueGIFT_db[c(1,3)],by = join_by(Elements == Code_element))
+
+element_gift_names <- element_gift_filt%>%
+  dplyr::select(-type)%>%
+  t() %>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric)  %>%
+  rownames_to_column(., "Elements")  %>%
+  left_join(.,uniqueGIFT_db[c(1,3)],by = join_by(Elements == Code_element))%>%
+  dplyr::select(-Elements)%>%
+  dplyr::select(Function, everything())%>%
+  t()%>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric)  %>%
+  rownames_to_column(., "Tube_code")%>% 
+  left_join(., sample_metadata_tm5[c(1,7)], by = join_by(Tube_code == Tube_code))
+```
+
+```{r gitfs_plot, echo=TRUE,results=FALSE, warning=FALSE}
+colNames <- names(element_gift_names)[2:14] #always check names(element_gift_names) first to now where your traits finish
+for(i in colNames){
+  plt <- ggplot(element_gift_names, aes(x=type, y=.data[[i]], color = type)) +
     geom_boxplot(alpha = 0.2, outlier.shape = NA, width = 0.3, show.legend = FALSE) +
     geom_jitter(width = 0.1, show.legend = TRUE) +
     theme_minimal() +
@@ -345,7 +674,7 @@ element_gift_TM6 <- GIFTs_elements_community %>%
   inner_join(sample_metadata_TM6 %>% select(1, 7), by = "Tube_code")
 ```
 
-```{r gitfs_filtering_2, echo=TRUE,results=FALSE}
+```{r gitfs_filtering_2_1, echo=TRUE,results=FALSE}
 # Find numeric columns
 numeric_cols <- sapply(element_gift_TM6, is.numeric)
 
@@ -359,7 +688,7 @@ nonzero_numeric_cols <- names(col_sums_numeric)[col_sums_numeric != 0]
 filtered_data <- element_gift_TM6[, !numeric_cols | colnames(element_gift_TM6) %in% nonzero_numeric_cols]
 ```
 
-```{r gitfs_filtering_3, echo=TRUE,results=FALSE}
+```{r gitfs_filtering_3_1, echo=TRUE,results=FALSE}
 significant_elements_TM6 <- filtered_data %>%
   pivot_longer(-c(Tube_code,type), names_to = "trait", values_to = "value") %>%
   group_by(trait) %>%
@@ -413,8 +742,8 @@ element_gift_names <- element_gift_filt%>%
   left_join(., sample_metadata_TM6[c(1,7)], by = join_by(Tube_code == Tube_code))
 ```
 
-```{r gitfs_plot, echo=TRUE,results=FALSE, warning=FALSE}
-colNames <- names(element_gift_names)[2:20] #always check names(element_gift_names) first to now were your traits finish
+```{r gitfs_plot_1_1_1, echo=TRUE,results=FALSE, warning=FALSE}
+colNames <- names(element_gift_names)[2:20] #always check names(element_gift_names) first to now where your traits finish
 for(i in colNames){
   plt <- ggplot(element_gift_names, aes(x=type, y=.data[[i]], color = type)) +
     geom_boxplot(alpha = 0.2, outlier.shape = NA, width = 0.3, show.legend = FALSE) +
@@ -433,7 +762,7 @@ for(i in colNames){
 
 ### Comparison of samples from the 0 Time_point (0_Wild)
 
-```{r gitfs_merge_1, echo=TRUE,results=FALSE}
+```{r gitfs_merge_1_2, echo=TRUE,results=FALSE}
 #Merge the functional domains with the metadata
 merge_gift_wild<- GIFTs_domains_community %>% 
   as.data.frame() %>% 
@@ -527,10 +856,209 @@ p4 <-merge_gift_wild %>%
   labs( x = "Species")
 ```
 
-```{r final_plot_1, echo=FALSE, results=TRUE,fig.height=8, fig.width=10, fig.fullwidth=TRUE}
+```{r final_plot_1_2, echo=FALSE, results=TRUE,fig.height=8, fig.width=10, fig.fullwidth=TRUE}
 grid.arrange(arrangeGrob(p1, p2,p3, p4, ncol = 2))
 ```
 
+### Comparison of samples from the 1st Time_point (1_Acclimation)
+
+```{r gitfs_merge_1_1, echo=TRUE,results=FALSE}
+#Merge the functional domains with the metadata
+merge_gift_accli<- GIFTs_domains_community %>% 
+  as.data.frame() %>% 
+  rownames_to_column(., "Tube_code") %>% 
+  inner_join(., sample_metadata_accli, by="Tube_code")
+```
+
+
+```{r biosynthesis_plot_1_1, echo=TRUE, results=TRUE}
+#Biosynthesis
+p1 <-merge_gift_accli %>%
+  ggplot(aes(x=species,y=Biosynthesis,color=species,fill=species))+
+  geom_jitter(width = 0.2, size = 1.5, show.legend = FALSE)+ 
+  geom_boxplot(alpha=0.2,outlier.shape = NA, width = 0.5, show.legend = FALSE, coef=0)+
+  stat_compare_means() +
+  theme(axis.text.x = element_text(vjust = 0.5, size=10),
+        axis.text.y = element_text(size=10),
+        axis.title=element_text(size=12,face="bold"),
+        axis.text = element_text(face="bold", size=18),
+        panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
+        legend.text = element_text(size=10),
+        legend.title = element_text(size=12),
+        legend.position="none",
+        legend.key.size = unit(1, 'cm'),
+        strip.text.x = element_text(size = 12, color = "black", face = "bold"))+
+  labs( x = "Species")
+
+#Degradation
+p2 <-merge_gift_accli %>%
+  ggplot(aes(x=species,y=Degradation,color=species,fill=species))+
+  geom_jitter(width = 0.2, size = 1.45, show.legend = FALSE)+ 
+  geom_boxplot(alpha=0.2,outlier.shape = NA, width = 0.5, show.legend = FALSE, coef=0)+
+  stat_compare_means() +
+  theme(axis.text.x = element_text(vjust = 0.5, size=10),
+        axis.text.y = element_text(size=10),
+        axis.title=element_text(size=12,face="bold"),
+        panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
+        legend.text = element_text(size=10),
+        legend.title = element_text(size=12),
+        legend.position="none",
+        legend.key.size = unit(1, 'cm'),
+        strip.text.x = element_text(size = 12, color = "black", face = "bold"))+
+  labs( x = "Species")
+
+#Structure
+p3 <-merge_gift_accli %>%
+  ggplot(aes(x=species,y=Structure,color=species,fill=species))+
+  geom_jitter(width = 0.2, size = 1.5, show.legend = FALSE)+ 
+  geom_boxplot(alpha=0.2,outlier.shape = NA, width = 0.5, show.legend = FALSE, coef=0)+
+  stat_compare_means() +
+  theme(axis.text.x = element_text(vjust = 3, size=10),
+        axis.text.y = element_text(size=10),
+        axis.title=element_text(size=12,face="bold"),
+        axis.text = element_text(face="bold", size=18),
+        panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
+        legend.text = element_text(size=10),
+        legend.title = element_text(size=12),
+        legend.position="none",
+        legend.key.size = unit(1, 'cm'),
+        strip.text.x = element_text(size = 12, color = "black", face = "bold"))+
+  labs( x = "Species")
+
+#Overall
+p4 <-merge_gift_accli %>%
+  ggplot(aes(x=species,y=Overall,color=species,fill=species))+
+  geom_jitter(width = 0.2, size = 1.5, show.legend = FALSE)+ 
+  geom_boxplot(alpha=0.2,outlier.shape = NA, width = 0.5, show.legend = FALSE, coef=0)+
+  stat_compare_means() +
+  theme(axis.text.x = element_text(vjust = 0.5, size=10),
+        axis.text.y = element_text(size=10),
+        axis.title=element_text(size=12,face="bold"),
+        axis.text = element_text(face="bold", size=18),
+        panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
+        legend.text = element_text(size=10),
+        legend.title = element_text(size=12),
+        legend.position="none",
+        legend.key.size = unit(1, 'cm'),
+        strip.text.x = element_text(size = 12, color = "black", face = "bold"))+
+  labs( x = "Species")
+```
+
+```{r final_plot_1_1, echo=FALSE, results=TRUE,fig.height=8, fig.width=10, fig.fullwidth=TRUE}
+grid.arrange(arrangeGrob(p1, p2,p3, p4, ncol = 2))
+```
+
+### Comparison of samples from the 5th Time_point (5_Post-FMT1)
+
+```{r gitfs_merge_1, echo=TRUE,results=FALSE}
+#Merge the functional domains with the metadata
+merge_gift_tm5<- GIFTs_domains_community %>% 
+  as.data.frame() %>% 
+  rownames_to_column(., "Tube_code") %>% 
+  inner_join(., sample_metadata_tm5, by="Tube_code")
+```
+
+
+```{r biosynthesis_plot_1_2, echo=TRUE, results=TRUE}
+#Biosynthesis
+p1 <-merge_gift_tm5 %>%
+  ggplot(aes(x=species,y=Biosynthesis,color=species,fill=species))+
+  geom_jitter(width = 0.2, size = 1.5, show.legend = FALSE)+ 
+  geom_boxplot(alpha=0.2,outlier.shape = NA, width = 0.5, show.legend = FALSE, coef=0)+
+  stat_compare_means() +
+  theme(axis.text.x = element_text(vjust = 0.5, size=10),
+        axis.text.y = element_text(size=10),
+        axis.title=element_text(size=12,face="bold"),
+        axis.text = element_text(face="bold", size=18),
+        panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
+        legend.text = element_text(size=10),
+        legend.title = element_text(size=12),
+        legend.position="none",
+        legend.key.size = unit(1, 'cm'),
+        strip.text.x = element_text(size = 12, color = "black", face = "bold"))+
+  labs( x = "Species")
+
+#Degradation
+p2 <-merge_gift_tm5 %>%
+  ggplot(aes(x=species,y=Degradation,color=species,fill=species))+
+  geom_jitter(width = 0.2, size = 1.45, show.legend = FALSE)+ 
+  geom_boxplot(alpha=0.2,outlier.shape = NA, width = 0.5, show.legend = FALSE, coef=0)+
+  stat_compare_means() +
+  theme(axis.text.x = element_text(vjust = 0.5, size=10),
+        axis.text.y = element_text(size=10),
+        axis.title=element_text(size=12,face="bold"),
+        panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
+        legend.text = element_text(size=10),
+        legend.title = element_text(size=12),
+        legend.position="none",
+        legend.key.size = unit(1, 'cm'),
+        strip.text.x = element_text(size = 12, color = "black", face = "bold"))+
+  labs( x = "Species")
+
+#Structure
+p3 <-merge_gift_tm5 %>%
+  ggplot(aes(x=species,y=Structure,color=species,fill=species))+
+  geom_jitter(width = 0.2, size = 1.5, show.legend = FALSE)+ 
+  geom_boxplot(alpha=0.2,outlier.shape = NA, width = 0.5, show.legend = FALSE, coef=0)+
+  stat_compare_means() +
+  theme(axis.text.x = element_text(vjust = 3, size=10),
+        axis.text.y = element_text(size=10),
+        axis.title=element_text(size=12,face="bold"),
+        axis.text = element_text(face="bold", size=18),
+        panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
+        legend.text = element_text(size=10),
+        legend.title = element_text(size=12),
+        legend.position="none",
+        legend.key.size = unit(1, 'cm'),
+        strip.text.x = element_text(size = 12, color = "black", face = "bold"))+
+  labs( x = "Species")
+
+#Overall
+p4 <-merge_gift_tm5 %>%
+  ggplot(aes(x=species,y=Overall,color=species,fill=species))+
+  geom_jitter(width = 0.2, size = 1.5, show.legend = FALSE)+ 
+  geom_boxplot(alpha=0.2,outlier.shape = NA, width = 0.5, show.legend = FALSE, coef=0)+
+  stat_compare_means() +
+  theme(axis.text.x = element_text(vjust = 0.5, size=10),
+        axis.text.y = element_text(size=10),
+        axis.title=element_text(size=12,face="bold"),
+        axis.text = element_text(face="bold", size=18),
+        panel.background = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
+        legend.text = element_text(size=10),
+        legend.title = element_text(size=12),
+        legend.position="none",
+        legend.key.size = unit(1, 'cm'),
+        strip.text.x = element_text(size = 12, color = "black", face = "bold"))+
+  labs( x = "Species")
+```
+
+```{r final_plot_1, echo=FALSE, results=TRUE,fig.height=8, fig.width=10, fig.fullwidth=TRUE}
+grid.arrange(arrangeGrob(p1, p2,p3, p4, ncol = 2))
+```
 
 ### Comparison of samples from the 6th Time_point (6_Post-FMT2)
 

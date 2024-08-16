@@ -87,7 +87,6 @@ adonis2(formula=beta_div_func_wild$S ~ species, data=wild[labels(beta_div_func_w
 			kable()
 ```
 
-
 ```{r beta_neutral_nmds, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
 beta_q0n_nmds_wild <- beta_div_richness_wild$S %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace=FALSE) %>%
@@ -201,13 +200,380 @@ p3<-beta_q1f_nmds_wild %>%
 ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 ```
 
+### 2. Effect of acclimation
 
-### 2. Do the antibiotics work?
+```{r beta_div_neutral_accli, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE}
+accli <- meta %>%
+  filter(time_point == "1_Acclimation")
+
+# Create a temporary modified version of genome_counts_filt
+temp_genome_counts <- transform(genome_counts_filt, row.names = genome_counts_filt$genome)
+temp_genome_counts$genome <- NULL
+
+accli.counts <- temp_genome_counts[, which(colnames(temp_genome_counts) %in% rownames(accli))]
+identical(sort(colnames(accli.counts)), sort(as.character(rownames(accli))))
+
+accli_nmds <- sample_metadata %>%
+  filter(time_point == "1_Acclimation")
+```
+
+#### Number of samples used
+
+```{r beta_div_neutral_accli_samples, echo=FALSE, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE}
+nrow(accli)
+```
+
+```{r beta_div_neutral_accli_1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE}
+beta_div_richness_accli<-hillpair(data=accli.counts, q=0)
+beta_div_neutral_accli<-hillpair(data=accli.counts, q=1)
+beta_div_phylo_accli<-hillpair(data=accli.counts, q=1, tree=genome_tree)
+beta_div_func_accli<-hillpair(data=accli.counts, q=1, dist=dist)
+```
+
+#### Richness
+
+```{r beta_richness_permanova_1_accli, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+betadisper(beta_div_richness_accli$S, accli$Population) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_richness_permanova_accli, echo=FALSE, warning=FALSE, comments="", message=FALSE, results=TRUE}
+adonis2(formula=beta_div_richness_accli$S ~ Population, data=accli[labels(beta_div_richness_accli$S),], permutations=999) %>%
+  as.matrix() %>%
+  kable()
+```
+
+
+#### Neutral
+
+```{r beta_neutral_permanova_1_accli, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+betadisper(beta_div_neutral_accli$S, accli$Population) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_neutral_permanova_accli, echo=FALSE, warning=FALSE, comments="", message=FALSE, results=TRUE}
+adonis2(formula=beta_div_neutral_accli$S ~ Population, data=accli[labels(beta_div_neutral_accli$S),], permutations=999) %>%
+  as.matrix() %>%
+  kable()
+```
+
+#### Phylogenetic
+
+```{r beta_phylo_permanova_1_accli, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+betadisper(beta_div_phylo_accli$S, accli$Population) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_phylo_permanova_accli, echo=FALSE, warning=FALSE, comments="", message=FALSE, results=TRUE}
+adonis2(formula=beta_div_phylo_accli$S ~ Population, data=accli[labels(beta_div_phylo_accli$S),], permutations=999) %>%
+  as.matrix() %>%
+  kable()
+```
+
+#### Functional
+
+```{r beta_func_permanova_accli_1, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+betadisper(beta_div_func_accli$S, accli$Population) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_func_permanova_accli, echo=FALSE, warning=FALSE, comments="", message=FALSE, results=TRUE}
+adonis2(formula=beta_div_func_accli$S ~ Population, data=accli[labels(beta_div_func_accli$S),], permutations=999) %>%
+  as.matrix() %>%
+  kable()
+```
+
+
+```{r beta_neutral_nmds_accli, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
+beta_q0n_nmds_accli <- beta_div_richness_accli$S %>%
+  metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace=FALSE) %>%
+  vegan::scores() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(accli_nmds, by = join_by(sample == Tube_code))
+
+beta_q1n_nmds_accli <- beta_div_neutral_accli$S %>%
+  metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace=FALSE) %>%
+  vegan::scores() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(accli_nmds, by = join_by(sample == Tube_code))
+
+beta_q1p_nmds_accli <- beta_div_phylo_accli$S %>%
+  metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+  vegan::scores() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(accli_nmds, by = join_by(sample == Tube_code))
+
+beta_q1f_nmds_accli <- beta_div_func_accli$S %>%
+  metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+  vegan::scores() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(accli_nmds, by = join_by(sample == Tube_code))
+```
+
+```{r beta_neutral_nmds_plot_accli, echo=FALSE, results=TRUE}
+p0<-beta_q0n_nmds_accli %>%
+  group_by(Population) %>%
+  mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+  mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+  ungroup() %>%
+  ggplot(., aes(x=NMDS1,y=NMDS2, color=Population)) +
+  scale_color_manual(name="Population",
+                     breaks=c("Cold_wet","Hot_dry"),
+                     labels=c("Cold","Hot"),
+                     values=c('#008080',"#d57d2c")) +
+  scale_shape_manual(name="Type",
+                     breaks=c("Control", "Hot_control", "Treatment"),
+                     labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values=c("circle","square","triangle")) +
+  geom_point(size=2) +
+  geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+  labs(y = "NMDS2", x="NMDS1 \n Richness beta diversity") +
+  theme_classic() +
+  theme(legend.position="none")
+
+p1<-beta_q1n_nmds_accli %>%
+  group_by(Population) %>%
+  mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+  mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+  ungroup() %>%
+  ggplot(., aes(x=NMDS1,y=NMDS2, color=Population, shape=type)) +
+  scale_color_manual(name="Population",
+                     breaks=c("Cold_wet","Hot_dry"),
+                     labels=c("Cold","Hot"),
+                     values=c('#008080',"#d57d2c")) +
+  scale_shape_manual(name="Type",
+                     breaks=c("Control", "Hot_control", "Treatment"),
+                     labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values=c("circle","square","triangle")) +
+  geom_point(size=2) +
+  geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+  labs(y = "NMDS2", x="NMDS1 \n Neutral beta diversity") +
+  theme_classic() +
+  theme(legend.position="none")
+
+p2<-beta_q1p_nmds_accli %>%
+  group_by(Population) %>%
+  mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+  mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+  ungroup() %>%
+  ggplot(., aes(x=NMDS1,y=NMDS2, color=Population)) +
+  scale_color_manual(name="Population",
+                     breaks=c("Cold_wet","Hot_dry"),
+                     labels=c("Cold","Hot"),
+                     values=c('#008080',"#d57d2c")) +
+  scale_shape_manual(name="Type",
+                     breaks=c("Control", "Hot_control", "Treatment"),
+                     labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values=c("circle","square","triangle")) +
+  geom_point(size=2) +
+  geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+  labs(y= element_blank (),x="NMDS1 \n Phylogenetic beta diversity") +
+  theme_classic() +
+  theme(legend.position="none") 
+
+p3<-beta_q1f_nmds_accli %>%
+  group_by(Population) %>%
+  mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+  mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+  ungroup() %>%
+  ggplot(., aes(x=NMDS1,y=NMDS2, color=Population, label=sample)) +
+  scale_color_manual(name="Population",
+                     breaks=c("Cold_wet","Hot_dry"),
+                     labels=c("Cold","Hot"),
+                     values=c('#008080',"#d57d2c")) +
+  scale_shape_manual(name="Type",
+                     breaks=c("Control", "Hot_control", "Treatment"),
+                     labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values=c("circle","square","triangle")) +
+  geom_point(size=2) +
+  geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+  labs(y= element_blank (), x="NMDS1 \n Functional beta diversity") +
+  theme_classic() +
+  theme(legend.position="none") +
+  guides(color=guide_legend(title="Species"))
+```
+
+```{r beta_neutral_nmds_plot_final_accli, echo=FALSE, results=TRUE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
+ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
+```
+
+### 3. Comparison between Wild and Acclimation
+
+```{r beta_div_neutral_accli1, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE}
+accli1 <- meta  %>%
+  filter(time_point == "0_Wild" | time_point == "1_Acclimation")
+
+temp_genome_counts <- transform(genome_counts_filt, row.names = genome_counts_filt$genome)
+temp_genome_counts$genome <- NULL
+
+accli1.counts <- temp_genome_counts[,which(colnames(temp_genome_counts) %in% rownames(accli1))]
+identical(sort(colnames(accli1.counts)),sort(as.character(rownames(accli1))))
+
+accli1_nmds <- sample_metadata %>%
+  filter(time_point == "0_Wild" | time_point == "1_Acclimation")
+```
+
+#### Number of samples used
+
+```{r beta_div_neutral_accli1_samples, echo=FALSE, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE}
+nrow(accli1)
+```
+
+```{r beta_div_neutral_accli1_1, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE}
+beta_div_richness_accli1<-hillpair(data=accli1.counts, q=0)
+beta_div_neutral_accli1<-hillpair(data=accli1.counts, q=1)
+beta_div_phylo_accli1<-hillpair(data=accli1.counts, q=1, tree=genome_tree)
+beta_div_func_accli1<-hillpair(data=accli1.counts, q=1, dist=dist)
+```
+
+##### Richness
+
+```{r beta_div_richness_accli1_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+betadisper(beta_div_richness_accli1$S, accli1$time_point) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_div_richness_accli1_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+adonis2(formula=beta_div_richness_accli1$S ~ time_point+species+individual, data=accli1[labels(beta_div_neutral_accli1$S),], permutations=999) %>%
+		as.matrix() %>%
+		kable()
+```
+
+##### Neutral
+
+```{r beta_div_neutral_accli1_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+betadisper(beta_div_neutral_accli1$S, accli1$time_point) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_div_neutral_accli1_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+adonis2(formula=beta_div_neutral_accli1$S ~ time_point+species+individual, data=accli1[labels(beta_div_neutral_accli1$S),], permutations=999) %>%
+		as.matrix() %>%
+		kable()
+```
+
+
+##### Phylogenetic
+
+```{r beta_div_phylo_accli1_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+betadisper(beta_div_phylo_accli1$S, accli1$time_point) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_div_phylo_accli1_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+adonis2(formula=beta_div_phylo_accli1$S ~ time_point+species+individual, data=accli1[labels(beta_div_phylo_accli1$S),], permutations=999) %>%
+		as.matrix() %>%
+		kable()
+```
+
+##### Functional
+
+```{r beta_div_func_accli1_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+betadisper(beta_div_func_accli1$S, accli1$time_point) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_div_func_accli1_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+adonis2(formula=beta_div_func_accli1$S ~ time_point+species+individual, data=accli1[labels(beta_div_func_accli1$S),], permutations=999) %>%
+		as.matrix() %>%
+		kable()
+```
+
+
+```{r beta_neutral_nmds_accli1, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
+beta_richness_nmds_accli1 <- beta_div_richness_accli1$S %>%
+				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+				scores() %>%
+				as_tibble(., rownames = "sample") %>%
+				left_join(accli1_nmds, by = c("sample" = "Tube_code"))
+
+beta_neutral_nmds_accli1 <- beta_div_neutral_accli1$S %>%
+				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+				scores() %>%
+				as_tibble(., rownames = "sample") %>%
+				left_join(accli1_nmds, by = c("sample" = "Tube_code"))
+
+beta_phylo_nmds_accli1 <- beta_div_phylo_accli1$S %>%
+				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+				scores() %>%
+				as_tibble(., rownames = "sample") %>%
+				left_join(accli1_nmds, by = join_by(sample == Tube_code))
+
+beta_func_nmds_accli1 <- beta_div_func_accli1$S %>%
+				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+				scores() %>%
+				as_tibble(., rownames = "sample") %>%
+				left_join(accli1_nmds, by = join_by(sample == Tube_code))
+```
+
+```{r beta_neutral_nmds_accli1_plot, echo=FALSE, results=FALSE}
+p0<-beta_richness_nmds_accli1 %>%
+			group_by(individual) %>%
+			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+			ungroup() %>%
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+        scale_color_manual(name="Type",
+                       breaks=c("Control", "Hot_control", "accli1ment"),
+                       labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                       values=c("#4477AA","#d57d2c","#76b183")) +
+				geom_point(size=2) +
+				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+        labs(y = "NMDS2", x="NMDS1 \n Richness beta diversity") +
+				theme_classic() +
+				theme(legend.position="none")
+
+p1<-beta_neutral_nmds_accli1 %>%
+			group_by(individual) %>%
+			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+			ungroup() %>%
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+        scale_color_manual(name="Type",
+                       breaks=c("Control", "Hot_control", "accli1ment"),
+                       labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                       values=c("#4477AA","#d57d2c","#76b183")) +
+				geom_point(size=2) +
+				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+        labs(y = "NMDS2", x="NMDS1 \n Neutral beta diversity") +
+				theme_classic() +
+				theme(legend.position="none")
+  
+p2<-beta_phylo_nmds_accli1 %>%
+			group_by(individual) %>%
+			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+			ungroup() %>%
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+				scale_color_manual(name="Type",
+                       breaks=c("Control", "Hot_control", "accli1ment"),
+                       labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                       values=c("#4477AA","#d57d2c","#76b183")) +
+				geom_point(size=2) +
+				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+        labs(y= element_blank (), x="NMDS1 \n Phylogenetic beta diversity") +
+				theme_classic() +
+				theme(legend.position="none")
+
+p3<-beta_func_nmds_accli1 %>%
+			group_by(individual) %>%
+			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+			ungroup() %>%
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+				scale_color_manual(name="Type",
+                       breaks=c("Control", "Hot_control", "accli1ment"),
+                       labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                       values=c("#4477AA","#d57d2c","#76b183")) +
+				geom_point(size=2) +
+				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+        labs(y= element_blank (), x="NMDS1 \n Functional beta diversity") +
+				theme_classic()+
+				theme(legend.position="none")
+```
+
+```{r beta_neutral_nmds_plot_accli1_final, echo=FALSE, results=TRUE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
+ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
+```
+
+### 4. Do the antibiotics work?
 
 #### Acclimation vs antibiotics
 
 ```{r beta_div_neutral_treat, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE}
-treat <- meta  %>% #antibiotics samples giving error when plotting
+treat <- meta  %>%
   filter(time_point == "1_Acclimation" | time_point == "2_Antibiotics")
 
 temp_genome_counts <- transform(genome_counts_filt, row.names = genome_counts_filt$genome)
@@ -380,7 +746,7 @@ ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 ```
 
 
-### 3. Do the FMT work?
+### 5. Do the FMT work?
 
 #### Comparison between FMT2 vs Post-FMT2
 
@@ -581,7 +947,7 @@ ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 ```
 
 
-### 4. Are there differences between the control and the treatment group?
+### 7. Are there differences between the control and the treatment group?
 
 #### After 1 week --> Post-FMT1
 
