@@ -746,7 +746,7 @@ ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 ```
 
 
-### 5. Do the FMT work?
+### 5. Does the FMT work?
 
 #### Comparison between FMT2 vs Post-FMT2
 
@@ -947,7 +947,623 @@ ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 ```
 
 
-### 7. Are there differences between the control and the treatment group?
+
+#### Comparison between the different experimental time points
+##### Comparison against Wild samples
+
+```{r diss_data_1, echo=FALSE, results=FALSE}
+transplants_metadata<-sample_metadata%>%
+  mutate(Tube_code=str_remove_all(Tube_code, "_a"))
+transplants_metadata$newID <- paste(transplants_metadata$Tube_code, "_", transplants_metadata$individual)
+
+transplant4<-transplants_metadata%>%
+  filter(time_point == "4_Transplant2" | time_point == "6_Post-FMT2" |time_point == "0_Wild")%>%
+  column_to_rownames("newID")
+
+transplant4_pairwise <- transplants_metadata %>%
+  filter(time_point == "4_Transplant2" | time_point == "6_Post-FMT2"|time_point == "0_Wild")
+
+
+full_counts<-temp_genome_counts %>%
+  t()%>%
+  as.data.frame()%>%
+  rownames_to_column("Tube_code")%>%
+  full_join(transplants_metadata,by = join_by(Tube_code == Tube_code))
+
+transplant4_counts<-full_counts %>%
+  filter(time_point == "4_Transplant2" | time_point == "6_Post-FMT2"|time_point == "0_Wild") %>%
+  subset(select=-c(315:324)) %>%
+  column_to_rownames("newID")%>%
+  subset(select=-c(1))%>%
+  t() %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric)
+
+identical(sort(colnames(transplant4_counts)),sort(as.character(rownames(transplant4))))
+
+beta_div_neutral_transplant4<-hillpair(data=transplant4_counts, q=1)
+
+transplant4_beta_div_neutral<-as.matrix(beta_div_neutral_transplant4$S) #convert the pairwise comparisons into a matrix
+
+transplant4_beta_div_neutral_df <- as.data.frame(as.table(as.matrix(transplant4_beta_div_neutral))) #convert the matrix to a data frame with pairwise values
+```
+
+```{r diss_data, echo=FALSE, results=FALSE}
+transplant4_beta_div_neutral_df <- transplant4_beta_div_neutral_df %>% #remove the duplicated pairwise comparisons
+  filter(Var1 != Var2) %>%
+  mutate(pair = pmap_chr(list(Var1, Var2), ~paste(sort(c(..1, ..2)), collapse = "_"))) %>%
+  distinct(pair, .keep_all = TRUE) %>%
+  select(Sample_1 = Var1, Sample_2 = Var2, Distance = Freq) %>%
+  arrange(Sample_1, Sample_2)
+
+
+transplant4_beta_div_neutral_df <- transplant4_beta_div_neutral_df %>% #keep only the pairwise comparisons between the same individual
+  mutate(Sample_1_part = sub("^[^_]*_", "", Sample_1),
+         Sample_2_part = sub("^[^_]*_", "", Sample_2)) %>%
+  filter(Sample_1_part == Sample_2_part) 
+#%>%
+  #select(Sample_1, Sample_2, Distance)
+
+
+transplant4_beta_div_neutral_met<-transplant4_beta_div_neutral_df %>% #merge with the metadata associated to the pairwise comparisons for Sample_1
+  inner_join(transplant4_pairwise, by = join_by(Sample_1 == "newID"))
+
+# Extract the part before the first `_` for Sample_1 and Sample_2
+transplant4_beta_div_neutral_met$Sample_1_part <- sub("_.*", "", transplant4_beta_div_neutral_met$Sample_1)
+
+# Create a named vector for matching Tube_code with Time_point
+time_point_map <- setNames(transplant4_beta_div_neutral_met$time_point, transplant4_beta_div_neutral_met$Tube_code)
+
+# Function to replace the part before the first _ with the corresponding Time_point
+replace_with_time_point <- function(sample_part, tube_code, time_point_map) {
+  if (tube_code %in% names(time_point_map)) {
+    return(time_point_map[tube_code])
+  } else {
+    return(sample_part)
+  }
+}
+
+# Apply the function to Sample_1_part
+transplant4_beta_div_neutral_met$Sample_1_part <- mapply(replace_with_time_point,
+                                                         transplant4_beta_div_neutral_met$Sample_1_part,
+                                                         transplant4_beta_div_neutral_met$Tube_code,
+                                                         list(time_point_map))
+
+transplant4_beta_div_neutral_met<-transplant4_beta_div_neutral_met %>%
+  subset(select=-c(6:16))
+
+transplant4_beta_div_neutral_met$Sample_2_part <- sub("_.*", "", transplant4_beta_div_neutral_met$Sample_2)
+
+
+transplant4_beta_div_neutral_met<-transplant4_beta_div_neutral_met %>% #merge with the metadata associated to the pairwise comparisons for Sample_2
+  inner_join(transplant4_pairwise, by = join_by(Sample_2 == "newID"))
+
+# Create a named vector again for matching Tube_code with Time_point
+time_point_map <- setNames(transplant4_beta_div_neutral_met$time_point, transplant4_beta_div_neutral_met$Tube_code)
+
+
+replace_with_time_point <- function(sample_part, tube_code, time_point_map) {
+  if (tube_code %in% names(time_point_map)) {
+    return(time_point_map[tube_code])
+  } else {
+    return(sample_part)
+  }
+}
+
+# Apply the function to Sample_2_part
+transplant4_beta_div_neutral_met$Sample_2_part <- mapply(replace_with_time_point,
+                                                    transplant4_beta_div_neutral_met$Sample_2_part,
+                                                         transplant4_beta_div_neutral_met$Tube_code,
+                                                         list(time_point_map))
+
+
+# Create a new variable to plot the distances between the time_points
+transplant4_beta_div_neutral_met$comparison <- paste(transplant4_beta_div_neutral_met$Sample_1_part, "-",transplant4_beta_div_neutral_met$Sample_2_part)
+```
+
+```{r diss_plot, echo=FALSE, results=FALSE}
+transplant4_beta_div_neutral_met$type<-as.factor(transplant4_beta_div_neutral_met$type)
+
+Acclimation_Transplant<-transplant4_beta_div_neutral_met %>% 
+  filter(comparison == "0_Wild - 4_Transplant2")
+
+bxp1 <- Acclimation_Transplant %>%
+  ggplot(aes(x = type, y = Distance, color = type, fill = type)) +
+  geom_boxplot() +
+  scale_color_manual(name = "Type",
+                     breaks = c("Control", "Hot_control", "Treatment"),
+                     labels = c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values = c("#4477AA", "#d57d2c", "#76b183")) +
+  scale_fill_manual(name = "Type",
+                    breaks = c("Control", "Hot_control", "Treatment"),
+                    labels = c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                    values = c("#4477AA50", "#d57d2c50", "#76b18350")) +
+  scale_x_discrete(labels = c("Control" = "Cold-Cold", "Hot_control" = "Hot-Hot", "Treatment" = "Cold-Hot")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab("Beta diversity dissimilarity distance")
+
+# Add significance bars with p-values
+p1<-bxp1 + 
+  geom_signif(comparisons = list(c("Control", "Hot_control"), c("Control", "Treatment"), c("Hot_control", "Treatment")),
+              map_signif_level = TRUE)
+
+
+Transplant_Treatment<-transplant4_beta_div_neutral_met %>% 
+  filter(comparison == "6_Post-FMT2 - 4_Transplant2")
+bxp2 <- Transplant_Treatment %>%
+  ggplot(aes(x = type, y = Distance, color = type, fill = type)) +
+  geom_boxplot() +
+  scale_color_manual(name = "Type",
+                     breaks = c("Control", "Hot_control", "Treatment"),
+                     labels = c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values = c("#4477AA", "#d57d2c", "#76b183")) +
+  scale_fill_manual(name = "Type",
+                    breaks = c("Control", "Hot_control", "Treatment"),
+                    labels = c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                    values = c("#4477AA50", "#d57d2c50", "#76b18350")) +
+  scale_x_discrete(labels = c("Control" = "Cold-Cold", "Hot_control" = "Hot-Hot", "Treatment" = "Cold-Hot")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab("Beta diversity dissimilarity distance")
+# Add significance bars with p-values
+p2<-bxp2 + 
+  geom_signif(comparisons = list(c("Control", "Hot_control"), c("Control", "Treatment"), c("Hot_control", "Treatment")),
+              map_signif_level = TRUE)
+
+Treatment_Acclimation<-transplant4_beta_div_neutral_met %>% 
+  filter(comparison == "0_Wild - 6_Post-FMT2")
+bxp3 <- Treatment_Acclimation %>%
+  ggplot(aes(x = type, y = Distance, color = type, fill = type)) +
+  geom_boxplot() +
+  scale_color_manual(name = "Type",
+                     breaks = c("Control", "Hot_control", "Treatment"),
+                     labels = c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values = c("#4477AA", "#d57d2c", "#76b183")) +
+  scale_fill_manual(name = "Type",
+                    breaks = c("Control", "Hot_control", "Treatment"),
+                    labels = c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                    values = c("#4477AA50", "#d57d2c50", "#76b18350")) +
+  scale_x_discrete(labels = c("Control" = "Cold-Cold", "Hot_control" = "Hot-Hot", "Treatment" = "Cold-Hot")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab("Beta diversity dissimilarity distance")
+
+# Add significance bars with p-values
+p3<-bxp3 + 
+  geom_signif(comparisons = list(c("Control", "Hot_control"), c("Control", "Treatment"), c("Hot_control", "Treatment")),
+              map_signif_level = TRUE)
+```
+
+```{r diss_plot1_1, , fig.height=7, eho=FALSE, results=TRUE}
+ggarrange( p1, p2, p3, ncol=3, nrow=1, common.legend = TRUE, legend="right")
+```
+
+##### Comparison against Acclimation samples
+
+```{r diss_data1_2, echo=FALSE, results=FALSE}
+#Create newID to identify duplicated samples
+transplants_metadata<-sample_metadata%>%
+  mutate(Tube_code=str_remove_all(Tube_code, "_a"))
+transplants_metadata$newID <- paste(transplants_metadata$Tube_code, "_", transplants_metadata$individual)
+
+transplant5<-transplants_metadata%>%
+  filter(time_point == "4_Transplant2" | time_point == "6_Post-FMT2" |time_point == "1_Acclimation")%>%
+  column_to_rownames("newID")
+
+transplant5_pairwise <- transplants_metadata %>%
+  filter(time_point == "4_Transplant2" | time_point == "6_Post-FMT2"|time_point == "1_Acclimation")
+
+
+full_counts_new<-temp_genome_counts %>%
+  t()%>%
+  as.data.frame()%>%
+  rownames_to_column("Tube_code")%>%
+  full_join(transplants_metadata,by = join_by(Tube_code == Tube_code))
+
+transplant5_counts<-full_counts %>%
+  filter(time_point == "4_Transplant2" | time_point == "6_Post-FMT2"|time_point == "1_Acclimation") %>%
+  subset(select=-c(315:324)) %>%
+  column_to_rownames("newID")%>%
+  subset(select=-c(1))%>%
+  t() %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric)
+
+identical(sort(colnames(transplant5_counts)),sort(as.character(rownames(transplant5))))
+
+
+beta_div_neutral_transplant5<-hillpair(data=transplant5_counts, q=1)
+
+transplant5_beta_div_neutral<-as.matrix(beta_div_neutral_transplant5$S) #convert the pairwise comparisons into a matrix
+
+transplant5_beta_div_neutral_df <- as.data.frame(as.table(as.matrix(transplant5_beta_div_neutral))) #convert the matrix to a data frame with pairwise values
+```
+
+
+```{r diss_data1_1, echo=FALSE, results=FALSE}
+transplant5_beta_div_neutral_df <- transplant5_beta_div_neutral_df %>% #remove the duplicated pairwise comparisons
+  filter(Var1 != Var2) %>%
+  mutate(pair = pmap_chr(list(Var1, Var2), ~paste(sort(c(..1, ..2)), collapse = "_"))) %>%
+  distinct(pair, .keep_all = TRUE) %>%
+  select(Sample_1 = Var1, Sample_2 = Var2, Distance = Freq) %>%
+  arrange(Sample_1, Sample_2)
+
+
+transplant5_beta_div_neutral_df <- transplant5_beta_div_neutral_df %>% #keep only the pairwise comparisons between the same individual
+  mutate(Sample_1_part = sub("^[^_]*_", "", Sample_1),
+         Sample_2_part = sub("^[^_]*_", "", Sample_2)) %>%
+  filter(Sample_1_part == Sample_2_part) 
+#%>%
+  #select(Sample_1, Sample_2, Distance)
+
+
+transplant5_beta_div_neutral_met<-transplant5_beta_div_neutral_df %>% #merge with the metadata associated to the pairwise comparisons for Sample_1
+  inner_join(transplant5_pairwise, by = join_by(Sample_1 == "newID"))
+
+# Extract the part before the first `_` for Sample_1 and Sample_2
+transplant5_beta_div_neutral_met$Sample_1_part <- sub("_.*", "", transplant5_beta_div_neutral_met$Sample_1)
+
+# Create a named vector for matching Tube_code with Time_point
+time_point_map_new <- setNames(transplant5_beta_div_neutral_met$time_point, transplant5_beta_div_neutral_met$Tube_code)
+
+# Function to replace the part before the first _ with the corresponding Time_point
+replace_with_time_point_new <- function(sample_part, tube_code, time_point_map_new) {
+  if (tube_code %in% names(time_point_map_new)) {
+    return(time_point_map_new[tube_code])
+  } else {
+    return(sample_part)
+  }
+}
+
+# Apply the function to Sample_1_part
+transplant5_beta_div_neutral_met$Sample_1_part <- mapply(replace_with_time_point_new,
+                                                         transplant5_beta_div_neutral_met$Sample_1_part,
+                                                         transplant5_beta_div_neutral_met$Tube_code,
+                                                         list(time_point_map_new))
+
+transplant5_beta_div_neutral_met<-transplant5_beta_div_neutral_met %>%
+  subset(select=-c(6:16))
+
+transplant5_beta_div_neutral_met$Sample_2_part <- sub("_.*", "", transplant5_beta_div_neutral_met$Sample_2)
+
+
+transplant5_beta_div_neutral_met<-transplant5_beta_div_neutral_met %>% #merge with the metadata associated to the pairwise comparisons for Sample_2
+  inner_join(transplant5_pairwise, by = join_by(Sample_2 == "newID"))
+
+# Create a named vector again for matching Tube_code with Time_point
+time_point_map_new <- setNames(transplant5_beta_div_neutral_met$time_point, transplant5_beta_div_neutral_met$Tube_code)
+
+
+replace_with_time_point_new <- function(sample_part, tube_code, time_point_map_new) {
+  if (tube_code %in% names(time_point_map_new)) {
+    return(time_point_map_new[tube_code])
+  } else {
+    return(sample_part)
+  }
+}
+
+# Apply the function to Sample_2_part
+transplant5_beta_div_neutral_met$Sample_2_part <- mapply(replace_with_time_point_new,
+                                                         transplant5_beta_div_neutral_met$Sample_2_part,
+                                                         transplant5_beta_div_neutral_met$Tube_code,
+                                                         list(time_point_map_new))
+
+
+# Create a new variable to plot the distances between the time_points
+transplant5_beta_div_neutral_met$comparison <- paste(transplant5_beta_div_neutral_met$Sample_1_part, "-",transplant5_beta_div_neutral_met$Sample_2_part)
+
+
+##plot the differences between acclimation and post-transplant and transplant and post-transplant
+
+# Reorder the 'comparison' factor
+transplant5_beta_div_neutral_met$comparison <- factor(
+  transplant5_beta_div_neutral_met$comparison,
+  levels = c("4_Transplant2 - 1_Acclimation",  # Acclimation-Transplant first
+             "6_Post-FMT2 - 4_Transplant2",    # Transplant-Treatment second
+             "6_Post-FMT2 - 1_Acclimation")    # Treatment-Acclimation last
+)
+```
+
+```{r diss_plot1, echo=FALSE, results=FALSE}
+# Create the plot with the specified facet order
+transplant5_beta_div_neutral_met$type<-as.factor(transplant5_beta_div_neutral_met$type)
+
+Acclimation_Transplant<-transplant5_beta_div_neutral_met %>% 
+  filter(comparison == "4_Transplant2 - 1_Acclimation")
+
+bxp1 <- Acclimation_Transplant %>%
+  ggplot(aes(x = type, y = Distance, color = type, fill = type)) +
+  geom_boxplot() +
+  scale_color_manual(name = "Type",
+                     breaks = c("Control", "Hot_control", "Treatment"),
+                     labels = c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values = c("#4477AA", "#d57d2c", "#76b183")) +
+  scale_fill_manual(name = "Type",
+                    breaks = c("Control", "Hot_control", "Treatment"),
+                    labels = c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                    values = c("#4477AA50", "#d57d2c50", "#76b18350")) +
+  scale_x_discrete(labels = c("Control" = "Cold-Cold", "Hot_control" = "Hot-Hot", "Treatment" = "Cold-Hot")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab("Beta diversity dissimilarity distance")
+
+# Add significance bars with p-values
+p1<-bxp1 + 
+  geom_signif(comparisons = list(c("Control", "Hot_control"), c("Control", "Treatment"), c("Hot_control", "Treatment")),
+              map_signif_level = TRUE)
+
+
+Transplant_Treatment<-transplant5_beta_div_neutral_met %>% 
+  filter(comparison == "6_Post-FMT2 - 4_Transplant2")
+bxp2 <- Transplant_Treatment %>%
+  ggplot(aes(x = type, y = Distance, color = type, fill = type)) +
+  geom_boxplot() +
+  scale_color_manual(name = "Type",
+                     breaks = c("Control", "Hot_control", "Treatment"),
+                     labels = c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values = c("#4477AA", "#d57d2c", "#76b183")) +
+  scale_fill_manual(name = "Type",
+                    breaks = c("Control", "Hot_control", "Treatment"),
+                    labels = c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                    values = c("#4477AA50", "#d57d2c50", "#76b18350")) +
+  scale_x_discrete(labels = c("Control" = "Cold-Cold", "Hot_control" = "Hot-Hot", "Treatment" = "Cold-Hot")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab("Beta diversity dissimilarity distance")
+# Add significance bars with p-values
+p2<-bxp2 + 
+  geom_signif(comparisons = list(c("Control", "Hot_control"), c("Control", "Treatment"), c("Hot_control", "Treatment")),
+              map_signif_level = TRUE)
+
+Treatment_Acclimation<-transplant5_beta_div_neutral_met %>% 
+  filter(comparison == "6_Post-FMT2 - 1_Acclimation")
+bxp3 <- Treatment_Acclimation %>%
+  ggplot(aes(x = type, y = Distance, color = type, fill = type)) +
+  geom_boxplot() +
+  scale_color_manual(name = "Type",
+                     breaks = c("Control", "Hot_control", "Treatment"),
+                     labels = c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values = c("#4477AA", "#d57d2c", "#76b183")) +
+  scale_fill_manual(name = "Type",
+                    breaks = c("Control", "Hot_control", "Treatment"),
+                    labels = c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                    values = c("#4477AA50", "#d57d2c50", "#76b18350")) +
+  scale_x_discrete(labels = c("Control" = "Cold-Cold", "Hot_control" = "Hot-Hot", "Treatment" = "Cold-Hot")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab("Beta diversity dissimilarity distance")
+
+# Add significance bars with p-values
+p3<-bxp3 + 
+  geom_signif(comparisons = list(c("Control", "Hot_control"), c("Control", "Treatment"), c("Hot_control", "Treatment")),
+              map_signif_level = TRUE)
+```
+
+```{r diss_plot2_!, , fig.height=7, eho=FALSE, results=TRUE}
+ggarrange( p1, p2, p3, ncol=3, nrow=1, common.legend = TRUE, legend="right")
+```
+
+##### Comparison against Acclimation samples with combined Transplant samples
+
+```{r diss_data1_3, echo=FALSE, results=FALSE}
+transplants_metadata<-transplants_metadata%>%
+  filter(!(Tube_code == "AD45" | Tube_code == "AD48"))
+
+#Create newID to identify duplicated samples
+transplant6<-transplants_metadata%>%
+  filter(time_point == "3_Transplant1" | time_point == "4_Transplant2" | time_point == "6_Post-FMT2" |time_point == "1_Acclimation")%>%
+  column_to_rownames("newID")
+
+#Transform time_point names to combine the transplant samples
+transplant6 <- transplant6 %>%
+  mutate(time_point = recode(time_point,
+                             "3_Transplant1" = "Transplant",
+                             "4_Transplant2" = "Transplant"))
+
+#Transform time_point names to combine the transplant samples
+transplant6_pairwise <- transplants_metadata %>%
+  filter(time_point == "3_Transplant1" | time_point == "4_Transplant2" | time_point == "6_Post-FMT2"|time_point == "1_Acclimation")
+
+transplant6_pairwise <- transplant6_pairwise %>%
+  mutate(time_point = recode(time_point,
+                             "3_Transplant1" = "Transplant",
+                             "4_Transplant2" = "Transplant"))
+
+full_counts_new<-temp_genome_counts %>%
+  t()%>%
+  as.data.frame()%>%
+  rownames_to_column("Tube_code")%>%
+  full_join(transplants_metadata,by = join_by(Tube_code == Tube_code))
+
+transplant6_counts<-full_counts %>%
+  filter(time_point == "3_Transplant1" | time_point == "4_Transplant2" | time_point == "6_Post-FMT2"|time_point == "1_Acclimation") %>%
+  subset(select=-c(315:324)) %>%
+  column_to_rownames("newID")%>%
+  subset(select=-c(1))%>%
+  t() %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric)
+
+identical(sort(colnames(transplant6_counts)),sort(as.character(rownames(transplant6))))
+```
+
+```{r diss_data1_4, echo=FALSE, results=FALSE}
+beta_div_neutral_transplant6<-hillpair(data=transplant6_counts, q=1)
+
+transplant6_beta_div_neutral<-as.matrix(beta_div_neutral_transplant6$S) #convert the pairwise comparisons into a matrix
+
+transplant6_beta_div_neutral_df <- as.data.frame(as.table(as.matrix(transplant6_beta_div_neutral))) #convert the matrix to a data frame with pairwise values
+
+transplant6_beta_div_neutral_df <- transplant6_beta_div_neutral_df %>% #remove the duplicated pairwise comparisons
+  filter(Var1 != Var2) %>%
+  mutate(pair = pmap_chr(list(Var1, Var2), ~paste(sort(c(..1, ..2)), collapse = "_"))) %>%
+  distinct(pair, .keep_all = TRUE) %>%
+  select(Sample_1 = Var1, Sample_2 = Var2, Distance = Freq) %>%
+  arrange(Sample_1, Sample_2)
+
+
+transplant6_beta_div_neutral_df <- transplant6_beta_div_neutral_df %>% #keep only the pairwise comparisons between the same individual
+  mutate(Sample_1_part = sub("^[^_]*_", "", Sample_1),
+         Sample_2_part = sub("^[^_]*_", "", Sample_2)) %>%
+  filter(Sample_1_part == Sample_2_part) 
+#%>%
+#select(Sample_1, Sample_2, Distance)
+
+
+transplant6_beta_div_neutral_met<-transplant6_beta_div_neutral_df %>% #merge with the metadata associated to the pairwise comparisons for Sample_1
+  inner_join(transplant6_pairwise, by = join_by(Sample_1 == "newID"))
+
+# Extract the part before the first `_` for Sample_1 and Sample_2
+transplant6_beta_div_neutral_met$Sample_1_part <- sub("_.*", "", transplant6_beta_div_neutral_met$Sample_1)
+
+# Create a named vector for matching Tube_code with Time_point
+time_point_map_new <- setNames(transplant6_beta_div_neutral_met$time_point, transplant6_beta_div_neutral_met$Tube_code)
+
+# Function to replace the part before the first _ with the corresponding Time_point
+replace_with_time_point_new <- function(sample_part, tube_code, time_point_map_new) {
+  if (tube_code %in% names(time_point_map_new)) {
+    return(time_point_map_new[tube_code])
+  } else {
+    return(sample_part)
+  }
+}
+
+# Apply the function to Sample_1_part
+transplant6_beta_div_neutral_met$Sample_1_part <- mapply(replace_with_time_point_new,
+                                                         transplant6_beta_div_neutral_met$Sample_1_part,
+                                                         transplant6_beta_div_neutral_met$Tube_code,
+                                                         list(time_point_map_new))
+
+transplant6_beta_div_neutral_met<-transplant6_beta_div_neutral_met %>%
+  subset(select=-c(6:16))
+
+transplant6_beta_div_neutral_met$Sample_2_part <- sub("_.*", "", transplant6_beta_div_neutral_met$Sample_2)
+
+
+transplant6_beta_div_neutral_met<-transplant6_beta_div_neutral_met %>% #merge with the metadata associated to the pairwise comparisons for Sample_2
+  inner_join(transplant6_pairwise, by = join_by(Sample_2 == "newID"))
+
+# Create a named vector again for matching Tube_code with Time_point
+time_point_map_new <- setNames(transplant6_beta_div_neutral_met$time_point, transplant6_beta_div_neutral_met$Tube_code)
+
+
+replace_with_time_point_new <- function(sample_part, tube_code, time_point_map_new) {
+  if (tube_code %in% names(time_point_map_new)) {
+    return(time_point_map_new[tube_code])
+  } else {
+    return(sample_part)
+  }
+}
+
+# Apply the function to Sample_2_part
+transplant6_beta_div_neutral_met$Sample_2_part <- mapply(replace_with_time_point_new,
+                                                         transplant6_beta_div_neutral_met$Sample_2_part,
+                                                         transplant6_beta_div_neutral_met$Tube_code,
+                                                         list(time_point_map_new))
+
+
+# Create a new variable to plot the distances between the time_points
+transplant6_beta_div_neutral_met$comparison <- paste(transplant6_beta_div_neutral_met$Sample_1_part, "-",transplant6_beta_div_neutral_met$Sample_2_part)
+
+
+##plot the differences between acclimation and post-transplant and transplant and post-transplant
+
+# Reorder the 'comparison' factor
+transplant6_beta_div_neutral_met$comparison <- factor(
+  transplant6_beta_div_neutral_met$comparison,
+  levels = c("Transplant - 1_Acclimation",  # Acclimation-Transplant first
+             "6_Post-FMT2 - Transplant",    # Transplant-Treatment second
+             "6_Post-FMT2 - 1_Acclimation")    # Treatment-Acclimation last
+)
+
+transplant6_beta_div_neutral_met_filtered <- transplant6_beta_div_neutral_met %>%
+  filter(!(Sample_1_part == "Transplant" & Sample_2_part == "Transplant"))
+```
+
+```{r diss_plot2, echo=FALSE, results=FALSE}
+Acclimation_Transplant<-transplant6_beta_div_neutral_met_filtered %>% 
+  filter(comparison == "Transplant - 1_Acclimation")
+stat.test_accli <- Acclimation_Transplant %>% 
+  t_test(Distance ~ type)%>% 
+  add_xy_position(x = "type")%>% 
+  filter(p.adj < 0.05)
+
+
+bxp1 <- Acclimation_Transplant %>%
+  ggplot(aes(x = type, y = Distance, color = type, fill = type)) +
+  geom_boxplot() +
+  scale_color_manual(name = "Type",
+                     breaks = c("Control", "Hot_control", "Treatment"),
+                     labels = c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values = c("#4477AA", "#d57d2c", "#76b183")) +
+  scale_fill_manual(name = "Type",
+                    breaks = c("Control", "Hot_control", "Treatment"),
+                    labels = c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                    values = c("#4477AA50", "#d57d2c50", "#76b18350")) +
+  scale_x_discrete(labels = c("Control" = "Cold-Cold", "Hot_control" = "Hot-Hot", "Treatment" = "Cold-Hot")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab("Beta diversity dissimilarity distance")
+
+# Add significance bars with p-values
+p1<-bxp1 + 
+  geom_signif(comparisons = list(c("Control", "Hot_control"), c("Control", "Treatment"), c("Hot_control", "Treatment")),
+              map_signif_level = TRUE)
+
+
+Transplant_Treatment<-transplant6_beta_div_neutral_met_filtered %>% 
+  filter(comparison == "6_Post-FMT2 - Transplant")
+bxp2 <- Transplant_Treatment %>%
+  ggplot(aes(x = type, y = Distance, color = type, fill = type)) +
+  geom_boxplot() +
+  scale_color_manual(name = "Type",
+                     breaks = c("Control", "Hot_control", "Treatment"),
+                     labels = c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values = c("#4477AA", "#d57d2c", "#76b183")) +
+  scale_fill_manual(name = "Type",
+                    breaks = c("Control", "Hot_control", "Treatment"),
+                    labels = c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                    values = c("#4477AA50", "#d57d2c50", "#76b18350")) +
+  scale_x_discrete(labels = c("Control" = "Cold-Cold", "Hot_control" = "Hot-Hot", "Treatment" = "Cold-Hot")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab("Beta diversity dissimilarity distance")
+# Add significance bars with p-values
+p2<-bxp2 + 
+  geom_signif(comparisons = list(c("Control", "Hot_control"), c("Control", "Treatment"), c("Hot_control", "Treatment")),
+              map_signif_level = TRUE)
+
+Treatment_Acclimation<-transplant6_beta_div_neutral_met_filtered %>% 
+  filter(comparison == "6_Post-FMT2 - 1_Acclimation")
+bxp3 <- Treatment_Acclimation %>%
+  ggplot(aes(x = type, y = Distance, color = type, fill = type)) +
+  geom_boxplot() +
+  scale_color_manual(name = "Type",
+                     breaks = c("Control", "Hot_control", "Treatment"),
+                     labels = c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values = c("#4477AA", "#d57d2c", "#76b183")) +
+  scale_fill_manual(name = "Type",
+                    breaks = c("Control", "Hot_control", "Treatment"),
+                    labels = c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                    values = c("#4477AA50", "#d57d2c50", "#76b18350")) +
+  scale_x_discrete(labels = c("Control" = "Cold-Cold", "Hot_control" = "Hot-Hot", "Treatment" = "Cold-Hot")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab("Beta diversity dissimilarity distance")
+
+# Add significance bars with p-values
+p3<-bxp3 + 
+  geom_signif(comparisons = list(c("Control", "Hot_control"), c("Control", "Treatment"), c("Hot_control", "Treatment")),
+              map_signif_level = TRUE)
+```
+
+```{r diss_plot3, , fig.height=7, eho=FALSE, results=TRUE}
+ggarrange( p1, p2, p3, ncol=3, nrow=1, common.legend = TRUE, legend="right")
+```
+
+
+### 6. Are there differences between the control and the treatment group?
 
 #### After 1 week --> Post-FMT1
 
