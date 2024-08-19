@@ -92,8 +92,6 @@ neutral-4
 phylogenetic-4
 functional-4
 comparison-between-the-different-experimental-time-points
-comparison-against-wild-samples
-comparison-against-acclimation-samples
 comparison-against-acclimation-samples-with-combined-transplant-samples
 are-there-differences-between-the-control-and-the-treatment-group
 after-1-week-post-fmt1
