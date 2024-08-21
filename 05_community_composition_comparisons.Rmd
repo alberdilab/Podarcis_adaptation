@@ -31,7 +31,7 @@ wild_nmds <- sample_metadata %>%
 nrow(wild)
 ```
 
-```{r beta_div_neutral_wild_1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE}
+```{r beta_div_neutral_wild_1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE}
 beta_div_richness_wild<-hillpair(data=wild.counts, q=0)
 beta_div_neutral_wild<-hillpair(data=wild.counts, q=1)
 beta_div_phylo_wild<-hillpair(data=wild.counts, q=1, tree=genome_tree)
@@ -223,7 +223,7 @@ accli_nmds <- sample_metadata %>%
 nrow(accli)
 ```
 
-```{r beta_div_neutral_accli_1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE}
+```{r beta_div_neutral_accli_1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE}
 beta_div_richness_accli<-hillpair(data=accli.counts, q=0)
 beta_div_neutral_accli<-hillpair(data=accli.counts, q=1)
 beta_div_phylo_accli<-hillpair(data=accli.counts, q=1, tree=genome_tree)
@@ -415,7 +415,7 @@ accli1_nmds <- sample_metadata %>%
 nrow(accli1)
 ```
 
-```{r beta_div_neutral_accli1_1, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE}
+```{r beta_div_neutral_accli1_1, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE}
 beta_div_richness_accli1<-hillpair(data=accli1.counts, q=0)
 beta_div_neutral_accli1<-hillpair(data=accli1.counts, q=1)
 beta_div_phylo_accli1<-hillpair(data=accli1.counts, q=1, tree=genome_tree)
@@ -429,7 +429,7 @@ betadisper(beta_div_richness_accli1$S, accli1$time_point) %>% permutest(., pairw
 ```
 
 ```{r beta_div_richness_accli1_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_richness_accli1$S ~ time_point+species+individual, data=accli1[labels(beta_div_neutral_accli1$S),], permutations=999, strata=accli1$individual) %>%
+adonis2(formula=beta_div_richness_accli1$S ~ time_point*species, data=accli1[labels(beta_div_neutral_accli1$S),], permutations=999, strata=accli1$individual) %>%
 		as.matrix() %>%
 		kable()
 ```
@@ -441,7 +441,7 @@ betadisper(beta_div_neutral_accli1$S, accli1$time_point) %>% permutest(., pairwi
 ```
 
 ```{r beta_div_neutral_accli1_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_neutral_accli1$S ~ time_point+species+individual, data=accli1[labels(beta_div_neutral_accli1$S),], permutations=999, strata=accli1$individual) %>%
+adonis2(formula=beta_div_neutral_accli1$S ~ time_point*species, data=accli1[labels(beta_div_neutral_accli1$S),], permutations=999, strata=accli1$individual) %>%
 		as.matrix() %>%
 		kable()
 ```
@@ -453,7 +453,7 @@ betadisper(beta_div_phylo_accli1$S, accli1$time_point) %>% permutest(., pairwise
 ```
 
 ```{r beta_div_phylo_accli1_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_phylo_accli1$S ~ time_point+species+individual, data=accli1[labels(beta_div_phylo_accli1$S),], permutations=999, strata=accli1$individual) %>%
+adonis2(formula=beta_div_phylo_accli1$S ~ time_point*species, data=accli1[labels(beta_div_phylo_accli1$S),], permutations=999, strata=accli1$individual) %>%
 		as.matrix() %>%
 		kable()
 ```
@@ -465,7 +465,7 @@ betadisper(beta_div_func_accli1$S, accli1$time_point) %>% permutest(., pairwise 
 ```
 
 ```{r beta_div_func_accli1_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_func_accli1$S ~ time_point+species+individual, data=accli1[labels(beta_div_func_accli1$S),], permutations=999, strata=accli1$individual) %>%
+adonis2(formula=beta_div_func_accli1$S ~ time_point*species, data=accli1[labels(beta_div_func_accli1$S),], permutations=999, strata=accli1$individual) %>%
 		as.matrix() %>%
 		kable()
 ```
@@ -591,7 +591,7 @@ treat_nmds <- sample_metadata %>%
 nrow(treat)
 ```
 
-```{r beta_div_neutral_treat_1, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE}
+```{r beta_div_neutral_treat_1, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE}
 beta_div_richness_treat<-hillpair(data=treat.counts, q=0)
 beta_div_neutral_treat<-hillpair(data=treat.counts, q=1)
 beta_div_phylo_treat<-hillpair(data=treat.counts, q=1, tree=genome_tree)
@@ -787,12 +787,14 @@ nrow(transplant3)
 ```
 
 
-```{r beta_div_neutral_transplant3_1, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE}
+```{r beta_div_neutral_transplant3_1, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE}
 beta_div_richness_transplant3<-hillpair(data=transplant3_counts, q=0)
 beta_div_neutral_transplant3<-hillpair(data=transplant3_counts, q=1)
 beta_div_phylo_transplant3<-hillpair(data=transplant3_counts, q=1, tree=genome_tree)
 beta_div_func_transplant3<-hillpair(data=transplant3_counts, q=1, dist=dist)
+```
 
+```{r beta_div_neutral_transplant3_2, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE}
 #Arrange of metadata dataframe
 transplant3_arrange<-transplant3[labels(beta_div_neutral_transplant3$S),]
 ```
@@ -800,7 +802,7 @@ transplant3_arrange<-transplant3[labels(beta_div_neutral_transplant3$S),]
 ##### Richness
 
 ```{r beta_richness_permanova_transplant3_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_richness_transplant3$S ~ species+time_point+type+individual, data=transplant3[labels(beta_div_richness_transplant3$S),], permutations=999, strata=transplant3$individual) %>%
+adonis2(formula=beta_div_richness_transplant3$S ~ species+time_point+type, data=transplant3[labels(beta_div_richness_transplant3$S),], permutations=999, strata=transplant3$individual) %>%
 		as.matrix() %>%
 		kable()
 ```
@@ -813,7 +815,7 @@ pairwise
 ##### Neutral
 
 ```{r beta_neutral_permanova_transplant3_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_neutral_transplant3$S ~ species+time_point+type+individual, data=transplant3[labels(beta_div_neutral_transplant3$S),], permutations=999, strata=transplant3$individual) %>%
+adonis2(formula=beta_div_neutral_transplant3$S ~ species+time_point+type, data=transplant3[labels(beta_div_neutral_transplant3$S),], permutations=999, strata=transplant3$individual) %>%
 		as.matrix() %>%
 		kable()
 ```
@@ -826,7 +828,7 @@ pairwise
 ##### Phylogenetic
 
 ```{r beta_phylo_permanova_transplant3_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_phylo_transplant3$S ~ species+time_point+type+individual, data=transplant3[labels(beta_div_phylo_transplant3$S),], permutations=999, strata=transplant3$individual) %>%
+adonis2(formula=beta_div_phylo_transplant3$S ~ species+time_point+type, data=transplant3[labels(beta_div_phylo_transplant3$S),], permutations=999, strata=transplant3$individual) %>%
 		as.matrix() %>%
 		kable()
 ```
@@ -839,7 +841,7 @@ pairwise
 ##### Functional
 
 ```{r beta_func_permanova_transplant3_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_func_transplant3$S ~ species+time_point+type+individual, data=transplant3[labels(beta_div_func_transplant3$S),], permutations=999, strata=transplant3$individual) %>%
+adonis2(formula=beta_div_func_transplant3$S ~ species+time_point+type, data=transplant3[labels(beta_div_func_transplant3$S),], permutations=999, strata=transplant3$individual) %>%
 		as.matrix() %>%
 		kable()
 ```
@@ -1188,12 +1190,14 @@ post1_nmds <- sample_metadata %>%
 nrow(post1)
 ```
 
-```{r beta_div_phylo_post1_1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE}
+```{r beta_div_phylo_post1_1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE}
 beta_div_richness_post1<-hillpair(data=post1.counts, q=0)
 beta_div_neutral_post1<-hillpair(data=post1.counts, q=1)
 beta_div_phylo_post1<-hillpair(data=post1.counts, q=1, tree=genome_tree)
 beta_div_func_post1<-hillpair(data=post1.counts, q=1, dist=dist)
+```
 
+```{r beta_div_phylo_post1_2, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE}
 #Arrange of metadata dataframe
 post1_arrange<-post1[labels(beta_div_neutral_post1$S),]
 ```
@@ -1383,12 +1387,14 @@ post2_nmds <- sample_metadata %>%
 nrow(post2)
 ```
 
-```{r beta_div_phylo_post2_1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE}
+```{r beta_div_phylo_post2_1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE}
 beta_div_richness_post2<-hillpair(data=post2.counts, q=0)
 beta_div_neutral_post2<-hillpair(data=post2.counts, q=1)
 beta_div_phylo_post2<-hillpair(data=post2.counts, q=1, tree=genome_tree)
 beta_div_func_post2<-hillpair(data=post2.counts, q=1, dist=dist)
+```
 
+```{r beta_div_phylo_post2_2, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE}
 #Arrange of metadata dataframe
 post2_arrange<-post2[labels(beta_div_neutral_post2$S),]
 ```
