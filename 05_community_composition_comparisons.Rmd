@@ -980,7 +980,8 @@ adonis2(formula=beta_div_richness_transplant3$S ~ species+time_point+type, data=
 
 ```{r beta_richness_permanova_transplant3_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 pairwise<-pairwise.adonis(beta_div_richness_transplant3$S,transplant3_arrange$type, perm=999)
-pairwise
+pairwise%>%
+  tt()
 ```
 
 ##### Neutral
@@ -993,7 +994,8 @@ adonis2(formula=beta_div_neutral_transplant3$S ~ species+time_point+type, data=t
 
 ```{r beta_neutral_permanova_transplant3_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 pairwise<-pairwise.adonis(beta_div_neutral_transplant3$S,transplant3_arrange$type, perm=999)
-pairwise
+pairwise%>%
+  tt()
 ```
 
 ##### Phylogenetic
@@ -1006,7 +1008,8 @@ adonis2(formula=beta_div_phylo_transplant3$S ~ species+time_point+type, data=tra
 
 ```{r beta_phylo_permanova_transplant3_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 pairwise<-pairwise.adonis(beta_div_phylo_transplant3$S,transplant3_arrange$type, perm=999)
-pairwise
+pairwise%>%
+  tt()
 ```
 
 ##### Functional
@@ -1019,7 +1022,8 @@ adonis2(formula=beta_div_func_transplant3$S ~ species+time_point+type, data=tran
 
 ```{r beta_func_permanova_transplant3_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 pairwise<-pairwise.adonis(beta_div_func_transplant3$S,transplant3_arrange$type, perm=999)
-pairwise
+pairwise%>%
+  tt()
 ```
 
 ```{r beta_neutral_nmds_transplant3, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
@@ -1379,6 +1383,12 @@ beta_div_func_transplant7<-hillpair(data=transplant7_counts, q=1, dist=dist)
 ```{r beta_div_neutral_transplant7_2, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE}
 #Arrange of metadata dataframe
 transplant7_arrange<-transplant7[labels(beta_div_neutral_transplant7$S),]
+transplant7_arrange <- transplant7_arrange %>%
+  mutate(time_point = recode(time_point,
+                             "3_Transplant1" = "Transplant",
+                             "4_Transplant2" = "Transplant"))
+
+transplant7_arrange$type_time <- interaction(transplant7_arrange$type, transplant7_arrange$time_point)
 ```
 
 ##### Richness
@@ -1390,8 +1400,9 @@ adonis2(formula=beta_div_richness_transplant7$S ~ Population*time_point+type, da
 ```
 
 ```{r beta_richness_permanova_transplant7_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
-pairwise<-pairwise.adonis(beta_div_richness_transplant7$S,transplant7_arrange$type, perm=999)
-pairwise
+pairwise<-pairwise.adonis(beta_div_richness_transplant7$S,transplant7_arrange$type_time, perm=999)
+pairwise%>%
+  tt()
 ```
 
 ##### Neutral
@@ -1403,8 +1414,9 @@ adonis2(formula=beta_div_neutral_transplant7$S ~ Population+time_point*type, dat
 ```
 
 ```{r beta_neutral_permanova_transplant7_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
-pairwise<-pairwise.adonis(beta_div_neutral_transplant7$S,transplant7_arrange$type, perm=999)
-pairwise
+pairwise<-pairwise.adonis(beta_div_neutral_transplant7$S,transplant7_arrange$type_time, perm=999)
+pairwise%>%
+  tt()
 ```
 
 ##### Phylogenetic
@@ -1416,8 +1428,9 @@ adonis2(formula=beta_div_phylo_transplant7$S ~ Population+time_point+type, data=
 ```
 
 ```{r beta_phylo_permanova_transplant7_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
-pairwise<-pairwise.adonis(beta_div_phylo_transplant7$S,transplant7_arrange$type, perm=999)
-pairwise
+pairwise<-pairwise.adonis(beta_div_phylo_transplant7$S,transplant7_arrange$type_time, perm=999)
+pairwise%>%
+  tt()
 ```
 
 ##### Functional
@@ -1429,8 +1442,9 @@ adonis2(formula=beta_div_func_transplant7$S ~ Population+time_point+type, data=t
 ```
 
 ```{r beta_func_permanova_transplant7_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
-pairwise<-pairwise.adonis(beta_div_func_transplant7$S,transplant7_arrange$type, perm=999)
-pairwise
+pairwise<-pairwise.adonis(beta_div_func_transplant7$S,transplant7_arrange$type_time, perm=999)
+pairwise%>%
+  tt()
 ```
 
 ```{r beta_neutral_nmds_transplant7, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
@@ -1593,7 +1607,8 @@ adonis2(formula=beta_div_richness_post3$S ~ time_point*Population, data=post3[la
 
 ```{r beta_div_pairwise_post3_8, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 pairwise <- pairwise.adonis(beta_div_richness_post3$S, post3_arrange$type_time, perm=999)
-pairwise
+pairwise%>%
+  tt()
 ```
 
 ##### Neutral
@@ -1610,7 +1625,8 @@ adonis2(formula=beta_div_neutral_post3$S ~ time_point*Population, data=post3[lab
 
 ```{r beta_div_pairwise_post3_9, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 pairwise <- pairwise.adonis(beta_div_neutral_post3$S, post3_arrange$type_time, perm=999)
-pairwise
+pairwise%>%
+  tt()
 ```
 
 ##### Phylogenetic
@@ -1627,7 +1643,8 @@ adonis2(formula=beta_div_phylo_post3$S ~ time_point*Population, data=post3[label
 
 ```{r beta_div_pairwise_post3_6, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 pairwise <- pairwise.adonis(beta_div_phylo_post3$S, post3_arrange$type_time, perm=999)
-pairwise
+pairwise%>%
+  tt()
 ```
 
 ##### Functional
@@ -1644,7 +1661,8 @@ adonis2(formula=beta_div_func_post3$S ~ time_point*Population, data=post3[labels
 
 ```{r beta_div_pairwise_post3_7, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 pairwise <- pairwise.adonis(beta_div_func_post3$S, post3_arrange$type_time, perm=999)
-pairwise
+pairwise%>%
+  tt()
 ```
 
 ```{r beta_neutral_nmds_post3, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
@@ -1792,7 +1810,8 @@ adonis2(formula=beta_div_richness_post4$S ~ time_point*Population, data=post4[la
 
 ```{r beta_div_pairwise_post4_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 pairwise <- pairwise.adonis(beta_div_richness_post4$S, post4_arrange$type_time, perm=999)
-pairwise
+pairwise%>%
+  tt()
 ```
 
 ##### Neutral
@@ -1809,7 +1828,8 @@ adonis2(formula=beta_div_neutral_post4$S ~ time_point*Population, data=post4[lab
 
 ```{r beta_div_pairwise_post4_6, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 pairwise <- pairwise.adonis(beta_div_neutral_post4$S, post4_arrange$type_time, perm=999)
-pairwise
+pairwise%>%
+  tt()
 ```
 
 ##### Phylogenetic
@@ -1826,7 +1846,8 @@ adonis2(formula=beta_div_phylo_post4$S ~ time_point*Population, data=post4[label
 
 ```{r beta_div_pairwise_post4_7, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 pairwise <- pairwise.adonis(beta_div_phylo_post4$S, post4_arrange$type_time, perm=999)
-pairwise
+pairwise%>%
+  tt()
 ```
 
 ##### Functional
@@ -1843,7 +1864,8 @@ adonis2(formula=beta_div_func_post4$S ~ time_point*Population, data=post4[labels
 
 ```{r beta_div_pairwise_post4_8, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 pairwise <- pairwise.adonis(beta_div_func_post4$S, post4_arrange$type_time, perm=999)
-pairwise
+pairwise%>%
+  tt()
 ```
 
 ```{r beta_neutral_nmds_post4, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
@@ -2186,7 +2208,8 @@ adonis2(formula=beta_div_richness_post2$S ~ type, data=post2[labels(beta_div_ric
 
 ```{r beta_richness_permanova_post2_3, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 pairwise<-pairwise.adonis(beta_div_richness_post2$S,post2_arrange$type, perm=999)
-pairwise
+pairwise%>%
+  tt()
 ```
 
 ##### Neutral
@@ -2203,7 +2226,8 @@ adonis2(formula=beta_div_neutral_post2$S ~ type, data=post2[labels(beta_div_neut
 
 ```{r beta_neutral_permanova_post2_3, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 pairwise<-pairwise.adonis(beta_div_neutral_post2$S,post2_arrange$type, perm=999)
-pairwise
+pairwise%>%
+  tt()
 ```
 
 ##### Phylogenetic
@@ -2221,7 +2245,8 @@ adonis2(formula=beta_div_phylo_post2$S ~ type, data=post2[labels(beta_div_phylo_
 
 ```{r beta_phylo_permanova_post2_2, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 pairwise<-pairwise.adonis(beta_div_phylo_post2$S,post2_arrange$type, perm=999)
-pairwise
+pairwise%>%
+  tt()
 ```
 
 ##### Functional
@@ -2238,7 +2263,8 @@ adonis2(formula=beta_div_func_post2$S ~ type, data=post2[labels(beta_div_func_po
 
 ```{r beta_func_permanova_post2_3, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 pairwise<-pairwise.adonis(beta_div_func_post2$S,post2_arrange$type, perm=999)
-pairwise
+pairwise%>%
+  tt()
 ```
 
 
