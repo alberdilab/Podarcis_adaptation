@@ -503,11 +503,11 @@ p0<-beta_richness_nmds_accli1 %>%
 			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
 			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
 			ungroup() %>%
-			ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
-        scale_color_manual(name="Type",
-                       breaks=c("Control", "Hot_control", "accli1ment"),
-                       labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
-                       values=c("#4477AA","#d57d2c","#76b183")) +
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=Population, shape=time_point)) +
+        scale_color_manual(name="Population",
+                     breaks=c("Cold_wet","Hot_dry"),
+                     labels=c("Cold","Hot"),
+                     values=c('#008080',"#d57d2c")) +
 				geom_point(size=2) +
 				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
         labs(y = "NMDS2", x="NMDS1 \n Richness beta diversity") +
@@ -519,11 +519,11 @@ p1<-beta_neutral_nmds_accli1 %>%
 			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
 			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
 			ungroup() %>%
-			ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
-        scale_color_manual(name="Type",
-                       breaks=c("Control", "Hot_control", "accli1ment"),
-                       labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
-                       values=c("#4477AA","#d57d2c","#76b183")) +
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=Population, shape=time_point)) +
+        scale_color_manual(name="Population",
+                     breaks=c("Cold_wet","Hot_dry"),
+                     labels=c("Cold","Hot"),
+                     values=c('#008080',"#d57d2c")) +
 				geom_point(size=2) +
 				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
         labs(y = "NMDS2", x="NMDS1 \n Neutral beta diversity") +
@@ -535,11 +535,11 @@ p2<-beta_phylo_nmds_accli1 %>%
 			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
 			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
 			ungroup() %>%
-			ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
-				scale_color_manual(name="Type",
-                       breaks=c("Control", "Hot_control", "accli1ment"),
-                       labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
-                       values=c("#4477AA","#d57d2c","#76b183")) +
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=Population, shape=time_point)) +
+				scale_color_manual(name="Population",
+                     breaks=c("Cold_wet","Hot_dry"),
+                     labels=c("Cold","Hot"),
+                     values=c('#008080',"#d57d2c")) +
 				geom_point(size=2) +
 				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
         labs(y= element_blank (), x="NMDS1 \n Phylogenetic beta diversity") +
@@ -551,11 +551,11 @@ p3<-beta_func_nmds_accli1 %>%
 			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
 			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
 			ungroup() %>%
-			ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
-				scale_color_manual(name="Type",
-                       breaks=c("Control", "Hot_control", "accli1ment"),
-                       labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
-                       values=c("#4477AA","#d57d2c","#76b183")) +
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=Population, shape=time_point)) +
+				scale_color_manual(name="Population",
+                     breaks=c("Cold_wet","Hot_dry"),
+                     labels=c("Cold","Hot"),
+                     values=c('#008080',"#d57d2c")) +
 				geom_point(size=2) +
 				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
         labs(y= element_blank (), x="NMDS1 \n Functional beta diversity") +
@@ -568,6 +568,179 @@ ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 ```
 
 ### 4. Do the antibiotics work?
+
+#### Antibiotics
+
+```{r beta_div_neutral_treat1, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE}
+treat1 <- meta  %>%
+  filter(time_point == "2_Antibiotics")
+
+temp_genome_counts <- transform(genome_counts_filt, row.names = genome_counts_filt$genome)
+temp_genome_counts$genome <- NULL
+
+treat1.counts <- temp_genome_counts[,which(colnames(temp_genome_counts) %in% rownames(treat1))]
+identical(sort(colnames(treat1.counts)),sort(as.character(rownames(treat1))))
+
+treat1_nmds <- sample_metadata %>%
+  filter(time_point == "2_Antibiotics")
+```
+
+#### Number of samples used
+
+```{r beta_div_neutral_treat1_samples, echo=FALSE, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE}
+nrow(treat1)
+```
+
+```{r beta_div_neutral_treat1_1, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE}
+beta_div_richness_treat1<-hillpair(data=treat1.counts, q=0)
+beta_div_neutral_treat1<-hillpair(data=treat1.counts, q=1)
+beta_div_phylo_treat1<-hillpair(data=treat1.counts, q=1, tree=genome_tree)
+beta_div_func_treat1<-hillpair(data=treat1.counts, q=1, dist=dist)
+```
+
+##### Richness
+
+```{r beta_div_richness_treat1_1, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+betadisper(beta_div_richness_treat1$S, treat1$Population) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_div_richness_treat1_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+adonis2(formula=beta_div_richness_treat1$S ~ Population, data=treat1[labels(beta_div_neutral_treat1$S),], permutations=999) %>%
+		as.matrix() %>%
+		kable()
+```
+
+##### Neutral
+
+```{r beta_div_neutral_treat1_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+betadisper(beta_div_neutral_treat1$S, treat1$Population) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_div_neutral_treat1_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+adonis2(formula=beta_div_neutral_treat1$S ~ Population, data=treat1[labels(beta_div_neutral_treat1$S),], permutations=999) %>%
+		as.matrix() %>%
+		kable()
+```
+
+##### Phylogenetic
+
+```{r beta_div_phylo_treat1_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+betadisper(beta_div_phylo_treat1$S, treat1$Population) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_div_phylo_treat1_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+adonis2(formula=beta_div_phylo_treat1$S ~ Population, data=treat1[labels(beta_div_phylo_treat1$S),], permutations=999) %>%
+		as.matrix() %>%
+		kable()
+```
+
+##### Functional
+
+```{r beta_div_func_treat1_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+betadisper(beta_div_func_treat1$S, treat1$Population) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_div_func_treat1_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+adonis2(formula=beta_div_func_treat1$S ~ Population, data=treat1[labels(beta_div_func_treat1$S),], permutations=999) %>%
+		as.matrix() %>%
+		kable()
+```
+
+```{r beta_neutral_nmds_treat1, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
+beta_richness_nmds_treat1 <- beta_div_richness_treat1$S %>%
+				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+				scores() %>%
+				as_tibble(., rownames = "sample") %>%
+				left_join(treat1_nmds, by = c("sample" = "Tube_code"))
+
+beta_neutral_nmds_treat1 <- beta_div_neutral_treat1$S %>%
+				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+				scores() %>%
+				as_tibble(., rownames = "sample") %>%
+				left_join(treat1_nmds, by = c("sample" = "Tube_code"))
+
+beta_phylo_nmds_treat1 <- beta_div_phylo_treat1$S %>%
+				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+				scores() %>%
+				as_tibble(., rownames = "sample") %>%
+				left_join(treat1_nmds, by = join_by(sample == Tube_code))
+
+beta_func_nmds_treat1 <- beta_div_func_treat1$S %>%
+				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+				scores() %>%
+				as_tibble(., rownames = "sample") %>%
+				left_join(treat1_nmds, by = join_by(sample == Tube_code))
+```
+
+```{r beta_neutral_nmds_treat1_plot, echo=FALSE, results=FALSE}
+p0<-beta_richness_nmds_treat1 %>%
+			group_by(Population) %>%
+			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+			ungroup() %>%
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=Population, shape=type)) +
+        scale_color_manual(name="Population",
+                     breaks=c("Cold_wet","Hot_dry"),
+                     labels=c("Cold","Hot"),
+                     values=c('#008080',"#d57d2c")) +
+				geom_point(size=2) +
+				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+        labs(y = "NMDS2", x="NMDS1 \n Richness beta diversity") +
+				theme_classic() +
+				theme(legend.position="none")
+
+p1<-beta_neutral_nmds_treat1 %>%
+			group_by(Population) %>%
+			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+			ungroup() %>%
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=Population, shape=type)) +
+        scale_color_manual(name="Population",
+                     breaks=c("Cold_wet","Hot_dry"),
+                     labels=c("Cold","Hot"),
+                     values=c('#008080',"#d57d2c")) +
+				geom_point(size=2) +
+				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+        labs(y = "NMDS2", x="NMDS1 \n Neutral beta diversity") +
+				theme_classic() +
+				theme(legend.position="none")
+  
+p2<-beta_phylo_nmds_treat1 %>%
+			group_by(Population) %>%
+			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+			ungroup() %>%
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=Population, shape=type)) +
+				scale_color_manual(name="Population",
+                     breaks=c("Cold_wet","Hot_dry"),
+                     labels=c("Cold","Hot"),
+                     values=c('#008080',"#d57d2c")) +
+				geom_point(size=2) +
+				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+        labs(y= element_blank (), x="NMDS1 \n Phylogenetic beta diversity") +
+				theme_classic() +
+				theme(legend.position="none")
+
+p3<-beta_func_nmds_treat1 %>%
+			group_by(Population) %>%
+			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+			ungroup() %>%
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=Population, shape=type)) +
+				scale_color_manual(name="Population",
+                     breaks=c("Cold_wet","Hot_dry"),
+                     labels=c("Cold","Hot"),
+                     values=c('#008080',"#d57d2c")) +
+				geom_point(size=2) +
+				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+        labs(y= element_blank (), x="NMDS1 \n Functional beta diversity") +
+				theme_classic()+
+				theme(legend.position="none")
+```
+
+```{r beta_neutral_nmds_plot_treat1_final, echo=FALSE, results=TRUE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
+ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
+```
 
 #### Acclimation vs antibiotics
 
@@ -605,7 +778,7 @@ betadisper(beta_div_richness_treat$S, treat$time_point) %>% permutest(., pairwis
 ```
 
 ```{r beta_div_richness_treat_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_richness_treat$S ~ time_point+species+individual, data=treat[labels(beta_div_neutral_treat$S),], permutations=999) %>%
+adonis2(formula=beta_div_richness_treat$S ~ time_point*Population, data=treat[labels(beta_div_neutral_treat$S),], permutations=999,strata=treat$individual) %>%
 		as.matrix() %>%
 		kable()
 ```
@@ -617,11 +790,10 @@ betadisper(beta_div_neutral_treat$S, treat$time_point) %>% permutest(., pairwise
 ```
 
 ```{r beta_div_neutral_treat_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_neutral_treat$S ~ time_point+species+individual, data=treat[labels(beta_div_neutral_treat$S),], permutations=999) %>%
+adonis2(formula=beta_div_neutral_treat$S ~ time_point*Population, data=treat[labels(beta_div_neutral_treat$S),], permutations=999,strata=treat$individual) %>%
 		as.matrix() %>%
 		kable()
 ```
-
 
 ##### Phylogenetic
 
@@ -630,7 +802,7 @@ betadisper(beta_div_phylo_treat$S, treat$time_point) %>% permutest(., pairwise =
 ```
 
 ```{r beta_div_phylo_treat_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_phylo_treat$S ~ time_point+species+individual, data=treat[labels(beta_div_phylo_treat$S),], permutations=999) %>%
+adonis2(formula=beta_div_phylo_treat$S ~ time_point*Population, data=treat[labels(beta_div_phylo_treat$S),], permutations=999,strata=treat$individual) %>%
 		as.matrix() %>%
 		kable()
 ```
@@ -642,11 +814,10 @@ betadisper(beta_div_func_treat$S, treat$time_point) %>% permutest(., pairwise = 
 ```
 
 ```{r beta_div_func_treat_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_func_treat$S ~ time_point+species+individual, data=treat[labels(beta_div_func_treat$S),], permutations=999) %>%
+adonis2(formula=beta_div_func_treat$S ~ time_point*Population, data=treat[labels(beta_div_func_treat$S),], permutations=999,strata=treat$individual) %>%
 		as.matrix() %>%
 		kable()
 ```
-
 
 ```{r beta_neutral_nmds_treat, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
 beta_richness_nmds_treat <- beta_div_richness_treat$S %>%
@@ -949,8 +1120,7 @@ ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 
 
 
-#### Comparison between the different experimental time points
-##### Comparison against Acclimation samples with combined Transplant samples
+#### Comparison between the different experimental time points (Acclimation vs Transplant samples)
 
 ```{r diss_data1_3, echo=FALSE, results=FALSE}
 transplants_metadata<-transplants_metadata%>%
@@ -1168,6 +1338,609 @@ p3<-bxp3 +
 ggarrange( p1, p2, p3, ncol=3, nrow=1, common.legend = TRUE, legend="right")
 ```
 
+#### Comparison of acclimation samples to transplant samples
+
+```{r transplant7_data, eho=FALSE, results=TRUE}
+transplant7<-transplants_metadata%>%
+  filter(time_point == "4_Transplant2" | time_point == "1_Acclimation"| time_point == "3_Transplant1")%>%
+  column_to_rownames("newID")
+
+transplant7_nmds <- transplants_metadata %>%
+  filter(time_point == "4_Transplant2" | time_point == "1_Acclimation"| time_point == "3_Transplant1")
+
+transplant7_counts<-full_counts %>%
+  filter(time_point == "4_Transplant2" | time_point == "1_Acclimation"| time_point == "3_Transplant1") %>%
+  subset(select=-c(315:324)) %>%
+  column_to_rownames("newID")%>%
+  subset(select=-c(1))%>%
+  t() %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric)
+
+transplant7_counts <- transplant7_counts[, !names(transplant7_counts) %in% c("AD45 _ LI1_2nd_2", "AD48 _ LI1_2nd_6")]
+
+identical(sort(colnames(transplant7_counts)),sort(as.character(rownames(transplant7))))
+```
+
+#### Number of samples used
+
+```{r beta_div_neutral_transplant7_samples_1, echo=FALSE, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE}
+nrow(transplant7)
+```
+
+
+```{r beta_div_neutral_transplant7_1, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE}
+beta_div_richness_transplant7<-hillpair(data=transplant7_counts, q=0)
+beta_div_neutral_transplant7<-hillpair(data=transplant7_counts, q=1)
+beta_div_phylo_transplant7<-hillpair(data=transplant7_counts, q=1, tree=genome_tree)
+beta_div_func_transplant7<-hillpair(data=transplant7_counts, q=1, dist=dist)
+```
+
+```{r beta_div_neutral_transplant7_2, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE}
+#Arrange of metadata dataframe
+transplant7_arrange<-transplant7[labels(beta_div_neutral_transplant7$S),]
+```
+
+##### Richness
+
+```{r beta_richness_permanova_transplant7_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+adonis2(formula=beta_div_richness_transplant7$S ~ Population*time_point+type, data=transplant7[labels(beta_div_richness_transplant7$S),], permutations=999, strata=transplant7$individual) %>%
+  as.matrix() %>%
+  kable()
+```
+
+```{r beta_richness_permanova_transplant7_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+pairwise<-pairwise.adonis(beta_div_richness_transplant7$S,transplant7_arrange$type, perm=999)
+pairwise
+```
+
+##### Neutral
+
+```{r beta_neutral_permanova_transplant7_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+adonis2(formula=beta_div_neutral_transplant7$S ~ Population+time_point*type, data=transplant7[labels(beta_div_neutral_transplant7$S),], permutations=999, strata=transplant7$individual) %>%
+  as.matrix() %>%
+  kable()
+```
+
+```{r beta_neutral_permanova_transplant7_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+pairwise<-pairwise.adonis(beta_div_neutral_transplant7$S,transplant7_arrange$type, perm=999)
+pairwise
+```
+
+##### Phylogenetic
+
+```{r beta_phylo_permanova_transplant7_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+adonis2(formula=beta_div_phylo_transplant7$S ~ Population+time_point+type, data=transplant7[labels(beta_div_phylo_transplant7$S),], permutations=999, strata=transplant7$individual) %>%
+  as.matrix() %>%
+  kable()
+```
+
+```{r beta_phylo_permanova_transplant7_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+pairwise<-pairwise.adonis(beta_div_phylo_transplant7$S,transplant7_arrange$type, perm=999)
+pairwise
+```
+
+##### Functional
+
+```{r beta_func_permanova_transplant7_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+adonis2(formula=beta_div_func_transplant7$S ~ Population+time_point+type, data=transplant7[labels(beta_div_func_transplant7$S),], permutations=999, strata=transplant7$individual) %>%
+  as.matrix() %>%
+  kable()
+```
+
+```{r beta_func_permanova_transplant7_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+pairwise<-pairwise.adonis(beta_div_func_transplant7$S,transplant7_arrange$type, perm=999)
+pairwise
+```
+
+```{r beta_neutral_nmds_transplant7, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
+beta_richness_nmds_transplant7 <- beta_div_richness_transplant7$S %>%
+  metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+  scores() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(transplant7_nmds, by = join_by(sample == newID))
+
+beta_neutral_nmds_transplant7 <- beta_div_neutral_transplant7$S %>%
+  metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+  scores() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(transplant7_nmds, by = join_by(sample == newID))
+
+beta_phylo_nmds_transplant7 <- beta_div_phylo_transplant7$S %>%
+  metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+  scores() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(transplant7_nmds, by = join_by(sample == newID))
+
+beta_func_nmds_transplant7 <- beta_div_func_transplant7$S %>%
+  metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+  scores() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(transplant7_nmds, by = join_by(sample == newID))
+```
+
+```{r beta_neutral_nmds_transplant7_plot, eho=FALSE, results=FALSE}
+p0<-beta_richness_nmds_transplant7 %>%
+  group_by(type) %>%
+  mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+  mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+  ungroup() %>%
+  ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+  scale_color_manual(name="Type",
+                     breaks=c("Control", "Hot_control", "Treatment"),
+                     labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values=c("#4477AA","#d57d2c","#76b183")) +
+  scale_shape_manual(name="time_point",
+                     breaks=c("1_Acclimation", "3_Transplant1", "4_Transplant2"),
+                     labels=c("Acclimation", "Transplant", "Transplant"),
+                     values=c("circle","square","square")) +
+  geom_point(size=2) +
+  geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+  labs(y = "NMDS2", x="NMDS1 \n Richness beta diversity") +
+  theme_classic() +
+  theme(legend.position="none")
+
+p1<-beta_neutral_nmds_transplant7 %>%
+  group_by(type) %>%
+  mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+  mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+  ungroup() %>%
+  ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+  scale_color_manual(name="Type",
+                     breaks=c("Control", "Hot_control", "Treatment"),
+                     labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values=c("#4477AA","#d57d2c","#76b183")) +
+  scale_shape_manual(name="time_point",
+                     breaks=c("1_Acclimation", "3_Transplant1", "4_Transplant2"),
+                     labels=c("Acclimation", "Transplant", "Transplant"),
+                     values=c("circle","square","square")) +
+  geom_point(size=2) +
+  geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+  labs(y = "NMDS2", x="NMDS1 \n Neutral beta diversity") +
+  theme_classic() +
+  theme(legend.position="none")
+
+p2<-beta_phylo_nmds_transplant7 %>%
+  group_by(type) %>%
+  mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+  mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+  ungroup() %>%
+  ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+  scale_color_manual(name="Type",
+                     breaks=c("Control", "Hot_control", "Treatment"),
+                     labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values=c("#4477AA","#d57d2c","#76b183")) +
+  scale_shape_manual(name="time_point",
+                     breaks=c("1_Acclimation", "3_Transplant1", "4_Transplant2"),
+                     labels=c("Acclimation", "Transplant", "Transplant"),
+                     values=c("circle","square","square")) +
+  geom_point(size=2) +
+  geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+  labs(y= element_blank (), x="NMDS1 \n Phylogenetic beta diversity") +
+  theme_classic() +
+  theme(legend.position="none")
+
+p3<-beta_func_nmds_transplant7 %>%
+  group_by(type) %>%
+  mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+  mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+  ungroup() %>%
+  ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+  scale_color_manual(name="Type",
+                     breaks=c("Control", "Hot_control", "Treatment"),
+                     labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values=c("#4477AA","#d57d2c","#76b183")) +
+  scale_shape_manual(name="time_point",
+                     breaks=c("1_Acclimation", "3_Transplant1", "4_Transplant2"),
+                     labels=c("Acclimation", "Transplant", "Transplant"),
+                     values=c("circle","square","square")) +
+  geom_point(size=2) +
+  geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+  labs(y= element_blank (), x="NMDS1 \n Functional beta diversity") +
+  theme_classic()+
+  theme(legend.position="none")
+```
+
+```{r beta_neutral_nmds_plot_transplant7_final, echo=FALSE, results=TRUE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
+ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
+```
+
+#### Comparison between Acclimation vs Post-FMT1
+```{r beta_div_neutral_post3_data, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE}
+post3 <- meta  %>%
+  filter(time_point == "1_Acclimation" | time_point == "5_Post-FMT1")
+
+temp_genome_counts <- transform(genome_counts_filt, row.names = genome_counts_filt$genome)
+temp_genome_counts$genome <- NULL
+
+post3.counts <- temp_genome_counts[,which(colnames(temp_genome_counts) %in% rownames(post3))]
+identical(sort(colnames(post3.counts)),sort(as.character(rownames(post3))))
+
+post3_nmds <- sample_metadata %>%
+  filter(time_point == "1_Acclimation" | time_point == "5_Post-FMT1")
+```
+
+#### Number of samples used
+
+```{r beta_div_neutral_post3_samples, echo=FALSE, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE}
+nrow(post3)
+```
+
+```{r beta_div_neutral_post3_1, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE}
+beta_div_richness_post3<-hillpair(data=post3.counts, q=0)
+beta_div_neutral_post3<-hillpair(data=post3.counts, q=1)
+beta_div_phylo_post3<-hillpair(data=post3.counts, q=1, tree=genome_tree)
+beta_div_func_post3<-hillpair(data=post3.counts, q=1, dist=dist)
+```
+
+```{r data_post3_2, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE}
+#Arrange of metadata dataframe
+post3_arrange<-post3[labels(beta_div_neutral_post3$S),]
+post3_arrange$type_time <- interaction(post3_arrange$type, post3_arrange$time_point)
+```
+
+##### Richness
+
+```{r beta_div_richness_post3_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+betadisper(beta_div_richness_post3$S, post3_arrange$type) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_div_richness_post3_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+adonis2(formula=beta_div_richness_post3$S ~ time_point*Population, data=post3[labels(beta_div_neutral_post3$S),], permutations=999,strata=post3$individual) %>%
+  as.matrix() %>%
+  kable()
+```
+
+```{r beta_div_pairwise_post3_8, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+pairwise <- pairwise.adonis(beta_div_richness_post3$S, post3_arrange$type_time, perm=999)
+pairwise
+```
+
+##### Neutral
+
+```{r beta_div_neutral_post3_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+betadisper(beta_div_neutral_post3$S, post3$time_point) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_div_neutral_post3_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+adonis2(formula=beta_div_neutral_post3$S ~ time_point*Population, data=post3[labels(beta_div_neutral_post3$S),], permutations=999,strata=post3$individual) %>%
+  as.matrix() %>%
+  kable()
+```
+
+```{r beta_div_pairwise_post3_9, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+pairwise <- pairwise.adonis(beta_div_neutral_post3$S, post3_arrange$type_time, perm=999)
+pairwise
+```
+
+##### Phylogenetic
+
+```{r beta_div_phylo_post3_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+betadisper(beta_div_phylo_post3$S, post3$time_point) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_div_phylo_post3_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+adonis2(formula=beta_div_phylo_post3$S ~ time_point*Population, data=post3[labels(beta_div_phylo_post3$S),], permutations=999,strata=post3$individual) %>%
+  as.matrix() %>%
+  kable()
+```
+
+```{r beta_div_pairwise_post3_6, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+pairwise <- pairwise.adonis(beta_div_phylo_post3$S, post3_arrange$type_time, perm=999)
+pairwise
+```
+
+##### Functional
+
+```{r beta_div_func_post3_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+betadisper(beta_div_func_post3$S, post3$time_point) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_div_func_post3_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+adonis2(formula=beta_div_func_post3$S ~ time_point*Population, data=post3[labels(beta_div_func_post3$S),], permutations=999,strata=post3$individual) %>%
+  as.matrix() %>%
+  kable()
+```
+
+```{r beta_div_pairwise_post3_7, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+pairwise <- pairwise.adonis(beta_div_func_post3$S, post3_arrange$type_time, perm=999)
+pairwise
+```
+
+```{r beta_neutral_nmds_post3, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
+beta_richness_nmds_post3 <- beta_div_richness_post3$S %>%
+  metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+  scores() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(post3_nmds, by = c("sample" = "Tube_code"))
+
+beta_neutral_nmds_post3 <- beta_div_neutral_post3$S %>%
+  metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+  scores() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(post3_nmds, by = c("sample" = "Tube_code"))
+
+beta_phylo_nmds_post3 <- beta_div_phylo_post3$S %>%
+  metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+  scores() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(post3_nmds, by = join_by(sample == Tube_code))
+
+beta_func_nmds_post3 <- beta_div_func_post3$S %>%
+  metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+  scores() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(post3_nmds, by = join_by(sample == Tube_code))
+```
+
+```{r beta_neutral_nmds_post3_plot, echo=FALSE, results=FALSE}
+p0<-beta_richness_nmds_post3 %>%
+  group_by(type) %>%
+  mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+  mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+  ungroup() %>%
+  ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+  scale_color_manual(name="Type",
+                     breaks=c("Control", "Hot_control", "Treatment"),
+                     labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values=c("#4477AA","#d57d2c","#76b183")) +
+  geom_point(size=2) +
+  geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+  labs(y = "NMDS2", x="NMDS1 \n Richness beta diversity") +
+  theme_classic() +
+  theme(legend.position="none")
+
+p1<-beta_neutral_nmds_post3 %>%
+  group_by(type) %>%
+  mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+  mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+  ungroup() %>%
+  ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+  scale_color_manual(name="Type",
+                     breaks=c("Control", "Hot_control", "Treatment"),
+                     labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values=c("#4477AA","#d57d2c","#76b183")) +
+  geom_point(size=2) +
+  geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+  labs(y = "NMDS2", x="NMDS1 \n Neutral beta diversity") +
+  theme_classic() +
+  theme(legend.position="none")
+
+p2<-beta_phylo_nmds_post3 %>%
+  group_by(type) %>%
+  mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+  mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+  ungroup() %>%
+  ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+  scale_color_manual(name="Type",
+                     breaks=c("Control", "Hot_control", "Treatment"),
+                     labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values=c("#4477AA","#d57d2c","#76b183")) +
+  geom_point(size=2) +
+  geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+  labs(y= element_blank (), x="NMDS1 \n Phylogenetic beta diversity") +
+  theme_classic() +
+  theme(legend.position="none")
+
+p3<-beta_func_nmds_post3 %>%
+  group_by(type) %>%
+  mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+  mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+  ungroup() %>%
+  ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+  scale_color_manual(name="Type",
+                     breaks=c("Control", "Hot_control", "Treatment"),
+                     labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values=c("#4477AA","#d57d2c","#76b183")) +
+  geom_point(size=2) +
+  geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+  labs(y= element_blank (), x="NMDS1 \n Functional beta diversity") +
+  theme_classic()+
+  theme(legend.position="none")
+```
+
+```{r beta_neutral_nmds_plot_post3_final, echo=FALSE, results=TRUE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
+ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
+```
+
+#### Comparison between Acclimation vs Post-FMT2
+
+```{r beta_div_neutral_post3, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE}
+post4 <- meta  %>%
+  filter(time_point == "1_Acclimation" | time_point == "6_Post-FMT2")
+
+temp_genome_counts <- transform(genome_counts_filt, row.names = genome_counts_filt$genome)
+temp_genome_counts$genome <- NULL
+
+post4.counts <- temp_genome_counts[,which(colnames(temp_genome_counts) %in% rownames(post4))]
+identical(sort(colnames(post4.counts)),sort(as.character(rownames(post4))))
+
+post4_nmds <- sample_metadata %>%
+  filter(time_point == "1_Acclimation" | time_point == "6_Post-FMT2")
+```
+
+#### Number of samples used
+
+```{r beta_div_neutral_post4_samples, echo=FALSE, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE}
+nrow(post4)
+```
+
+```{r beta_div_neutral_post4_1, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE}
+beta_div_richness_post4<-hillpair(data=post4.counts, q=0)
+beta_div_neutral_post4<-hillpair(data=post4.counts, q=1)
+beta_div_phylo_post4<-hillpair(data=post4.counts, q=1, tree=genome_tree)
+beta_div_func_post4<-hillpair(data=post4.counts, q=1, dist=dist)
+```
+
+```{r data_post4_2, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE}
+#Arrange of metadata dataframe
+post4_arrange<-post4[labels(beta_div_neutral_post4$S),]
+post4_arrange$type_time <- interaction(post4_arrange$type, post4_arrange$time_point)
+```
+
+##### Richness
+
+```{r beta_div_richness_post4_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+betadisper(beta_div_richness_post4$S, post4_arrange$type) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_div_richness_post4_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+adonis2(formula=beta_div_richness_post4$S ~ time_point*Population, data=post4[labels(beta_div_neutral_post4$S),], permutations=999,strata=post4$individual) %>%
+  as.matrix() %>%
+  kable()
+```
+
+```{r beta_div_pairwise_post4_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+pairwise <- pairwise.adonis(beta_div_richness_post4$S, post4_arrange$type_time, perm=999)
+pairwise
+```
+
+##### Neutral
+
+```{r beta_div_neutral_post4_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+betadisper(beta_div_neutral_post4$S, post4_arrange$time_point) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_div_neutral_post4_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+adonis2(formula=beta_div_neutral_post4$S ~ time_point*Population, data=post4[labels(beta_div_neutral_post4$S),], permutations=999,strata=post4$individual) %>%
+  as.matrix() %>%
+  kable()
+```
+
+```{r beta_div_pairwise_post4_6, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+pairwise <- pairwise.adonis(beta_div_neutral_post4$S, post4_arrange$type_time, perm=999)
+pairwise
+```
+
+##### Phylogenetic
+
+```{r beta_div_phylo_post4_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+betadisper(beta_div_phylo_post4$S, post4$time_point) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_div_phylo_post4_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+adonis2(formula=beta_div_phylo_post4$S ~ time_point*Population, data=post4[labels(beta_div_phylo_post4$S),], permutations=999,strata=post4$individual) %>%
+  as.matrix() %>%
+  kable()
+```
+
+```{r beta_div_pairwise_post4_7, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+pairwise <- pairwise.adonis(beta_div_phylo_post4$S, post4_arrange$type_time, perm=999)
+pairwise
+```
+
+##### Functional
+
+```{r beta_div_func_post4_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+betadisper(beta_div_func_post4$S, post4$time_point) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_div_func_post4_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+adonis2(formula=beta_div_func_post4$S ~ time_point*Population, data=post4[labels(beta_div_func_post4$S),], permutations=999,strata=post4$individual) %>%
+  as.matrix() %>%
+  kable()
+```
+
+```{r beta_div_pairwise_post4_8, echo=FALSE, warning=FALSE, comments="", message=FALSE}
+pairwise <- pairwise.adonis(beta_div_func_post4$S, post4_arrange$type_time, perm=999)
+pairwise
+```
+
+```{r beta_neutral_nmds_post4, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
+beta_richness_nmds_post4 <- beta_div_richness_post4$S %>%
+  metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+  scores() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(post4_nmds, by = c("sample" = "Tube_code"))
+
+beta_neutral_nmds_post4 <- beta_div_neutral_post4$S %>%
+  metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+  scores() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(post4_nmds, by = c("sample" = "Tube_code"))
+
+beta_phylo_nmds_post4 <- beta_div_phylo_post4$S %>%
+  metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+  scores() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(post4_nmds, by = join_by(sample == Tube_code))
+
+beta_func_nmds_post4 <- beta_div_func_post4$S %>%
+  metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
+  scores() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(post4_nmds, by = join_by(sample == Tube_code))
+```
+
+```{r beta_neutral_nmds_post4_plot, echo=FALSE, results=FALSE}
+p0<-beta_richness_nmds_post4 %>%
+  group_by(type) %>%
+  mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+  mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+  ungroup() %>%
+  ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+  scale_color_manual(name="Type",
+                     breaks=c("Control", "Hot_control", "Treatment"),
+                     labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values=c("#4477AA","#d57d2c","#76b183")) +
+  geom_point(size=2) +
+  geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+  labs(y = "NMDS2", x="NMDS1 \n Richness beta diversity") +
+  theme_classic() +
+  theme(legend.position="none")
+
+p1<-beta_neutral_nmds_post4 %>%
+  group_by(type) %>%
+  mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+  mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+  ungroup() %>%
+  ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+  scale_color_manual(name="Type",
+                     breaks=c("Control", "Hot_control", "Treatment"),
+                     labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values=c("#4477AA","#d57d2c","#76b183")) +
+  geom_point(size=2) +
+  geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+  labs(y = "NMDS2", x="NMDS1 \n Neutral beta diversity") +
+  theme_classic() +
+  theme(legend.position="none")
+
+p2<-beta_phylo_nmds_post4 %>%
+  group_by(type) %>%
+  mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+  mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+  ungroup() %>%
+  ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+  scale_color_manual(name="Type",
+                     breaks=c("Control", "Hot_control", "Treatment"),
+                     labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values=c("#4477AA","#d57d2c","#76b183")) +
+  geom_point(size=2) +
+  geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+  labs(y= element_blank (), x="NMDS1 \n Phylogenetic beta diversity") +
+  theme_classic() +
+  theme(legend.position="none")
+
+p3<-beta_func_nmds_post4 %>%
+  group_by(type) %>%
+  mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+  mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+  ungroup() %>%
+  ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+  scale_color_manual(name="Type",
+                     breaks=c("Control", "Hot_control", "Treatment"),
+                     labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                     values=c("#4477AA","#d57d2c","#76b183")) +
+  geom_point(size=2) +
+  geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+  labs(y= element_blank (), x="NMDS1 \n Functional beta diversity") +
+  theme_classic()+
+  theme(legend.position="none")
+```
+
+```{r beta_neutral_nmds_plot_post4_final, echo=FALSE, results=TRUE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
+ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
+```
 
 ### 6. Are there differences between the control and the treatment group?
 

@@ -124,23 +124,23 @@ GIFTs_functions_community %>%
   rownames_to_column("sample") %>%
   left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
   filter(time_point=="0_Wild") %>%
-  select(c(1:21, 27)) %>%
-  pivot_longer(-c(sample,type),names_to = "trait", values_to = "value") %>%
+  select(c(1:21, 24)) %>%
+  pivot_longer(-c(sample,Population),names_to = "trait", values_to = "value") %>%
   mutate(trait = case_when(
       trait %in% GIFT_db$Code_function ~ GIFT_db$Function[match(trait, GIFT_db$Code_function)],
       TRUE ~ trait
     )) %>%
   mutate(trait=factor(trait,levels=unique(GIFT_db$Function))) %>%
-  ggplot(aes(x=value, y=type, group=type, fill=type, color=type)) +
+  ggplot(aes(x=value, y=Population, group=Population, fill=Population, color=Population)) +
     geom_boxplot() +
-    scale_color_manual(name="type",
-          breaks=c("Control","Hot_control", "Treatment"),
-          labels=c("Cold-Cold","Hot-Hot", "Cold-Hot"),
-          values=c("#4477AA","#d57d2c","#76b183")) +
-      scale_fill_manual(name="type",
-          breaks=c("Control","Hot_control", "Treatment"),
-          labels=c("Cold-Cold","Hot-Hot", "Cold-Hot"),
-          values=c("#4477AA50","#d57d2c50","#76b18350")) +
+    scale_color_manual(name="Population",
+          breaks=c("Cold_wet","Hot_dry"),
+          labels=c("Cold","Hot"),
+          values=c('#008080', "#d57d2c")) +
+      scale_fill_manual(name="Population",
+          breaks=c("Cold_wet","Hot_dry"),
+          labels=c("Cold","Hot"),
+          values=c('#00808050', "#d57d2c50")) +
     facet_grid(trait ~ ., space="free", scales="free") +
               theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
               strip.text.y = element_text(angle = 0)) + 
@@ -287,23 +287,23 @@ GIFTs_functions_community %>%
   rownames_to_column("sample") %>%
   left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
   filter(time_point=="1_Acclimation") %>%
-  select(c(1:21, 27)) %>%
-  pivot_longer(-c(sample,type),names_to = "trait", values_to = "value") %>%
+  select(c(1:21, 24)) %>%
+  pivot_longer(-c(sample,Population),names_to = "trait", values_to = "value") %>%
   mutate(trait = case_when(
       trait %in% GIFT_db$Code_function ~ GIFT_db$Function[match(trait, GIFT_db$Code_function)],
       TRUE ~ trait
     )) %>%
   mutate(trait=factor(trait,levels=unique(GIFT_db$Function))) %>%
-  ggplot(aes(x=value, y=type, group=type, fill=type, color=type)) +
+  ggplot(aes(x=value, y=Population, group=Population, fill=Population, color=Population)) +
     geom_boxplot() +
-    scale_color_manual(name="type",
-          breaks=c("Control","Hot_control", "Treatment"),
-          labels=c("Cold-Cold","Hot-Hot", "Cold-Hot"),
-          values=c("#4477AA","#d57d2c","#76b183")) +
-      scale_fill_manual(name="type",
-          breaks=c("Control","Hot_control", "Treatment"),
-          labels=c("Cold-Cold","Hot-Hot", "Cold-Hot"),
-          values=c("#4477AA50","#d57d2c50","#76b18350")) +
+    scale_color_manual(name="Population",
+          breaks=c("Cold_wet","Hot_dry"),
+          labels=c("Cold","Hot"),
+          values=c('#008080', "#d57d2c")) +
+      scale_fill_manual(name="Population",
+          breaks=c("Cold_wet","Hot_dry"),
+          labels=c("Cold","Hot"),
+          values=c('#00808050', "#d57d2c50")) +
     facet_grid(trait ~ ., space="free", scales="free") +
               theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1),
               strip.text.y = element_text(angle = 0)) + 
