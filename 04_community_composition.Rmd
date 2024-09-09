@@ -496,11 +496,11 @@ alpha_div %>%
       geom_jitter(alpha=0.5) +
       scale_color_manual(name="Type",
           breaks=c("Control","Hot_control", "Treatment"),
-          labels=c("Cold-Cold","Hot-Hot", "Cold-Hot"),
+          labels=c("Cold-control","Warm-control", "Cold-intervention"),
           values=c("#4477AA","#d57d2c", "#76b183")) +
       scale_fill_manual(name="Type",
           breaks=c("Control","Hot_control", "Treatment"),
-          labels=c("Cold-Cold","Hot-Hot", "Cold-Hot"),
+          labels=c("Cold-control","Warm-control", "Cold-intervention"),
           values=c("#4477AA50","#d57d2c50","#76b18350")) +
       facet_wrap(. ~ metric,scales = "free") +
       coord_cartesian(xlim = c(1, NA)) +
