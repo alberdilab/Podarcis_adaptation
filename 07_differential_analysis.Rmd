@@ -66,7 +66,7 @@ ancom_rand_output_mag_accli_post2_CC = ancombc2(data = physeq_sample_CC,
                   trend_control = NULL)
 ```
 
-```{r ancom_rand_capCC, comment="", echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+```{r ancom_rand_capCC, comment="", echo=FALSE, message=FALSE, warning=FALSE, eval=TRUE}
 phylum_colors <- read_tsv("https://raw.githubusercontent.com/earthhologenome/EHI_taxonomy_colour/main/ehi_phylum_colors.tsv") %>%
   right_join(ancom_result_CC, by=join_by(phylum == phylum)) %>%
   arrange(match(genome, genome_tree$tip.label)) %>%
@@ -148,7 +148,7 @@ tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
 	pull()
 ```
 
-```{r ancombc_rand_plot_phy_CC, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE, eval=FALSE}
+```{r ancombc_rand_plot_phy_CC, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE, eval=TRUE}
 ancombc_rand_table_mag %>%
   mutate(genome=factor(genome,levels=ancombc_rand_table_mag$genome)) %>% 
 ggplot(., aes(x=lfc_time_point6_Post_FMT2, y=forcats::fct_reorder(species, lfc_time_point6_Post_FMT2), fill=phylum)) + #forcats::fct_rev()
@@ -232,7 +232,7 @@ ancom_rand_output_mag_accli_post2_WC = ancombc2(data = physeq_sample_WC,
                   trend_control = NULL)
 ```
 
-```{r ancom_rand_capWC_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+```{r ancom_rand_capWC_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, eval=TRUE}
 colnames(ancom_rand_output_mag_accli_post2_WC$res) <- gsub("-", "_", colnames(ancom_rand_output_mag_accli_post2_WC$res))
 
 ancom_result_WC <- ancom_rand_output_mag_accli_post2_WC$res %>%
@@ -306,7 +306,7 @@ tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
 	pull()
 ```
 
-```{r ancombc_rand_plot_phy_WC, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE, eval=FALSE}
+```{r ancombc_rand_plot_phy_WC, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE, eval=TRUE}
 ancombc_rand_table_mag_WC %>%
   mutate(genome=factor(genome,levels=ancombc_rand_table_mag_WC$genome)) %>% 
 ggplot(., aes(x=lfc_time_point6_Post_FMT2, y=forcats::fct_reorder(species, lfc_time_point6_Post_FMT2), fill=phylum)) + #forcats::fct_rev()
@@ -390,7 +390,7 @@ ancom_rand_output_mag_accli_post2_CI = ancombc2(data = physeq_sample_CI,
                   trend_control = NULL)
 ```
 
-```{r ancom_rand_CI_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+```{r ancom_rand_CI_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, eval=TRUE}
 colnames(ancom_rand_output_mag_accli_post2_CI$res) <- gsub("-", "_", colnames(ancom_rand_output_mag_accli_post2_CI$res))
 
 ancom_result_CI <- ancom_rand_output_mag_accli_post2_CI$res %>%
@@ -462,7 +462,7 @@ tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
 	pull()
 ```
 
-```{r ancombc_rand_plot_phy_CI, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE, eval=FALSE}
+```{r ancombc_rand_plot_phy_CI, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE, eval=TRUE}
 ancombc_rand_table_mag_CI %>%
   mutate(genome=factor(genome,levels=ancombc_rand_table_mag_CI$genome)) %>% 
 ggplot(., aes(x=lfc_time_point6_Post_FMT2, y=forcats::fct_reorder(species, lfc_time_point6_Post_FMT2), fill=phylum)) + #forcats::fct_rev()
@@ -518,8 +518,42 @@ GIFTs_functions_community %>%
   labs(y="Traits",x="Metabolic capacity index")
 ```
 
+```{r data_TM6_plot_1, echo=TRUE,results=FALSE}
+GIFTs_elements_community_merged<-GIFTs_elements_community %>%
+    as.data.frame() %>%
+    rownames_to_column(var="sample") %>%
+    filter(sample!="AD69") %>%
+    pivot_longer(!sample,names_to="trait",values_to="gift") %>%
+    left_join(sample_metadata, by = join_by(sample == Tube_code))%>%
+    filter(time_point=="1_Acclimation"|time_point == "6_Post-FMT2")%>%
+    mutate(functionid = substr(trait, 1, 3)) %>%
+    mutate(trait = case_when(
+      trait %in% GIFT_db$Code_element ~ GIFT_db$Element[match(trait, GIFT_db$Code_element)],
+      TRUE ~ trait
+    )) %>%
+    mutate(functionid = case_when(
+      functionid %in% GIFT_db$Code_function ~ GIFT_db$Function[match(functionid, GIFT_db$Code_function)],
+      TRUE ~ functionid
+    )) %>%
+    mutate(trait=factor(trait,levels=unique(GIFT_db$Element))) %>%
+    mutate(functionid=factor(functionid,levels=unique(GIFT_db$Function)))
+
+# Create an interaction variable for time_point and sample
+GIFTs_elements_community_merged$interaction_var <- interaction(GIFTs_elements_community_merged$sample, GIFTs_elements_community_merged$time_point)
+  
+ggplot(GIFTs_elements_community_merged,aes(x=interaction_var,y=trait,fill=gift)) +
+        geom_tile(colour="white", linewidth=0.2)+
+        scale_fill_gradientn(colours=rev(c("#d53e4f", "#f46d43", "#fdae61", "#fee08b", "#e6f598", "#abdda4", "#ddf1da")))+
+        facet_grid(functionid ~ type, scales="free",space="free") +
+        theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1, size=5),
+              strip.text.y = element_text(angle = 0)) + 
+        labs(y="Traits",x="Time_point",fill="GIFT")+
+  scale_x_discrete(labels = function(x) gsub(".*\\.", "", x))
+```
+
+
 # ANCOM-BC2 functional traits
-##CC
+## CC
 
 ```{r phyloseq_ele, comment="", echo=FALSE, message=FALSE, warning=FALSE}
 samples_CC <- sample_metadata%>%
@@ -710,7 +744,7 @@ ancombc_rand_table_func_CC%>%
   ylab("log2FoldChange")
 ```
 
-##CI
+## CI
 
 ```{r phyloseq_ele_1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
 samples_CI <- sample_metadata%>%
@@ -901,7 +935,7 @@ ancombc_rand_table_func_CI%>%
   ylab("log2FoldChange")
 ```
 
-##WC
+## WC
 
 ```{r phyloseq_ele_1WC, comment="", echo=FALSE, message=FALSE, warning=FALSE}
 samples_WC <- sample_metadata%>%
@@ -1078,7 +1112,7 @@ ancombc_rand_table_func_WC%>%
   mutate(Color = ifelse(lfc_time_point6_Post_FMT2 <0, "Acclimation","Post2")) %>%
   ggplot(aes(x=forcats::fct_reorder(Function,lfc_time_point6_Post_FMT2), y=lfc_time_point6_Post_FMT2, fill=Color)) + 
   geom_col() +
-  scale_fill_manual(values=c("#e5bd5b", "#6b7398")) + 
+  scale_fill_manual(values=c("#6b7398","#e5bd5b")) + 
   geom_hline(yintercept=0) + 
   coord_flip()+
   theme(axis.text = element_text(size = 10, face="bold.italic"),
