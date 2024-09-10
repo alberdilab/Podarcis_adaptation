@@ -608,6 +608,18 @@ GIFTs_functions_community %>%
   summarise(MCI = mean(value), sd = sd(value))
 ```
 
+```{r gitfs_functional_tm6_stats, echo=TRUE,results=TRUE}
+MCI_tm6 <- GIFTs_functions_community %>%
+  rowMeans() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(sample_metadata_TM6, by = join_by(sample == Tube_code)) 
+
+shapiro.test(MCI_tm6$value)
+
+res.aov<-aov(value ~ type, data=MCI_tm6)
+summary(res.aov)
+```
+
 #### GIFT test visualisation
 
 ```{r gift_test_function_plot, message=FALSE, warning=FALSE, fig.height=12, fig.width=10, fig.fullwidth=TRUE, eval=TRUE}
@@ -651,6 +663,18 @@ GIFTs_domains_community %>%
   summarise(MCI = mean(value), sd = sd(value))
 ```
 
+```{r gitfs_domain_tm6_stats, echo=TRUE,results=TRUE}
+MCI_domains_tm6 <- GIFTs_domains_community %>%
+  rowMeans() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(sample_metadata_TM6, by = join_by(sample == Tube_code)) 
+
+shapiro.test(MCI_domains_tm6$value)
+
+res.aov<-aov(value ~ type, data=MCI_domains_tm6)
+summary(res.aov)
+```
+
 ### GIFTs Elements community
 
 ```{r gitfs_elements_tm6, echo=TRUE,results=TRUE}
@@ -661,6 +685,18 @@ GIFTs_elements_community %>%
   filter(time_point=="6_Post-FMT2") %>%
   group_by(type) %>%
   summarise(MCI = mean(value), sd = sd(value))
+```
+
+```{r gitfs_ele_tm6_stats, echo=TRUE,results=TRUE}
+MCI_ele_tm6 <- GIFTs_elements_community %>%
+  rowMeans() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(sample_metadata_TM6, by = join_by(sample == Tube_code)) 
+
+shapiro.test(MCI_ele_tm6$value)
+
+res.aov<-aov(value ~ type, data=MCI_ele_tm6)
+summary(res.aov)
 ```
 
 ```{r data_TM6, echo=TRUE,results=FALSE}
