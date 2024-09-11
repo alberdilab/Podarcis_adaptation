@@ -98,8 +98,8 @@ ancom_result_CC %>%
   geom_vline(xintercept=0) + 
   xlim(-max(ancom_result_CC$lfc_time_point6_Post_FMT2)-2,max(ancom_result_CC$lfc_time_point6_Post_FMT2)+2) +
   scale_color_manual(values=phylum_colors) +
-  geom_text(aes(-max(ancom_result_CC$lfc_time_point6_Post_FMT2)+1, 1), label = "Enriched\nin Post2", color="#666666") +
-  geom_text(aes(max(ancom_result_CC$lfc_time_point6_Post_FMT2)-1, 1), label = "Enriched\nin Accli", color="#666666") +
+  geom_text(aes(-max(ancom_result_CC$lfc_time_point6_Post_FMT2)+1, 1), label = "Enriched\nin Accli", color="#666666") +
+  geom_text(aes(max(ancom_result_CC$lfc_time_point6_Post_FMT2)-1, 1), label = "Enriched\nin Post2", color="#666666") +
   theme(legend.position='right',
         panel.background = element_blank(),
         axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
@@ -151,7 +151,7 @@ tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
 ```{r ancombc_rand_plot_phy_CC, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE, eval=TRUE}
 ancombc_rand_table_mag %>%
   mutate(genome=factor(genome,levels=ancombc_rand_table_mag$genome)) %>% 
-ggplot(., aes(x=lfc_time_point6_Post_FMT2, y=forcats::fct_reorder(species, lfc_time_point6_Post_FMT2), fill=phylum)) + #forcats::fct_rev()
+ggplot(., aes(x=lfc_time_point6_Post_FMT2, y=forcats::fct_reorder(genus, lfc_time_point6_Post_FMT2), fill=phylum)) + #forcats::fct_rev()
   geom_col() + 
   scale_fill_manual(values=tax_color) + 
   geom_hline(yintercept=0) + 
@@ -165,7 +165,7 @@ ggplot(., aes(x=lfc_time_point6_Post_FMT2, y=forcats::fct_reorder(species, lfc_t
         legend.title = element_text(size = 14, face = "bold"),
         legend.position = "right", legend.box = "vertical")+
   xlab("log2FoldChange") + 
-  ylab("Species")+
+  ylab("Genus")+
   guides(fill=guide_legend(title="Phylum"))
 ```
 
@@ -256,9 +256,9 @@ ancom_result_WC %>%
   geom_vline(xintercept=0) + 
   xlim(-max(ancom_result_WC$lfc_time_point6_Post_FMT2)-2,max(ancom_result_WC$lfc_time_point6_Post_FMT2)+2) +
   scale_color_manual(values=phylum_colors) +
-  geom_text(aes(-max(ancom_result_WC$lfc_time_point6_Post_FMT2)+1, 1), label = "Enriched\nin Post2", color="#666666") +
-  geom_text(aes(max(ancom_result_WC$lfc_time_point6_Post_FMT2)-1, 1), label = "Enriched\nin Accli", color="#666666") +
-  theme(legend.position='none',
+  geom_text(aes(-max(ancom_result_WC$lfc_time_point6_Post_FMT2)+1, 1), label = "Enriched\nin Accli", color="#666666") +
+  geom_text(aes(max(ancom_result_WC$lfc_time_point6_Post_FMT2)-1, 1), label = "Enriched\nin Post2", color="#666666") +
+  theme(legend.position='right',
         panel.background = element_blank(),
         axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
         axis.title.x=element_blank())+
@@ -414,9 +414,9 @@ ancom_result_CI %>%
   geom_vline(xintercept=0) + 
   xlim(-max(ancom_result_CI$lfc_time_point6_Post_FMT2)-2,max(ancom_result_CI$lfc_time_point6_Post_FMT2)+2) +
   scale_color_manual(values=phylum_colors) +
-  geom_text(aes(-max(ancom_result_CI$lfc_time_point6_Post_FMT2)+1, 1), label = "Enriched\nin Post2", color="#666666") +
-  geom_text(aes(max(ancom_result_CI$lfc_time_point6_Post_FMT2)-1, 1), label = "Enriched\nin Accli", color="#666666") +
-  theme(legend.position='none',
+  geom_text(aes(-max(ancom_result_CI$lfc_time_point6_Post_FMT2)+1, 1), label = "Enriched\nin Accli", color="#666666") +
+  geom_text(aes(max(ancom_result_CI$lfc_time_point6_Post_FMT2)-1, 1), label = "Enriched\nin Post2", color="#666666") +
+  theme(legend.position='right',
         panel.background = element_blank(),
         axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
         axis.title.x=element_blank())+
