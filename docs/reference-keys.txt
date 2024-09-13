@@ -154,11 +154,15 @@ gifts-functional-community-3
 gift-test-visualisation-3
 gifts-domain-community-3
 gifts-elements-community-3
+ci-vs-cc
+ci-vs-wc
 domain-level
 comparison-of-samples-from-the-0-time_point-0_wild-1
 comparison-of-samples-from-the-1st-time_point-1_acclimation-1
 comparison-of-samples-from-the-5th-time_point-5_post-fmt1-1
 comparison-of-samples-from-the-6th-time_point-6_post-fmt2-1
+ci-vs-cc-1
+ci-vs-wc-1
 differential-abundance-analysis
 cc-acclimation-vs-post2
 enrichment-analysis-ancombc2
