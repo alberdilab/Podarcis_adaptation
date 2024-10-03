@@ -742,7 +742,7 @@ difference_table_CC %>%
   geom_text_repel(aes(label = Elements), size=2, max.overlaps = Inf)
 ```
 
-```{r commun_wilcox_elem_plot, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=6, fig.width=12, fig.fullwidth=TRUE, eval=FALSE}
+```{r commun_wilcox_elem_plot, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=6, fig.width=12, fig.fullwidth=TRUE, eval=TRUE}
 difference_table_CC %>%
   ggplot(aes(x=forcats::fct_reorder(Function,Difference), y=Difference, fill=group_color)) + 
   geom_col() +
@@ -942,7 +942,7 @@ log_fold_CI <- means_gift_CI %>%
 ```
 
 
-```{r plot1_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=8, fig.width=10, fig.fullwidth=TRUE, eval=FALSE}
+```{r plot1_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=8, fig.width=10, fig.fullwidth=TRUE, eval=TRUE}
 difference_table_CI %>%
   #  mutate(Difference_abs = abs(Difference)) %>% 
   left_join(significant_elements_CI, by=join_by(Elements==trait)) %>% 
@@ -1014,7 +1014,7 @@ difference_table_CI %>%
   geom_text_repel(aes(label = Elements), size=2, max.overlaps = Inf)
 ```
 
-```{r commun_wilcox_elem_plot_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=6, fig.width=12, fig.fullwidth=TRUE, eval=FALSE}
+```{r commun_wilcox_elem_plot_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=6, fig.width=12, fig.fullwidth=TRUE, eval=TRUE}
 difference_table_CI %>%
   ggplot(aes(x=forcats::fct_reorder(Function,Difference), y=Difference, fill=group_color)) + 
   geom_col() +
@@ -1285,7 +1285,7 @@ difference_table_WC %>%
   geom_text_repel(aes(label = Elements), size=2, max.overlaps = Inf)
 ```
 
-```{r commun_wilcox_elem_plot_2, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=6, fig.width=12, fig.fullwidth=TRUE, eval=FALSE}
+```{r commun_wilcox_elem_plot_2, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=6, fig.width=12, fig.fullwidth=TRUE, eval=TRUE}
 difference_table_WC %>%
   ggplot(aes(x=forcats::fct_reorder(Function,Difference), y=Difference, fill=group_color)) + 
   geom_col() +
