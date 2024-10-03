@@ -174,10 +174,7 @@ ci-acclimation-vs-post2
 enrichment-analysis-ancombc2-2
 mag-level-2
 community-level-plots
-ancom-bc2-functional-traits
-cc
-functional-level
-ci
-functional-level-1
-wc
-functional-level-2
+wilcoxon-comparison
+community-elements-differences-in-cc-acclimation-vs-post2
+community-elements-differences-in-ci-acclimation-vs-post2
+community-elements-differences-in-wc-acclimation-vs-post2
