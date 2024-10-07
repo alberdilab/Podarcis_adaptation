@@ -1479,7 +1479,7 @@ log_fold_wild <- means_gift_wild %>%
 ```
 
 
-```{r plot1_6, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=8, fig.width=10, fig.fullwidth=TRUE, eval=FALSE}
+```{r plot1_6, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
 difference_table_wild %>%
   #  mutate(Difference_abs = abs(Difference)) %>% 
   left_join(significant_elements_wild, by=join_by(Elements==trait)) %>% 
@@ -1491,7 +1491,7 @@ difference_table_wild %>%
   geom_text_repel(aes(label = Elements), size=2)
 ```
 
-```{r plot3_6, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=5, fig.width=10, fig.fullwidth=TRUE, eval=FALSE}
+```{r plot3_6, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=5, fig.width=10, fig.fullwidth=TRUE}
 uniqueGIFT <- unique(GIFT_db[c(2,3,4,5,6)])
 
 code_function_wild <- difference_table_wild %>%
@@ -1538,7 +1538,7 @@ code_function_wild %>%
   geom_text_repel(aes(label = Element), min.segment.length = 0.4, size=2.5, max.overlaps = Inf)
 ```
 
-```{r plot4_6, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=8, fig.width=10, fig.fullwidth=TRUE, eval=FALSE}
+```{r plot4_6, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
 difference_table_wild %>%
   #  mutate(Difference_abs = abs(Difference)) %>% 
   left_join(significant_elements_wild, by=join_by(Elements==trait)) %>%
@@ -1551,7 +1551,7 @@ difference_table_wild %>%
   geom_text_repel(aes(label = Elements), size=2, max.overlaps = Inf)
 ```
 
-```{r commun_wilcox_elem_plot_6, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=6, fig.width=12, fig.fullwidth=TRUE, eval=FALSE}
+```{r commun_wilcox_elem_plot_6, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=6, fig.width=12, fig.fullwidth=TRUE}
 difference_table_wild %>%
   ggplot(aes(x=forcats::fct_reorder(Function,Difference), y=Difference, fill=group_color)) + 
   geom_col() +
@@ -1624,7 +1624,7 @@ for(i in colNames){
 
 ```
 
-#Butiryc acid biosynthesis
+####Butiryc acid biosynthesis
 
 ```{r commun_wilcox_elem_plot_9, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=6, fig.width=12, fig.fullwidth=TRUE, eval=FALSE}
 lipid_function <- GIFT_db %>% 
@@ -1636,12 +1636,12 @@ GIFTs_elements_community %>%
   as.data.frame() %>% 
   select(any_of(lipid_function)) %>% 
   rownames_to_column(., "Tube_code") %>% 
-  left_join(samples_WC[c(1,10)], by=join_by(Tube_code==Tube_code)) %>%
-  filter(time_point!="NA") %>% 
+  left_join(sample_metadata[c(1,4)], by=join_by(Tube_code==Tube_code)) %>%
+  filter(Population!="NA") %>% 
   select(-Tube_code) %>% 
-  pivot_longer(!time_point,names_to="trait",values_to="gift") %>% 
+  pivot_longer(!Population,names_to="trait",values_to="gift") %>% 
   left_join(uniqueGIFT_db, by=join_by(trait==Code_element)) %>% 
-  ggplot(aes(x=time_point, y=gift, color=time_point, fill=time_point)) +
+  ggplot(aes(x=Population, y=gift, color=Population, fill=Population)) +
   geom_jitter(width = 0.2, show.legend = FALSE) +
   geom_boxplot(width = 0.5, alpha=0.3,outlier.shape = NA, show.legend = FALSE) +
   scale_color_manual(values=c("#e5bd5b", "#6b7398"))+
@@ -1728,7 +1728,7 @@ log_fold_accli <- means_gift_accli %>%
 ```
 
 
-```{r plot1_7, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=8, fig.width=10, fig.fullwidth=TRUE, eval=FALSE}
+```{r plot1_7, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
 difference_table_accli %>%
   #  mutate(Difference_abs = abs(Difference)) %>% 
   left_join(significant_elements_accli, by=join_by(Elements==trait)) %>% 
@@ -1740,7 +1740,7 @@ difference_table_accli %>%
   geom_text_repel(aes(label = Elements), size=2)
 ```
 
-```{r plot3_7, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=5, fig.width=10, fig.fullwidth=TRUE, eval=FALSE}
+```{r plot3_7, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=5, fig.width=10, fig.fullwidth=TRUE}
 uniqueGIFT <- unique(GIFT_db[c(2,3,4,5,6)])
 
 code_function_accli <- difference_table_accli %>%
@@ -1770,6 +1770,7 @@ code_function_accli %>%
 #   geom_text_repel(aes(label = Elements), size=2, max.overlaps = Inf)
 
 ```
+
 ```{r final_plot_7, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=8, fig.width=12, fig.fullwidth=TRUE}
 code_function_accli %>%
   #  mutate(Difference_abs = abs(Difference)) %>% 
@@ -1787,7 +1788,7 @@ code_function_accli %>%
   geom_text_repel(aes(label = Element), min.segment.length = 0.4, size=2.5, max.overlaps = Inf)
 ```
 
-```{r plot4_7, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=8, fig.width=10, fig.fullwidth=TRUE, eval=FALSE}
+```{r plot4_7, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
 difference_table_accli %>%
   #  mutate(Difference_abs = abs(Difference)) %>% 
   left_join(significant_elements_accli, by=join_by(Elements==trait)) %>%
@@ -1800,7 +1801,7 @@ difference_table_accli %>%
   geom_text_repel(aes(label = Elements), size=2, max.overlaps = Inf)
 ```
 
-```{r commun_wilcox_elem_plot_10, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=6, fig.width=12, fig.fullwidth=TRUE, eval=FALSE}
+```{r commun_wilcox_elem_plot_10_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=6, fig.width=12, fig.fullwidth=TRUE}
 difference_table_accli %>%
   ggplot(aes(x=forcats::fct_reorder(Function,Difference), y=Difference, fill=group_color)) + 
   geom_col() +
@@ -1819,9 +1820,9 @@ difference_table_accli %>%
   ylab("Mean difference")
 ```
 
-```{r commun_wilcox_elem_plot_7, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=6, fig.width=12, fig.fullwidth=TRUE, eval=FALSE}
-element_gift_names_CC <- element_gift_filt_CC%>%
-  select(-time_point)%>%
+```{r commun_wilcox_elem_plot_7, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=6, fig.width=12, fig.fullwidth=TRUE}
+element_gift_names_accli <- element_gift_filt_accli%>%
+  select(-Population)%>%
   t() %>%
   row_to_names(row_number = 1) %>%
   as.data.frame() %>%
@@ -1835,12 +1836,210 @@ element_gift_names_CC <- element_gift_filt_CC%>%
   as.data.frame() %>%
   mutate_if(is.character, as.numeric)  %>%
   rownames_to_column(., "Tube_code")%>% 
-  left_join(., samples_CC[c(1,10)], by = join_by(Tube_code == Tube_code))
+  left_join(., sample_metadata_accli[c(1,4)], by = join_by(Tube_code == Tube_code))
 
 
-colNames <- names(element_gift_names_CC)[2:16] #check the column that has the last code
+colNames <- names(element_gift_names_accli)[2:18] #check the column that has the last code
 for(i in colNames){
-  plt <- ggplot(element_gift_names_CC, aes(x=time_point, y=.data[[i]], color = time_point, fill=time_point)) +
+  plt <- ggplot(element_gift_names_accli, aes(x=Population, y=.data[[i]], color = Population, fill=Population)) +
+    geom_boxplot(alpha = 0.2, outlier.shape = NA, width = 0.3, show.legend = FALSE) +
+    geom_jitter(width = 0.1, show.legend = TRUE) +
+    scale_color_manual(values=c("#e5bd5b", "#6b7398"))+
+    scale_fill_manual(values=c("#e5bd5b", "#6b7398"))+
+    theme_minimal() +
+    theme(
+      axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      panel.border = element_blank())
+  print(plt)
+}
+```
+
+### Comparison of CC and CI in post2 samples ####
+
+```{r comunity_elem_7_1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+element_gift_post2<- GIFTs_elements_community %>% 
+  as.data.frame() %>% 
+  rownames_to_column(., "Tube_code") %>% 
+  inner_join(sample_metadata_TM6[c(1,7)], by="Tube_code") 
+```
+
+```{r commun_wilcox_elem_7_1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+uniqueGIFT_db<- unique(GIFT_db[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
+
+significant_elements_post2 <- element_gift_post2 %>%
+  pivot_longer(-c(Tube_code,type), names_to = "trait", values_to = "value") %>%
+  group_by(trait) %>%
+  summarise(p_value = wilcox.test(value ~ type)$p.value) %>%
+  mutate(p_adjust=p.adjust(p_value, method="BH")) %>%
+  filter(p_adjust < 0.05)%>%
+  rownames_to_column(., "Elements")  %>% 
+  select(-Elements)
+# %>%
+#   left_join(.,uniqueGIFT_db[c(1,3)],by = join_by(trait == Code_element))
+
+element_gift_t_post2 <- element_gift_post2  %>% 
+  dplyr::select(-c(type))  %>%
+  t() %>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric)  %>%
+  rownames_to_column(., "trait")
+
+element_gift_filt_post2 <- subset(element_gift_t_post2, trait %in% significant_elements_post2$trait) %>% 
+  t() %>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric)  %>%
+  rownames_to_column(., "Tube_code")%>% 
+  left_join(., sample_metadata_TM6[c(1,7)], by = join_by(Tube_code == Tube_code))
+
+difference_table_post2 <- element_gift_filt_post2 %>%
+  select(-Tube_code) %>%
+  group_by(type) %>%
+  summarise(across(everything(), mean)) %>%
+  t() %>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric) %>%
+  rownames_to_column(., "Elements") %>%
+  left_join(.,uniqueGIFT_db[c(1,3,4)],by = join_by(Elements == Code_element)) %>% 
+  arrange(Function) %>% 
+  mutate(Difference=Control-Treatment)%>% 
+  mutate(group_color = ifelse(Difference <0, "Treatment","Control")) 
+```
+
+```{r log_fold_calc_7_1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+means_gift_post2 <- element_gift_filt_post2 %>% 
+  select(-type) %>% 
+  pivot_longer(!Tube_code, names_to = "elements", values_to = "abundance") %>% 
+  left_join(sample_metadata_TM6, by=join_by(Tube_code==Tube_code)) %>% 
+  group_by(type, elements) %>%
+  summarise(mean=mean(abundance))
+
+log_fold_post2 <- means_gift_post2 %>%
+  group_by(elements) %>%
+  summarise(
+    logfc_control_treatment = log2(mean[type == "Control"] / mean[type == "Treatment"])
+  )
+```
+
+
+```{r plot1_7_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
+difference_table_post2 %>%
+  #  mutate(Difference_abs = abs(Difference)) %>% 
+  left_join(significant_elements_post2, by=join_by(Elements==trait)) %>% 
+  ggplot(., aes(x = Difference, y = -log(p_adjust), color=group_color)) + 
+  geom_point(size=2, show.legend = FALSE) + 
+  scale_color_manual(values=c("#e5bd5b", "#6b7398"))+
+  #xlim(c(-10,4)) +
+  theme_classic()+
+  geom_text_repel(aes(label = Elements), size=2)
+```
+
+```{r plot3_7_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=5, fig.width=10, fig.fullwidth=TRUE}
+uniqueGIFT <- unique(GIFT_db[c(2,3,4,5,6)])
+
+code_function_post2 <- difference_table_post2 %>%
+  left_join(uniqueGIFT[c(1:3)], by=join_by(Elements==Code_element))
+
+unique_codes_post2<-unique(code_function_post2$Code_function)
+
+gift_colors_post2 <- read_tsv("data/gift_colors.tsv") %>% 
+  filter(Code_function %in% unique_codes_post2)%>% 
+  mutate(legend=str_c(Code_function," - ",Function))
+
+code_function_post2 %>%
+  #  mutate(Difference_abs = abs(Difference)) %>% 
+  left_join(significant_elements_post2, by=join_by(Elements==trait)) %>%
+  left_join(log_fold_post2, by=join_by(Elements==elements)) %>% 
+  left_join(gift_colors_post2, by=join_by(Code_function==Code_function)) %>% 
+  ggplot(., aes(x = logfc_control_treatment, y = -log(p_adjust), color=legend, size=abs(Difference))) + #note that p_value was used instead of p_adjust
+  geom_point()+
+  geom_vline(xintercept=0) +
+  scale_color_manual(values = gift_colors_post2$Color)+
+  #xlim(c(-10,4)) +
+  theme_classic()+
+  labs(size="Mean difference (abs)", color="Functional trait")+
+  labs(x = "Log-fold change", y="-Log adjusted p-value")
+
+# +
+#   geom_text_repel(aes(label = Elements), size=2, max.overlaps = Inf)
+
+```
+
+```{r final_plot_7_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=8, fig.width=12, fig.fullwidth=TRUE}
+code_function_post2 %>%
+  #  mutate(Difference_abs = abs(Difference)) %>% 
+  left_join(significant_elements_post2, by=join_by(Elements==trait)) %>%
+  left_join(log_fold_post2, by=join_by(Elements==elements)) %>% 
+  left_join(gift_colors_post2, by=join_by(Code_function==Code_function)) %>% 
+  ggplot(., aes(x = logfc_control_treatment, y = -log(p_adjust), color=legend, size=abs(Difference))) + #note that p_value was used instead of p_adjust
+  geom_jitter(width = 0.2, height = 0.2)+
+  geom_vline(xintercept=0) +
+  scale_color_manual(values = gift_colors_post2$Color)+
+  #xlim(c(-10,4)) +
+  theme_classic()+
+  labs(size="Mean difference (abs)", color="Functional trait")+
+  labs(x = "Log-fold change", y="-Log adjusted p-value") +
+  geom_text_repel(aes(label = Element), min.segment.length = 0.4, size=2.5, max.overlaps = Inf)
+```
+
+```{r plot4_7_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
+difference_table_post2 %>%
+  #  mutate(Difference_abs = abs(Difference)) %>% 
+  left_join(significant_elements_post2, by=join_by(Elements==trait)) %>%
+  left_join(log_fold_post2, by=join_by(Elements==elements)) %>% 
+  ggplot(., aes(x = Difference, y = logfc_control_treatment, color=group_color)) +
+  geom_point(size=2, show.legend = FALSE) + 
+  scale_color_manual(values=c("#e5bd5b", "#6b7398"))+
+  #xlim(c(-10,4)) +
+  theme_classic()+
+  geom_text_repel(aes(label = Elements), size=2, max.overlaps = Inf)
+```
+
+```{r commun_wilcox_elem_plot_10, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=6, fig.width=12, fig.fullwidth=TRUE}
+difference_table_post2 %>%
+  ggplot(aes(x=forcats::fct_reorder(Function,Difference), y=Difference, fill=group_color)) + 
+  geom_col() +
+  #  geom_point(size=4) + 
+  scale_fill_manual(values=c("#e5bd5b", "#6b7398")) + 
+  geom_hline(yintercept=0) + 
+  coord_flip()+
+  theme(axis.text = element_text(size = 10),
+        axis.title = element_text(size = 12),
+        legend.position = "right", 
+        legend.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major = element_line(size = 0.15, linetype = 'solid',
+                                        colour = "grey"))+
+  xlab("Function") + 
+  ylab("Mean difference")
+```
+
+```{r commun_wilcox_elem_plot_7_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=6, fig.width=12, fig.fullwidth=TRUE}
+element_gift_names_post2 <- element_gift_filt_post2%>%
+  select(-type)%>%
+  t() %>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric)  %>%
+  rownames_to_column(., "Elements")  %>%
+  left_join(.,uniqueGIFT_db[c(1,3)],by = join_by(Elements == Code_element))%>%
+  select(-Elements)%>%
+  select(Function, everything())%>%
+  t()%>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric)  %>%
+  rownames_to_column(., "Tube_code")%>% 
+  left_join(., sample_metadata_TM6[c(1,7)], by = join_by(Tube_code == Tube_code))
+
+
+colNames <- names(element_gift_names_post2)[2:3] #check the column that has the last code
+for(i in colNames){
+  plt <- ggplot(element_gift_names_post2, aes(x=type, y=.data[[i]], color = type, fill=type)) +
     geom_boxplot(alpha = 0.2, outlier.shape = NA, width = 0.3, show.legend = FALSE) +
     geom_jitter(width = 0.1, show.legend = TRUE) +
     scale_color_manual(values=c("#e5bd5b", "#6b7398"))+
