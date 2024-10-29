@@ -67,6 +67,12 @@ ancom_rand_output_mag_accli_post2_CC = ancombc2(data = physeq_sample_CC,
 ```
 
 ```{r ancom_rand_capCC, comment="", echo=FALSE, message=FALSE, warning=FALSE, eval=TRUE}
+colnames(ancom_rand_output_mag_accli_post2_CC$res) <- gsub("-", "_", colnames(ancom_rand_output_mag_accli_post2_CC$res))
+
+ancom_result_CC <- ancom_rand_output_mag_accli_post2_CC$res %>%
+  rename(genome=taxon) %>%
+  left_join(genome_metadata,by=join_by(genome==genome))
+
 phylum_colors <- read_tsv("https://raw.githubusercontent.com/earthhologenome/EHI_taxonomy_colour/main/ehi_phylum_colors.tsv") %>%
   right_join(ancom_result_CC, by=join_by(phylum == phylum)) %>%
   arrange(match(genome, genome_tree$tip.label)) %>%
@@ -76,10 +82,6 @@ phylum_colors <- read_tsv("https://raw.githubusercontent.com/earthhologenome/EHI
   arrange(phylum) %>%
   dplyr::select(colors) %>%
   pull()
-
-ancom_result_CC <- ancom_rand_output_mag_accli_post2_CC$res %>%
-  rename(genome=taxon) %>%
-  left_join(genome_metadata,by=join_by(genome==genome))
 
 ancom_result_CC %>%
   mutate(significance = ifelse(p_time_point6_Post_FMT2 < 0.01, "1", "0")) %>%
@@ -505,6 +507,344 @@ tax_color <- tax_color %>%
 ancombc_rand_table_mag_CI %>%
   mutate(genome=factor(genome,levels=ancombc_rand_table_mag_CI$genome)) %>% 
 ggplot(., aes(x=lfc_time_point6_Post_FMT2, y=forcats::fct_reorder(species, lfc_time_point6_Post_FMT2), fill=phylum)) + #forcats::fct_rev()
+  geom_col() + 
+  scale_fill_manual(values=tax_color) + 
+  geom_hline(yintercept=0) + 
+#  coord_flip()+
+  theme(panel.background = element_blank(),
+        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
+        axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 8),
+        axis.title = element_text(size = 14, face = "bold"),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 14, face = "bold"),
+        legend.position = "right", legend.box = "vertical")+
+  xlab("log2FoldChange") + 
+  ylab("Species")+
+  guides(fill=guide_legend(title="Phylum"))
+```
+
+## post2 CC and CI
+### Enrichment analysis: Ancombc2
+
+```{r zero_phylo1_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+#phyloseq object considering structual zeros
+phylo_samples <- sample_metadata %>% 
+                    filter(type!= "Hot_control") %>% 
+                    filter(time_point == "6_Post-FMT2") %>% 
+                    column_to_rownames("Tube_code") %>% 
+                    sample_data() #convert to phyloseq sample_data object
+phylo_genome <- genome_counts_filt %>% 
+                    #filter(genome %in% structural_zeros$genome) %>% # remove structural zeros
+                    column_to_rownames("genome") %>% 
+                    mutate_all(~ replace(., . == 0, 0.00001)) %>% #add pseudo counts to avoid structural zero issues (note this approach can be improved!)
+                    otu_table(., taxa_are_rows = TRUE)
+phylo_taxonomy <- genome_metadata %>% 
+                    filter(genome %in% rownames(phylo_genome)) %>% # remove structural zeros
+                    mutate(genome2=genome) %>% #create a pseudo genome name column
+                    column_to_rownames("genome2") %>% 
+                    dplyr::select(domain,phylum,class,order,family,genus,species,genome) %>% #add an additional taxonomic level to ensure genome-level analysis (as no all genomes have species-level taxonomic assignments. Otherwise, ANCOMBC2 aggregates analyses per species)
+                    as.matrix() %>% 
+                    tax_table() #convert to phyloseq tax_table object
+
+physeq_genome_filtered <- phyloseq(phylo_genome, phylo_taxonomy, phylo_samples)
+physeq_genome_filtered_clr <- microbiome::transform(physeq_genome_filtered, 'clr')
+```
+
+```{r filtercold, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+physeq_sample_cold <- subset_samples(physeq_genome_filtered, time_point %in% c("1_Acclimation","6_Post-FMT2"))
+physeq_sample_cold <- prune_taxa(taxa_sums(physeq_sample_cold)>0, physeq_sample_cold)
+```
+
+
+#### MAG level
+```{r ancom_rand_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+set.seed(1234) #set seed for reproducibility
+ancom_rand_output_mag_post2_cold = ancombc2(data = physeq_sample_cold, 
+                  assay_name = "counts", 
+                  tax_level = NULL, #change to agglomerate analysis to a higher taxonomic range
+                  fix_formula = "type", #fixed variable(s)
+ #                 rand_formula = "(1|individual)",
+                  p_adj_method = "holm", 
+                  pseudo_sens = TRUE,
+                  prv_cut = 0.10, 
+                        lib_cut = 1, 
+                        s0_perc = 0.05,
+                        group = NULL, 
+                        struc_zero = FALSE, 
+                        neg_lb = FALSE,
+                        alpha = 0.05, 
+                        n_cl = 2, 
+                  verbose = TRUE,
+                  global = FALSE, 
+                  pairwise = FALSE, 
+                  dunnet = FALSE, 
+                  trend = FALSE,
+                  iter_control = list(tol = 1e-5, max_iter = 20, verbose = FALSE),
+                  em_control = list(tol = 1e-5, max_iter = 100),
+#                  lme_control = lme4::lmerControl(),
+                  mdfdr_control = list(fwer_ctrl_method = "holm", B = 100), 
+                  trend_control = NULL)
+```
+
+```{r ancom_rand_cold_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, eval=TRUE}
+colnames(ancom_rand_output_mag_post2_cold$res) <- gsub("-", "_", colnames(ancom_rand_output_mag_post2_cold$res))
+
+ancom_result_cold <- ancom_rand_output_mag_post2_cold$res %>%
+  rename(genome=taxon) %>%
+  left_join(genome_metadata,by=join_by(genome==genome))
+
+ancom_result_cold %>%
+  mutate(significance = ifelse(p_typeTreatment < 0.01, "1", "0")) %>%
+  ggplot(., aes(x=-log(p_typeTreatment), y=lfc_typeTreatment, color=significance)) +
+  geom_point() +
+  scale_color_manual(values = c("#cccccc","#00FFFF")) +
+  geom_text(aes(2.5, 10), label = "Enriched\nin CI", color="#666666") +
+  geom_text(aes(2.5, -10), label = "Enriched\nin CC", color="#666666") +
+  labs(color="Significance", y="Difference between treatments", x="p-value") +
+  theme_classic()
+
+ancom_result_cold %>%
+  filter(p_typeTreatment < 0.01) %>%
+  ggplot(., aes(x=lfc_typeTreatment, y=forcats::fct_rev(genome), color=phylum)) +
+  geom_jitter(size=3) +
+  geom_vline(xintercept=0) + 
+  xlim(-max(ancom_result_cold$lfc_typeTreatment)-2,max(ancom_result_cold$lfc_typeTreatment)+2) +
+  scale_color_manual(values=phylum_colors) +
+  geom_text(aes(-max(ancom_result_cold$lfc_typeTreatment)+2, 2), label = "Enriched\nin CC", color="#666666") +
+  geom_text(aes(max(ancom_result_cold$lfc_typeTreatment)-2, 2), label = "Enriched\nin CI", color="#666666") +
+  theme(legend.position='right',
+        panel.background = element_blank(),
+        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
+        axis.title.x=element_blank())+
+  labs(y="MAGs",x="Genome counts") + 
+  guides(col=guide_legend("Phylum"))
+```  
+
+```{r ancom_table_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+taxonomy <- data.frame(physeq_sample_cold@tax_table) %>%
+  rownames_to_column(., "taxon") %>%
+  mutate_at(vars(order, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))%>%
+  mutate(across(c(family,genus, species), na_if, ""))%>%
+    mutate(family = coalesce(family, paste('Unclassified', order)),
+           genus = coalesce(genus, 
+                              if_else(grepl('^Unclassified', family),
+                                      family, paste('Unclassified', family))),
+           species = coalesce(species, 
+                              if_else(grepl('^Unclassified', genus),
+                                      genus, paste('Unclassified', genus))))
+
+ancombc_rand_table_mag_cold <- ancom_rand_output_mag_post2_cold$res %>%
+  dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
+  filter(p_typeTreatment < 0.05) %>%
+  dplyr::arrange(p_typeTreatment) %>%
+  merge(., taxonomy, by="taxon") %>%
+#  mutate_at(vars(phylum, species), ~ str_replace(., "[dpcofgs]__", ""))%>%
+  dplyr::arrange(lfc_typeTreatment)
+  
+colors_alphabetic <- read_tsv("https://raw.githubusercontent.com/earthhologenome/EHI_taxonomy_colour/main/ehi_phylum_colors.tsv") %>%
+#  mutate_at(vars(phylum), ~ str_replace(., "[dpcofgs]__", ""))  %>%
+  right_join(taxonomy, by=join_by(phylum == phylum)) %>%
+  dplyr::select(phylum, colors) %>%
+  mutate(colors = str_c(colors, "80"))  %>% #add 80% alpha
+	unique() %>%
+	dplyr::arrange(phylum)
+
+tax_table <- as.data.frame(unique(ancombc_rand_table_mag_cold$phylum))
+  
+colnames(tax_table)[1] <- "phylum"
+tax_color <- merge(tax_table, colors_alphabetic, by="phylum")
+
+tax_color <- tax_color %>%
+  mutate(colors = if_else(phylum=="p__Bacillota", '#074759',
+          if_else(phylum=="p__Bacillota_A", '#0c80a2',
+          if_else(phylum=="p__Bacillota_B", '#10acd9',
+          if_else(phylum=="p__Bacillota_C", '#7ddaf5',
+          if_else(phylum=="p__Bacteroidota", "#82383880",
+          if_else(phylum=="p__Pseudomonadota", '#E0A60880',
+          if_else(phylum=="p___Fusobacteriota", '#08EACA80',
+          if_else(phylum=="p__Verrucomicrobiota", '#AD8D8D80',
+          if_else(phylum=="p__Desulfobacterota", "#39A60880",
+          if_else(phylum=="p__Campylobacterota", "#DE2E0880", colors
+                  )))))))))))%>%
+  dplyr::arrange(phylum) %>%
+	dplyr::select(colors) %>%
+	pull()
+```
+
+```{r ancombc_rand_plot_phy_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE, eval=TRUE}
+ancombc_rand_table_mag_cold %>%
+  mutate(genome=factor(genome,levels=ancombc_rand_table_mag_cold$genome)) %>% 
+ggplot(., aes(x=lfc_typeTreatment, y=forcats::fct_reorder(species, lfc_typeTreatment), fill=phylum)) + #forcats::fct_rev()
+  geom_col() + 
+  scale_fill_manual(values=tax_color) + 
+  geom_hline(yintercept=0) + 
+#  coord_flip()+
+  theme(panel.background = element_blank(),
+        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
+        axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 8),
+        axis.title = element_text(size = 14, face = "bold"),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 14, face = "bold"),
+        legend.position = "right", legend.box = "vertical")+
+  xlab("log2FoldChange") + 
+  ylab("Species")+
+  guides(fill=guide_legend(title="Phylum"))
+```
+
+## post2 WC and CI
+### Enrichment analysis: Ancombc2
+
+```{r zero_phylo1_treat, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+#phyloseq object considering structual zeros
+phylo_samples <- sample_metadata %>% 
+                    filter(type!= "Control") %>% 
+                    filter(time_point == "6_Post-FMT2") %>% 
+                    column_to_rownames("Tube_code") %>% 
+                    sample_data() #convert to phyloseq sample_data object
+phylo_genome <- genome_counts_filt %>% 
+                    #filter(genome %in% structural_zeros$genome) %>% # remove structural zeros
+                    column_to_rownames("genome") %>% 
+                    mutate_all(~ replace(., . == 0, 0.00001)) %>% #add pseudo counts to avoid structural zero issues (note this approach can be improved!)
+                    otu_table(., taxa_are_rows = TRUE)
+phylo_taxonomy <- genome_metadata %>% 
+                    filter(genome %in% rownames(phylo_genome)) %>% # remove structural zeros
+                    mutate(genome2=genome) %>% #create a pseudo genome name column
+                    column_to_rownames("genome2") %>% 
+                    dplyr::select(domain,phylum,class,order,family,genus,species,genome) %>% #add an additional taxonomic level to ensure genome-level analysis (as no all genomes have species-level taxonomic assignments. Otherwise, ANCOMBC2 aggregates analyses per species)
+                    as.matrix() %>% 
+                    tax_table() #convert to phyloseq tax_table object
+
+physeq_genome_filtered <- phyloseq(phylo_genome, phylo_taxonomy, phylo_samples)
+physeq_genome_filtered_clr <- microbiome::transform(physeq_genome_filtered, 'clr')
+```
+
+```{r filtertreat, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+physeq_sample_treat <- subset_samples(physeq_genome_filtered, time_point %in% c("1_Acclimation","6_Post-FMT2"))
+physeq_sample_treat <- prune_taxa(taxa_sums(physeq_sample_treat)>0, physeq_sample_treat)
+```
+
+
+#### MAG level
+```{r ancom_rand_treat, comment="", echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+set.seed(1234) #set seed for reproducibility
+ancom_rand_output_mag_post2_treat = ancombc2(data = physeq_sample_treat, 
+                  assay_name = "counts", 
+                  tax_level = NULL, #change to agglomerate analysis to a higher taxonomic range
+                  fix_formula = "type", #fixed variable(s)
+ #                 rand_formula = "(1|individual)",
+                  p_adj_method = "holm", 
+                  pseudo_sens = TRUE,
+                  prv_cut = 0.10, 
+                        lib_cut = 1, 
+                        s0_perc = 0.05,
+                        group = NULL, 
+                        struc_zero = FALSE, 
+                        neg_lb = FALSE,
+                        alpha = 0.05, 
+                        n_cl = 2, 
+                  verbose = TRUE,
+                  global = FALSE, 
+                  pairwise = FALSE, 
+                  dunnet = FALSE, 
+                  trend = FALSE,
+                  iter_control = list(tol = 1e-5, max_iter = 20, verbose = FALSE),
+                  em_control = list(tol = 1e-5, max_iter = 100),
+#                  lme_control = lme4::lmerControl(),
+                  mdfdr_control = list(fwer_ctrl_method = "holm", B = 100), 
+                  trend_control = NULL)
+```
+
+```{r ancom_rand_treat_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, eval=TRUE}
+colnames(ancom_rand_output_mag_post2_treat$res) <- gsub("-", "_", colnames(ancom_rand_output_mag_post2_treat$res))
+
+ancom_result_treat <- ancom_rand_output_mag_post2_treat$res %>%
+  rename(genome=taxon) %>%
+  left_join(genome_metadata,by=join_by(genome==genome))
+
+ancom_result_treat %>%
+  mutate(significance = ifelse(p_typeTreatment < 0.01, "1", "0")) %>%
+  ggplot(., aes(x=-log(p_typeTreatment), y=lfc_typeTreatment, color=significance)) +
+  geom_point() +
+  scale_color_manual(values = c("#cccccc","#00FFFF")) +
+  geom_text(aes(2.5, 10), label = "Enriched\nin CI", color="#666666") +
+  geom_text(aes(2.5, -10), label = "Enriched\nin WC", color="#666666") +
+  labs(color="Significance", y="Difference between treatments", x="p-value") +
+  theme_classic()
+
+ancom_result_treat %>%
+  filter(p_typeTreatment < 0.01) %>%
+  ggplot(., aes(x=lfc_typeTreatment, y=forcats::fct_rev(genome), color=phylum)) +
+  geom_jitter(size=3) +
+  geom_vline(xintercept=0) + 
+  xlim(-max(ancom_result_treat$lfc_typeTreatment)-2,max(ancom_result_treat$lfc_typeTreatment)+2) +
+  scale_color_manual(values=phylum_colors) +
+  geom_text(aes(-max(ancom_result_treat$lfc_typeTreatment)+2, 2), label = "Enriched\nin WC", color="#666666") +
+  geom_text(aes(max(ancom_result_treat$lfc_typeTreatment)-2, 2), label = "Enriched\nin CI", color="#666666") +
+  theme(legend.position='right',
+        panel.background = element_blank(),
+        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
+        axis.title.x=element_blank())+
+  labs(y="MAGs",x="Genome counts") + 
+  guides(col=guide_legend("Phylum"))
+```  
+
+```{r ancom_table_treat, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+taxonomy <- data.frame(physeq_sample_treat@tax_table) %>%
+  rownames_to_column(., "taxon") %>%
+  mutate_at(vars(order, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))%>%
+  mutate(across(c(family,genus, species), na_if, ""))%>%
+    mutate(family = coalesce(family, paste('Unclassified', order)),
+           genus = coalesce(genus, 
+                              if_else(grepl('^Unclassified', family),
+                                      family, paste('Unclassified', family))),
+           species = coalesce(species, 
+                              if_else(grepl('^Unclassified', genus),
+                                      genus, paste('Unclassified', genus))))
+
+ancombc_rand_table_mag_treat <- ancom_rand_output_mag_post2_treat$res %>%
+  dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
+  filter(p_typeTreatment < 0.05) %>%
+  dplyr::arrange(p_typeTreatment) %>%
+  merge(., taxonomy, by="taxon") %>%
+#  mutate_at(vars(phylum, species), ~ str_replace(., "[dpcofgs]__", ""))%>%
+  dplyr::arrange(lfc_typeTreatment)
+  
+colors_alphabetic <- read_tsv("https://raw.githubusercontent.com/earthhologenome/EHI_taxonomy_colour/main/ehi_phylum_colors.tsv") %>%
+#  mutate_at(vars(phylum), ~ str_replace(., "[dpcofgs]__", ""))  %>%
+  right_join(taxonomy, by=join_by(phylum == phylum)) %>%
+  dplyr::select(phylum, colors) %>%
+  mutate(colors = str_c(colors, "80"))  %>% #add 80% alpha
+	unique() %>%
+	dplyr::arrange(phylum)
+
+tax_table <- as.data.frame(unique(ancombc_rand_table_mag_treat$phylum))
+  
+colnames(tax_table)[1] <- "phylum"
+tax_color <- merge(tax_table, colors_alphabetic, by="phylum")
+
+tax_color <- tax_color %>%
+  mutate(colors = if_else(phylum=="p__Bacillota", '#074759',
+          if_else(phylum=="p__Bacillota_A", '#0c80a2',
+          if_else(phylum=="p__Bacillota_B", '#10acd9',
+          if_else(phylum=="p__Bacillota_C", '#7ddaf5',
+          if_else(phylum=="p__Bacteroidota", "#82383880",
+          if_else(phylum=="p__Pseudomonadota", '#E0A60880',
+          if_else(phylum=="p___Fusobacteriota", '#08EACA80',
+          if_else(phylum=="p__Verrucomicrobiota", '#AD8D8D80',
+          if_else(phylum=="p__Desulfobacterota", "#39A60880",
+          if_else(phylum=="p__Campylobacterota", "#DE2E0880", colors
+                  )))))))))))%>%
+  dplyr::arrange(phylum) %>%
+	dplyr::select(colors) %>%
+	pull()
+```
+
+```{r ancombc_rand_plot_phy_treat, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE, eval=TRUE}
+ancombc_rand_table_mag_treat %>%
+  mutate(genome=factor(genome,levels=ancombc_rand_table_mag_treat$genome)) %>% 
+ggplot(., aes(x=lfc_typeTreatment, y=forcats::fct_reorder(species, lfc_typeTreatment), fill=phylum)) + #forcats::fct_rev()
   geom_col() + 
   scale_fill_manual(values=tax_color) + 
   geom_hline(yintercept=0) + 
@@ -1865,10 +2205,24 @@ element_gift_post2<- GIFTs_elements_community %>%
   inner_join(sample_metadata_TM6[c(1,7)], by="Tube_code") 
 ```
 
+```{r comunity_elem_7_1_filter, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+# Find numeric columns
+numeric_cols <- sapply(element_gift_post2, is.numeric)
+
+# Calculate column sums for numeric columns only
+col_sums_numeric <- colSums(element_gift_post2[, numeric_cols])
+
+# Identify numeric columns with sums not equal to zero
+nonzero_numeric_cols <- names(col_sums_numeric)[col_sums_numeric != 0]
+
+# Remove numeric columns with sums not equal to zero
+element_gift_post2_filter <- element_gift_post2[, !numeric_cols | colnames(element_gift_post2) %in% nonzero_numeric_cols]
+```
+
 ```{r commun_wilcox_elem_7_1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
 uniqueGIFT_db<- unique(GIFT_db[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
 
-significant_elements_post2 <- element_gift_post2 %>%
+significant_elements_post2 <- element_gift_post2_filter %>%
   pivot_longer(-c(Tube_code,type), names_to = "trait", values_to = "value") %>%
   group_by(trait) %>%
   summarise(p_value = wilcox.test(value ~ type)$p.value) %>%
@@ -1879,7 +2233,7 @@ significant_elements_post2 <- element_gift_post2 %>%
 # %>%
 #   left_join(.,uniqueGIFT_db[c(1,3)],by = join_by(trait == Code_element))
 
-element_gift_t_post2 <- element_gift_post2  %>% 
+element_gift_t_post2 <- element_gift_post2_filter  %>% 
   dplyr::select(-c(type))  %>%
   t() %>%
   row_to_names(row_number = 1) %>%
@@ -2040,6 +2394,218 @@ element_gift_names_post2 <- element_gift_filt_post2%>%
 colNames <- names(element_gift_names_post2)[2:3] #check the column that has the last code
 for(i in colNames){
   plt <- ggplot(element_gift_names_post2, aes(x=type, y=.data[[i]], color = type, fill=type)) +
+    geom_boxplot(alpha = 0.2, outlier.shape = NA, width = 0.3, show.legend = FALSE) +
+    geom_jitter(width = 0.1, show.legend = TRUE) +
+    scale_color_manual(values=c("#e5bd5b", "#6b7398"))+
+    scale_fill_manual(values=c("#e5bd5b", "#6b7398"))+
+    theme_minimal() +
+    theme(
+      axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      panel.border = element_blank())
+  print(plt)
+}
+```
+
+### Comparison of CI and WC in post2 samples ####
+
+```{r comunity_elem_7_1_1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+element_gift_post2_1<- GIFTs_elements_community %>% 
+  as.data.frame() %>% 
+  rownames_to_column(., "Tube_code") %>% 
+  inner_join(sample_metadata_TM8[c(1,7)], by="Tube_code") 
+```
+
+```{r comunity_elem_7_1_filter_1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+# Find numeric columns
+numeric_cols <- sapply(element_gift_post2_1, is.numeric)
+
+# Calculate column sums for numeric columns only
+col_sums_numeric <- colSums(element_gift_post2_1[, numeric_cols])
+
+# Identify numeric columns with sums not equal to zero
+nonzero_numeric_cols <- names(col_sums_numeric)[col_sums_numeric != 0]
+
+# Remove numeric columns with sums not equal to zero
+element_gift_post2_1_filter <- element_gift_post2_1[, !numeric_cols | colnames(element_gift_post2_1) %in% nonzero_numeric_cols]
+```
+
+```{r commun_wilcox_elem_7_1_1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+uniqueGIFT_db<- unique(GIFT_db[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
+
+significant_elements_post2_1 <- element_gift_post2_1_filter %>%
+  pivot_longer(-c(Tube_code,type), names_to = "trait", values_to = "value") %>%
+  group_by(trait) %>%
+  summarise(p_value = wilcox.test(value ~ type)$p.value) %>%
+  mutate(p_adjust=p.adjust(p_value, method="BH")) %>%
+  filter(p_value < 0.05)%>% #note than p_value was used instead of p_adjust
+  rownames_to_column(., "Elements")  %>% 
+  select(-Elements)
+# %>%
+#   left_join(.,uniqueGIFT_db[c(1,3)],by = join_by(trait == Code_element))
+
+element_gift_t_post2_1 <- element_gift_post2_1_filter  %>% 
+  dplyr::select(-c(type))  %>%
+  t() %>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric)  %>%
+  rownames_to_column(., "trait")
+
+element_gift_filt_post2_1 <- subset(element_gift_t_post2_1, trait %in% significant_elements_post2_1$trait) %>% 
+  t() %>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric)  %>%
+  rownames_to_column(., "Tube_code")%>% 
+  left_join(., sample_metadata_TM8[c(1,7)], by = join_by(Tube_code == Tube_code))
+
+difference_table_post2_1 <- element_gift_filt_post2_1 %>%
+  select(-Tube_code) %>%
+  group_by(type) %>%
+  summarise(across(everything(), mean)) %>%
+  t() %>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric) %>%
+  rownames_to_column(., "Elements") %>%
+  left_join(.,uniqueGIFT_db[c(1,3,4)],by = join_by(Elements == Code_element)) %>% 
+  arrange(Function) %>% 
+  mutate(Difference=Hot_control-Treatment)%>% 
+  mutate(group_color = ifelse(Difference <0, "Treatment","Hot_control")) 
+```
+
+```{r log_fold_calc_7_1_1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+means_gift_post2_1 <- element_gift_filt_post2_1 %>% 
+  select(-type) %>% 
+  pivot_longer(!Tube_code, names_to = "elements", values_to = "abundance") %>% 
+  left_join(sample_metadata_TM8, by=join_by(Tube_code==Tube_code)) %>% 
+  group_by(type, elements) %>%
+  summarise(mean=mean(abundance))
+
+log_fold_post2_1 <- means_gift_post2_1 %>%
+  group_by(elements) %>%
+  summarise(
+    logfc_control_treatment = log2(mean[type == "Hot_control"] / mean[type == "Treatment"])
+  )
+```
+
+
+```{r plot1_7_1_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
+difference_table_post2_1 %>%
+  #  mutate(Difference_abs = abs(Difference)) %>% 
+  left_join(significant_elements_post2_1, by=join_by(Elements==trait)) %>% 
+  ggplot(., aes(x = Difference, y = -log(p_adjust), color=group_color)) + 
+  geom_point(size=2, show.legend = FALSE) + 
+  scale_color_manual(values=c("#e5bd5b", "#6b7398"))+
+  #xlim(c(-10,4)) +
+  theme_classic()+
+  geom_text_repel(aes(label = Elements), size=2)
+```
+
+```{r plot3_7_1_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=5, fig.width=10, fig.fullwidth=TRUE}
+uniqueGIFT <- unique(GIFT_db[c(2,3,4,5,6)])
+
+code_function_post2_1 <- difference_table_post2_1 %>%
+  left_join(uniqueGIFT[c(1:3)], by=join_by(Elements==Code_element))
+
+unique_codes_post2_1<-unique(code_function_post2_1$Code_function)
+
+gift_colors_post2_1 <- read_tsv("data/gift_colors.tsv") %>% 
+  filter(Code_function %in% unique_codes_post2_1)%>% 
+  mutate(legend=str_c(Code_function," - ",Function))
+
+code_function_post2_1 %>%
+  #  mutate(Difference_abs = abs(Difference)) %>% 
+  left_join(significant_elements_post2_1, by=join_by(Elements==trait)) %>%
+  left_join(log_fold_post2_1, by=join_by(Elements==elements)) %>% 
+  left_join(gift_colors_post2_1, by=join_by(Code_function==Code_function)) %>% 
+  ggplot(., aes(x = logfc_control_treatment, y = -log(p_adjust), color=legend, size=abs(Difference))) + #note that p_value was used instead of p_adjust
+  geom_point()+
+  geom_vline(xintercept=0) +
+  scale_color_manual(values = gift_colors_post2_1$Color)+
+  #xlim(c(-10,4)) +
+  theme_classic()+
+  labs(size="Mean difference (abs)", color="Functional trait")+
+  labs(x = "Log-fold change", y="-Log adjusted p-value")
+
+# +
+#   geom_text_repel(aes(label = Elements), size=2, max.overlaps = Inf)
+
+```
+
+```{r final_plot_7_1_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=8, fig.width=12, fig.fullwidth=TRUE}
+code_function_post2_1 %>%
+  #  mutate(Difference_abs = abs(Difference)) %>% 
+  left_join(significant_elements_post2_1, by=join_by(Elements==trait)) %>%
+  left_join(log_fold_post2_1, by=join_by(Elements==elements)) %>% 
+  left_join(gift_colors_post2_1, by=join_by(Code_function==Code_function)) %>% 
+  ggplot(., aes(x = logfc_control_treatment, y = -log(p_adjust), color=legend, size=abs(Difference))) + #note that p_value was used instead of p_adjust
+  geom_jitter(width = 0.2, height = 0.2)+
+  geom_vline(xintercept=0) +
+  scale_color_manual(values = gift_colors_post2_1$Color)+
+  #xlim(c(-10,4)) +
+  theme_classic()+
+  labs(size="Mean difference (abs)", color="Functional trait")+
+  labs(x = "Log-fold change", y="-Log adjusted p-value") +
+  geom_text_repel(aes(label = Element), min.segment.length = 0.4, size=2.5, max.overlaps = Inf)
+```
+
+```{r plot4_7_1_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
+difference_table_post2_1 %>%
+  #  mutate(Difference_abs = abs(Difference)) %>% 
+  left_join(significant_elements_post2_1, by=join_by(Elements==trait)) %>%
+  left_join(log_fold_post2_1, by=join_by(Elements==elements)) %>% 
+  ggplot(., aes(x = Difference, y = logfc_control_treatment, color=group_color)) +
+  geom_point(size=2, show.legend = FALSE) + 
+  scale_color_manual(values=c("#e5bd5b", "#6b7398"))+
+  #xlim(c(-10,4)) +
+  theme_classic()+
+  geom_text_repel(aes(label = Elements), size=2, max.overlaps = Inf)
+```
+
+```{r commun_wilcox_elem_plot_10_1_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=6, fig.width=12, fig.fullwidth=TRUE}
+difference_table_post2_1 %>%
+  ggplot(aes(x=forcats::fct_reorder(Function,Difference), y=Difference, fill=group_color)) + 
+  geom_col() +
+  #  geom_point(size=4) + 
+  scale_fill_manual(values=c("#e5bd5b", "#6b7398")) + 
+  geom_hline(yintercept=0) + 
+  coord_flip()+
+  theme(axis.text = element_text(size = 10),
+        axis.title = element_text(size = 12),
+        legend.position = "right", 
+        legend.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major = element_line(size = 0.15, linetype = 'solid',
+                                        colour = "grey"))+
+  xlab("Function") + 
+  ylab("Mean difference")
+```
+
+```{r commun_wilcox_elem_plot_7_1_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=6, fig.width=12, fig.fullwidth=TRUE}
+element_gift_names_post2_1 <- element_gift_filt_post2_1%>%
+  select(-type)%>%
+  t() %>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric)  %>%
+  rownames_to_column(., "Elements")  %>%
+  left_join(.,uniqueGIFT_db[c(1,3)],by = join_by(Elements == Code_element))%>%
+  select(-Elements)%>%
+  select(Function, everything())%>%
+  t()%>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric)  %>%
+  rownames_to_column(., "Tube_code")%>% 
+  left_join(., sample_metadata_TM8[c(1,7)], by = join_by(Tube_code == Tube_code))
+
+
+colNames <- names(element_gift_names_post2_1)[2:13] #check the column that has the last code
+for(i in colNames){
+  plt <- ggplot(element_gift_names_post2_1, aes(x=type, y=.data[[i]], color = type, fill=type)) +
     geom_boxplot(alpha = 0.2, outlier.shape = NA, width = 0.3, show.legend = FALSE) +
     geom_jitter(width = 0.1, show.legend = TRUE) +
     scale_color_manual(values=c("#e5bd5b", "#6b7398"))+

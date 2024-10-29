@@ -53,6 +53,7 @@ library(tidyverse)
 library(devtools)
 library(tinytable)
 library(janitor)
+library(readxl)
 
 # For tree handling
 library(ape)

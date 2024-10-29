@@ -46,7 +46,6 @@ wild-samples-1
 taxonomy-boxplot
 family
 genus
-diversity-analysis
 alpha-diversity
 wild-samples-2
 acclimation-samples
@@ -173,6 +172,9 @@ mag-level-1
 ci-acclimation-vs-post2
 enrichment-analysis-ancombc2-2
 mag-level-2
+post2-ci-vs-wc
+enrichment-analysis-ancombc2-3
+mag-level-3
 community-level-plots
 wilcoxon-comparison
 community-elements-differences-in-cc-acclimation-vs-post2
@@ -181,3 +183,4 @@ community-elements-differences-in-wc-acclimation-vs-post2
 comparison-of-both-population-in-wild-samples
 comparison-of-both-population-in-acclimation-samples
 comparison-of-cc-and-ci-in-post2-samples
+comparison-of-ci-and-wc-in-post2-samples
