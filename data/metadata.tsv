@@ -114,7 +114,6 @@ AD66	AH1_2nd_6	Podarcis_muralis	Cold_wet	43.31323	-1.75101	Treatment	Male	Faeces
 AD56	AH1_2nd_7	Podarcis_muralis	Cold_wet	43.31323	-1.75101	Control	Male	Faeces	4_Transplant2	Lizards_Hologenomics
 AD57	AH1_2nd_9	Podarcis_muralis	Cold_wet	43.31323	-1.75101	Control	Male	Faeces	4_Transplant2	Lizards_Hologenomics
 AD68	AH1_2nd_10	Podarcis_muralis	Cold_wet	43.31323	-1.75101	Treatment	Male	Faeces	4_Transplant2	Lizards_Hologenomics
-AD69	AH1_2nd_11	Podarcis_muralis	Cold_wet	43.31323	-1.75101	Treatment	Male	Faeces	4_Transplant2	Lizards_Hologenomics
 AD58	AH1_2nd_12	Podarcis_muralis	Cold_wet	43.31323	-1.75101	Control	Male	Faeces	4_Transplant2	Lizards_Hologenomics
 AD70	AH1_2nd_20	Podarcis_muralis	Cold_wet	43.31323	-1.75101	Treatment	Male	Faeces	4_Transplant2	Lizards_Hologenomics
 AD71	AH1_2nd_13	Podarcis_muralis	Cold_wet	43.31323	-1.75101	Treatment	Male	Faeces	4_Transplant2	Lizards_Hologenomics
@@ -125,11 +124,8 @@ AD61	AH1_2nd_17	Podarcis_muralis	Cold_wet	43.31323	-1.75101	Control	Male	Faeces	
 AD62	AH1_2nd_18	Podarcis_muralis	Cold_wet	43.31323	-1.75101	Control	Male	Faeces	4_Transplant2	Lizards_Hologenomics
 AD63	AH1_2nd_19	Podarcis_muralis	Cold_wet	43.31323	-1.75101	Control	Male	Faeces	4_Transplant2	Lizards_Hologenomics
 AD66_a	LI1_2nd_1	Podarcis_liolepis	Hot_dry	42.67034	-2.0269	Hot_control	Male	Faeces	4_Transplant2	Lizards_Hologenomics
-AD64_a	LI1_2nd_2	Podarcis_liolepis	Hot_dry	42.67034	-2.0269	Hot_control	Male	Faeces	4_Transplant2	Lizards_Hologenomics
-AD69_a	LI1_2nd_3	Podarcis_liolepis	Hot_dry	42.67034	-2.0269	Hot_control	Male	Faeces	4_Transplant2	Lizards_Hologenomics
 AD65_a	LI1_2nd_4	Podarcis_liolepis	Hot_dry	42.67034	-2.0269	Hot_control	Male	Faeces	4_Transplant2	Lizards_Hologenomics
 AD73	LI1_2nd_5	Podarcis_liolepis	Hot_dry	42.67034	-2.0269	Hot_control	Male	Faeces	4_Transplant2	Lizards_Hologenomics
-AD67_a	LI1_2nd_6	Podarcis_liolepis	Hot_dry	42.67034	-2.0269	Hot_control	Male	Faeces	4_Transplant2	Lizards_Hologenomics
 AD68_a	LI1_2nd_7	Podarcis_liolepis	Hot_dry	42.67034	-2.0269	Hot_control	Male	Faeces	4_Transplant2	Lizards_Hologenomics
 AD71_a	LI1_2nd_8	Podarcis_liolepis	Hot_dry	42.67034	-2.0269	Hot_control	Male	Faeces	4_Transplant2	Lizards_Hologenomics
 AD70_a	LI1_2nd_9	Podarcis_liolepis	Hot_dry	42.67034	-2.0269	Hot_control	Male	Faeces	4_Transplant2	Lizards_Hologenomics

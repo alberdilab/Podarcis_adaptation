@@ -920,14 +920,11 @@ ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 
 #### Comparison between FMT2 vs Post-FMT2
 
-```{r beta_div_neutral_transplant3, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE, include=FALSE}
+```{r beta_div_neutral_transplant3, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE}
 #Create newID to identify duplicated samples
 transplants_metadata<-sample_metadata%>%
   mutate(Tube_code=str_remove_all(Tube_code, "_a"))
 transplants_metadata$newID <- paste(transplants_metadata$Tube_code, "_", transplants_metadata$individual)
-
-transplants_metadata<-transplants_metadata %>%
-  filter(Tube_code!="AD64"|Tube_code!="AD67")
 
 transplant3<-transplants_metadata%>%
   filter(time_point == "4_Transplant2" | time_point == "6_Post-FMT2")%>%
@@ -956,32 +953,32 @@ identical(sort(colnames(transplant3_counts)),sort(as.character(rownames(transpla
 
 #### Number of samples used
 
-```{r beta_div_neutral_treat_samples_1, echo=FALSE, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE,include=FALSE}
+```{r beta_div_neutral_treat_samples_1, echo=FALSE, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE}
 nrow(transplant3)
 ```
 
 
-```{r beta_div_neutral_transplant3_1, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE,include=FALSE}
+```{r beta_div_neutral_transplant3_1, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE}
 beta_div_richness_transplant3<-hillpair(data=transplant3_counts, q=0)
 beta_div_neutral_transplant3<-hillpair(data=transplant3_counts, q=1)
 beta_div_phylo_transplant3<-hillpair(data=transplant3_counts, q=1, tree=genome_tree)
 beta_div_func_transplant3<-hillpair(data=transplant3_counts, q=1, dist=dist)
 ```
 
-```{r beta_div_neutral_transplant3_2, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE,include=FALSE}
+```{r beta_div_neutral_transplant3_2, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE}
 #Arrange of metadata dataframe
 transplant3_arrange<-transplant3[labels(beta_div_neutral_transplant3$S),]
 ```
 
 ##### Richness
 
-```{r beta_richness_permanova_transplant3_4, echo=FALSE, warning=FALSE, comments="", message=FALSE,include=FALSE, eval=FALSE}
+```{r beta_richness_permanova_transplant3_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 adonis2(formula=beta_div_richness_transplant3$S ~ species+time_point+type, data=transplant3[labels(beta_div_richness_transplant3$S),], permutations=999, strata=transplant3$individual) %>%
 		as.matrix() %>%
 		kable()
 ```
 
-```{r beta_richness_permanova_transplant3_5, echo=FALSE, warning=FALSE, comments="", message=FALSE,include=FALSE, eval=FALSE}
+```{r beta_richness_permanova_transplant3_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 pairwise<-pairwise.adonis(beta_div_richness_transplant3$S,transplant3_arrange$type, perm=999)
 pairwise%>%
   tt()
@@ -989,13 +986,13 @@ pairwise%>%
 
 ##### Neutral
 
-```{r beta_neutral_permanova_transplant3_4, echo=FALSE, warning=FALSE, comments="", message=FALSE,include=FALSE, eval=FALSE}
+```{r beta_neutral_permanova_transplant3_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 adonis2(formula=beta_div_neutral_transplant3$S ~ species+time_point+type, data=transplant3[labels(beta_div_neutral_transplant3$S),], permutations=999, strata=transplant3$individual) %>%
 		as.matrix() %>%
 		kable()
 ```
 
-```{r beta_neutral_permanova_transplant3_5, echo=FALSE, warning=FALSE, comments="", message=FALSE,include=FALSE, eval=FALSE}
+```{r beta_neutral_permanova_transplant3_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 pairwise<-pairwise.adonis(beta_div_neutral_transplant3$S,transplant3_arrange$type, perm=999)
 pairwise%>%
   tt()
@@ -1003,13 +1000,13 @@ pairwise%>%
 
 ##### Phylogenetic
 
-```{r beta_phylo_permanova_transplant3_4, echo=FALSE, warning=FALSE, comments="", message=FALSE,include=FALSE, eval=FALSE}
+```{r beta_phylo_permanova_transplant3_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 adonis2(formula=beta_div_phylo_transplant3$S ~ species+time_point+type, data=transplant3[labels(beta_div_phylo_transplant3$S),], permutations=999, strata=transplant3$individual) %>%
 		as.matrix() %>%
 		kable()
 ```
 
-```{r beta_phylo_permanova_transplant3_5, echo=FALSE, warning=FALSE, comments="", message=FALSE,include=FALSE, eval=FALSE}
+```{r beta_phylo_permanova_transplant3_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 pairwise<-pairwise.adonis(beta_div_phylo_transplant3$S,transplant3_arrange$type, perm=999)
 pairwise%>%
   tt()
@@ -1017,19 +1014,19 @@ pairwise%>%
 
 ##### Functional
 
-```{r beta_func_permanova_transplant3_4, echo=FALSE, warning=FALSE, comments="", message=FALSE,include=FALSE, eval=FALSE}
+```{r beta_func_permanova_transplant3_4, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 adonis2(formula=beta_div_func_transplant3$S ~ species+time_point+type, data=transplant3[labels(beta_div_func_transplant3$S),], permutations=999, strata=transplant3$individual) %>%
 		as.matrix() %>%
 		kable()
 ```
 
-```{r beta_func_permanova_transplant3_5, echo=FALSE, warning=FALSE, comments="", message=FALSE,include=FALSE, eval=FALSE}
+```{r beta_func_permanova_transplant3_5, echo=FALSE, warning=FALSE, comments="", message=FALSE}
 pairwise<-pairwise.adonis(beta_div_func_transplant3$S,transplant3_arrange$type, perm=999)
 pairwise%>%
   tt()
 ```
 
-```{r beta_neutral_nmds_transplant3, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide",include=FALSE, eval=FALSE}
+```{r beta_neutral_nmds_transplant3, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
 beta_richness_nmds_transplant3 <- beta_div_richness_transplant3$S %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
@@ -1055,7 +1052,7 @@ beta_func_nmds_transplant3 <- beta_div_func_transplant3$S %>%
 				left_join(transplant3_nmds, by = join_by(sample == newID))
 ```
 
-```{r beta_neutral_nmds_transplant3_plot, eho=FALSE, results=FALSE,include=FALSE, eval=FALSE}
+```{r beta_neutral_nmds_transplant3_plot, eho=FALSE, results=FALSE}
 p0<-beta_richness_nmds_transplant3 %>%
 			group_by(individual) %>%
 			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
@@ -1121,7 +1118,7 @@ p3<-beta_func_nmds_transplant3 %>%
 				theme(legend.position="none")
 ```
 
-```{r beta_neutral_nmds_plot_transplant3_final, echo=FALSE, results=TRUE, fig.height=8, fig.width=10, fig.fullwidth=TRUE,include=FALSE, eval=FALSE}
+```{r beta_neutral_nmds_plot_transplant3_final, echo=FALSE, results=TRUE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
 ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 ```
 
