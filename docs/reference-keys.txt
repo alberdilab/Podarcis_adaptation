@@ -206,3 +206,6 @@ time-point-measurements-linking-individuals
 data-modelling-1
 raw-data-modelling-lmm-2
 raw-data-modelling-lm-without-random-effect-2
+data-modeling-without-wc-1
+raw-data-modelling-lmm-3
+raw-data-modelling-lm-without-random-effect-3

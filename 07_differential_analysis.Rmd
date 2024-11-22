@@ -949,10 +949,24 @@ element_gift_CC <- GIFTs_elements_community %>%
   inner_join(samples_CC[c(1,10)], by="Tube_code") 
 ```
 
+```{r comunity_elem_filter, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+# Find numeric columns
+numeric_cols <- sapply(element_gift_CC, is.numeric)
+
+# Calculate column sums for numeric columns only
+col_sums_numeric <- colSums(element_gift_CC[, numeric_cols])
+
+# Identify numeric columns with sums not equal to zero
+nonzero_numeric_cols <- names(col_sums_numeric)[col_sums_numeric != 0]
+
+# Remove numeric columns with sums not equal to zero
+element_gift_CC_filter <- element_gift_CC[, !numeric_cols | colnames(element_gift_CC) %in% nonzero_numeric_cols]
+```
+
 ```{r commun_wilcox_elem, comment="", echo=FALSE, message=FALSE, warning=FALSE}
 uniqueGIFT_db<- unique(GIFT_db[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
 
-significant_elements_CC <- element_gift_CC %>%
+significant_elements_CC <- element_gift_CC_filter %>%
   pivot_longer(-c(Tube_code,time_point), names_to = "trait", values_to = "value") %>%
   group_by(trait) %>%
   summarise(p_value = wilcox.test(value ~ time_point)$p.value) %>%
@@ -963,7 +977,7 @@ significant_elements_CC <- element_gift_CC %>%
 # %>%
 #   left_join(.,uniqueGIFT_db[c(1,3)],by = join_by(trait == Code_element))
 
-element_gift_t_CC <- element_gift_CC  %>% 
+element_gift_t_CC <- element_gift_CC_filter  %>% 
   dplyr::select(-c(time_point))  %>%
   t() %>%
   row_to_names(row_number = 1) %>%
@@ -1221,10 +1235,24 @@ element_gift_CI <- GIFTs_elements_community %>%
   inner_join(samples_CI[c(1,10)], by="Tube_code") 
 ```
 
+```{r comunity_elem_1_filter, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+# Find numeric columns
+numeric_cols <- sapply(element_gift_CI, is.numeric)
+
+# Calculate column sums for numeric columns only
+col_sums_numeric <- colSums(element_gift_CI[, numeric_cols])
+
+# Identify numeric columns with sums not equal to zero
+nonzero_numeric_cols <- names(col_sums_numeric)[col_sums_numeric != 0]
+
+# Remove numeric columns with sums not equal to zero
+element_gift_CI_filter <- element_gift_CI[, !numeric_cols | colnames(element_gift_CI) %in% nonzero_numeric_cols]
+```
+
 ```{r commun_wilcox_elem_1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
 uniqueGIFT_db<- unique(GIFT_db[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
 
-significant_elements_CI <- element_gift_CI %>%
+significant_elements_CI <- element_gift_CI_filter %>%
   pivot_longer(-c(Tube_code,time_point), names_to = "trait", values_to = "value") %>%
   group_by(trait) %>%
   summarise(p_value = wilcox.test(value ~ time_point)$p.value) %>%
@@ -1235,7 +1263,7 @@ significant_elements_CI <- element_gift_CI %>%
 # %>%
 #   left_join(.,uniqueGIFT_db[c(1,3)],by = join_by(trait == Code_element))
 
-element_gift_t_CI <- element_gift_CI  %>% 
+element_gift_t_CI <- element_gift_CI_filter  %>% 
   dplyr::select(-c(time_point))  %>%
   t() %>%
   row_to_names(row_number = 1) %>%
@@ -1491,10 +1519,24 @@ element_gift_WC <- GIFTs_elements_community %>%
   inner_join(samples_WC[c(1,10)], by="Tube_code") 
 ```
 
+```{r comunity_elem_2_filter, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+# Find numeric columns
+numeric_cols <- sapply(element_gift_WC, is.numeric)
+
+# Calculate column sums for numeric columns only
+col_sums_numeric <- colSums(element_gift_WC[, numeric_cols])
+
+# Identify numeric columns with sums not equal to zero
+nonzero_numeric_cols <- names(col_sums_numeric)[col_sums_numeric != 0]
+
+# Remove numeric columns with sums not equal to zero
+element_gift_WC_filter <- element_gift_WC[, !numeric_cols | colnames(element_gift_WC) %in% nonzero_numeric_cols]
+```
+
 ```{r commun_wilcox_elem_2, comment="", echo=FALSE, message=FALSE, warning=FALSE}
 uniqueGIFT_db<- unique(GIFT_db[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
 
-significant_elements_WC <- element_gift_WC %>%
+significant_elements_WC <- element_gift_WC_filter %>%
   pivot_longer(-c(Tube_code,time_point), names_to = "trait", values_to = "value") %>%
   group_by(trait) %>%
   summarise(p_value = wilcox.test(value ~ time_point)$p.value) %>%
@@ -1505,7 +1547,7 @@ significant_elements_WC <- element_gift_WC %>%
 # %>%
 #   left_join(.,uniqueGIFT_db[c(1,3)],by = join_by(trait == Code_element))
 
-element_gift_t_WC <- element_gift_WC  %>% 
+element_gift_t_WC <- element_gift_WC_filter  %>% 
   dplyr::select(-c(time_point))  %>%
   t() %>%
   row_to_names(row_number = 1) %>%
@@ -1758,10 +1800,24 @@ element_gift_wild<- GIFTs_elements_community %>%
   inner_join(sample_metadata_wild[c(1,4)], by="Tube_code") 
 ```
 
+```{r commun_wilcox_elem_6_filter, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+# Find numeric columns
+numeric_cols <- sapply(element_gift_wild, is.numeric)
+
+# Calculate column sums for numeric columns only
+col_sums_numeric <- colSums(element_gift_wild[, numeric_cols])
+
+# Identify numeric columns with sums not equal to zero
+nonzero_numeric_cols <- names(col_sums_numeric)[col_sums_numeric != 0]
+
+# Remove numeric columns with sums not equal to zero
+element_gift_wild_filter <- element_gift_wild[, !numeric_cols | colnames(element_gift_wild) %in% nonzero_numeric_cols]
+```
+
 ```{r commun_wilcox_elem_6, comment="", echo=FALSE, message=FALSE, warning=FALSE}
 uniqueGIFT_db<- unique(GIFT_db[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
 
-significant_elements_wild <- element_gift_wild %>%
+significant_elements_wild <- element_gift_wild_filter %>%
   pivot_longer(-c(Tube_code,Population), names_to = "trait", values_to = "value") %>%
   group_by(trait) %>%
   summarise(p_value = wilcox.test(value ~ Population)$p.value) %>%
@@ -1772,7 +1828,7 @@ significant_elements_wild <- element_gift_wild %>%
 # %>%
 #   left_join(.,uniqueGIFT_db[c(1,3)],by = join_by(trait == Code_element))
 
-element_gift_t_wild <- element_gift_wild  %>% 
+element_gift_t_wild <- element_gift_wild_filter  %>% 
   dplyr::select(-c(Population))  %>%
   t() %>%
   row_to_names(row_number = 1) %>%
@@ -2007,10 +2063,24 @@ element_gift_accli<- GIFTs_elements_community %>%
   inner_join(sample_metadata_accli[c(1,4)], by="Tube_code") 
 ```
 
+```{r comunity_elem_7_accli_filter, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+# Find numeric columns
+numeric_cols <- sapply(element_gift_accli, is.numeric)
+
+# Calculate column sums for numeric columns only
+col_sums_numeric <- colSums(element_gift_accli[, numeric_cols])
+
+# Identify numeric columns with sums not equal to zero
+nonzero_numeric_cols <- names(col_sums_numeric)[col_sums_numeric != 0]
+
+# Remove numeric columns with sums not equal to zero
+element_gift_accli_filter <- element_gift_accli[, !numeric_cols | colnames(element_gift_accli) %in% nonzero_numeric_cols]
+```
+
 ```{r commun_wilcox_elem_7, comment="", echo=FALSE, message=FALSE, warning=FALSE}
 uniqueGIFT_db<- unique(GIFT_db[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
 
-significant_elements_accli <- element_gift_accli %>%
+significant_elements_accli <- element_gift_accli_filter %>%
   pivot_longer(-c(Tube_code,Population), names_to = "trait", values_to = "value") %>%
   group_by(trait) %>%
   summarise(p_value = wilcox.test(value ~ Population)$p.value) %>%
@@ -2021,7 +2091,7 @@ significant_elements_accli <- element_gift_accli %>%
 # %>%
 #   left_join(.,uniqueGIFT_db[c(1,3)],by = join_by(trait == Code_element))
 
-element_gift_t_accli <- element_gift_accli  %>% 
+element_gift_t_accli <- element_gift_accli_filter  %>% 
   dplyr::select(-c(Population))  %>%
   t() %>%
   row_to_names(row_number = 1) %>%
