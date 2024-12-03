@@ -970,31 +970,10 @@ p3 <-merge_gift_wild %>%
         legend.key.size = unit(1, 'cm'),
         strip.text.x = element_text(size = 12, color = "black", face = "bold"))+
   labs( x = "Species")
-
-#Overall
-p4 <-merge_gift_wild %>%
-  ggplot(aes(x=species,y=Overall,color=species,fill=species))+
-  geom_jitter(width = 0.2, size = 1.5, show.legend = FALSE)+ 
-  geom_boxplot(alpha=0.2,outlier.shape = NA, width = 0.5, show.legend = FALSE, coef=0)+
-  stat_compare_means() +
-  theme(axis.text.x = element_text(vjust = 0.5, size=10),
-        axis.text.y = element_text(size=10),
-        axis.title=element_text(size=12,face="bold"),
-        axis.text = element_text(face="bold", size=18),
-        panel.background = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
-        legend.text = element_text(size=10),
-        legend.title = element_text(size=12),
-        legend.position="none",
-        legend.key.size = unit(1, 'cm'),
-        strip.text.x = element_text(size = 12, color = "black", face = "bold"))+
-  labs( x = "Species")
 ```
 
 ```{r final_plot_1_2, echo=FALSE, results=TRUE,fig.height=8, fig.width=10, fig.fullwidth=TRUE}
-grid.arrange(arrangeGrob(p1, p2,p3, p4, ncol = 2))
+grid.arrange(arrangeGrob(p1, p2,p3, ncol = 3))
 ```
 
 ### Comparison of samples from the 1st Time_point (1_Acclimation)
@@ -1070,31 +1049,10 @@ p3 <-merge_gift_accli %>%
         legend.key.size = unit(1, 'cm'),
         strip.text.x = element_text(size = 12, color = "black", face = "bold"))+
   labs( x = "Species")
-
-#Overall
-p4 <-merge_gift_accli %>%
-  ggplot(aes(x=species,y=Overall,color=species,fill=species))+
-  geom_jitter(width = 0.2, size = 1.5, show.legend = FALSE)+ 
-  geom_boxplot(alpha=0.2,outlier.shape = NA, width = 0.5, show.legend = FALSE, coef=0)+
-  stat_compare_means() +
-  theme(axis.text.x = element_text(vjust = 0.5, size=10),
-        axis.text.y = element_text(size=10),
-        axis.title=element_text(size=12,face="bold"),
-        axis.text = element_text(face="bold", size=18),
-        panel.background = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
-        legend.text = element_text(size=10),
-        legend.title = element_text(size=12),
-        legend.position="none",
-        legend.key.size = unit(1, 'cm'),
-        strip.text.x = element_text(size = 12, color = "black", face = "bold"))+
-  labs( x = "Species")
 ```
 
 ```{r final_plot_1_1, echo=FALSE, results=TRUE,fig.height=8, fig.width=10, fig.fullwidth=TRUE}
-grid.arrange(arrangeGrob(p1, p2,p3, p4, ncol = 2))
+grid.arrange(arrangeGrob(p1, p2,p3, ncol = 3))
 ```
 
 ### Comparison of samples from the 5th Time_point (5_Post-FMT1)
@@ -1170,31 +1128,10 @@ p3 <-merge_gift_tm5 %>%
         legend.key.size = unit(1, 'cm'),
         strip.text.x = element_text(size = 12, color = "black", face = "bold"))+
   labs( x = "Species")
-
-#Overall
-p4 <-merge_gift_tm5 %>%
-  ggplot(aes(x=type,y=Overall,color=type,fill=type))+
-  geom_jitter(width = 0.2, size = 1.5, show.legend = FALSE)+ 
-  geom_boxplot(alpha=0.2,outlier.shape = NA, width = 0.5, show.legend = FALSE, coef=0)+
-  stat_compare_means() +
-  theme(axis.text.x = element_text(vjust = 0.5, size=10),
-        axis.text.y = element_text(size=10),
-        axis.title=element_text(size=12,face="bold"),
-        axis.text = element_text(face="bold", size=18),
-        panel.background = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
-        legend.text = element_text(size=10),
-        legend.title = element_text(size=12),
-        legend.position="none",
-        legend.key.size = unit(1, 'cm'),
-        strip.text.x = element_text(size = 12, color = "black", face = "bold"))+
-  labs( x = "Species")
 ```
 
 ```{r final_plot_1, echo=FALSE, results=TRUE,fig.height=8, fig.width=10, fig.fullwidth=TRUE}
-grid.arrange(arrangeGrob(p1, p2,p3, p4, ncol = 2))
+grid.arrange(arrangeGrob(p1, p2,p3, ncol = 3))
 ```
 
 ### Comparison of samples from the 6th Time_point (6_Post-FMT2)
@@ -1272,31 +1209,10 @@ p3 <-merge_gift_TM6 %>%
         legend.key.size = unit(1, 'cm'),
         strip.text.x = element_text(size = 12, color = "black", face = "bold"))+
   labs( x = "type")
-
-#Overall
-p4 <-merge_gift_TM6 %>%
-  ggplot(aes(x=type,y=Overall,color=type,fill=type))+
-  geom_jitter(width = 0.2, size = 1.5, show.legend = FALSE)+ 
-  geom_boxplot(alpha=0.2,outlier.shape = NA, width = 0.5, show.legend = FALSE, coef=0)+
-  stat_compare_means() +
-  theme(axis.text.x = element_text(vjust = 0.5, size=10),
-        axis.text.y = element_text(size=10),
-        axis.title=element_text(size=12,face="bold"),
-        axis.text = element_text(face="bold", size=18),
-        panel.background = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
-        legend.text = element_text(size=10),
-        legend.title = element_text(size=12),
-        legend.position="none",
-        legend.key.size = unit(1, 'cm'),
-        strip.text.x = element_text(size = 12, color = "black", face = "bold"))+
-  labs( x = "type")
 ```
 
 ```{r final_plot, echo=FALSE, results=TRUE,fig.height=8, fig.width=10, fig.fullwidth=TRUE}
-grid.arrange(arrangeGrob(p1, p2,p3, p4, ncol = 2))
+grid.arrange(arrangeGrob(p1, p2,p3, ncol = 3))
 ```
 
 #### CI vs WC
@@ -1373,28 +1289,8 @@ p3 <-merge_gift_TM8 %>%
         strip.text.x = element_text(size = 12, color = "black", face = "bold"))+
   labs( x = "type")
 
-#Overall
-p4 <-merge_gift_TM8 %>%
-  ggplot(aes(x=type,y=Overall,color=type,fill=type))+
-  geom_jitter(width = 0.2, size = 1.5, show.legend = FALSE)+ 
-  geom_boxplot(alpha=0.2,outlier.shape = NA, width = 0.5, show.legend = FALSE, coef=0)+
-  stat_compare_means() +
-  theme(axis.text.x = element_text(vjust = 0.5, size=10),
-        axis.text.y = element_text(size=10),
-        axis.title=element_text(size=12,face="bold"),
-        axis.text = element_text(face="bold", size=18),
-        panel.background = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
-        legend.text = element_text(size=10),
-        legend.title = element_text(size=12),
-        legend.position="none",
-        legend.key.size = unit(1, 'cm'),
-        strip.text.x = element_text(size = 12, color = "black", face = "bold"))+
-  labs( x = "type")
 ```
 
 ```{r final_plot_1_1_1, echo=FALSE, results=TRUE,fig.height=8, fig.width=10, fig.fullwidth=TRUE}
-grid.arrange(arrangeGrob(p1, p2,p3, p4, ncol = 2))
+grid.arrange(arrangeGrob(p1, p2,p3, ncol = 3))
 ```

@@ -7,6 +7,48 @@ load("data/data.Rdata")
 ## CC acclimation vs post2
 ### Enrichment analysis: Ancombc2
 
+#### Structural zeros
+
+```{r struct_zero_cc_acclipost2, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+cc_accli_samples <- sample_metadata %>% 
+  filter(type== "Control") %>% 
+  filter(time_point == "1_Acclimation") %>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+cc_post2_samples <- sample_metadata %>% 
+  filter(type== "Control") %>% 
+  filter(time_point == "6_Post-FMT2")%>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+structural_zeros <- genome_counts_filt %>% 
+   rowwise() %>% #compute for each row (genome)
+   mutate(all_zeros_accli = all(c_across(all_of(cc_accli_samples)) == 0)) %>% # set true if all samples in accli have zeros
+   mutate(all_zeros_post2 = all(c_across(all_of(cc_post2_samples)) == 0)) %>% # set true if all samples in post2 have zeros
+   mutate(average_accli = mean(c_across(all_of(cc_accli_samples)), na.rm = TRUE)) %>% # get average genome counts across accli
+   mutate(average_post2 = mean(c_across(all_of(cc_post2_samples)), na.rm = TRUE)) %>% # get average genome counts across post2
+   filter(all_zeros_accli == TRUE || all_zeros_post2==TRUE)  %>% # filter only genomes with structural zeros
+   mutate(present = case_when(
+      all_zeros_accli & !all_zeros_post2 ~ "post2",
+      !all_zeros_accli & all_zeros_post2 ~ "accli",
+      !all_zeros_accli & !all_zeros_post2 ~ "None",
+      TRUE ~ NA_character_
+    )) %>%
+   mutate(average = ifelse(present == "accli", average_accli, average_post2)) %>%
+   dplyr::select(genome, present, average) %>%
+   left_join(genome_metadata, by=join_by(genome==genome)) %>%
+   arrange(present,-average)
+structural_zeros
+struct_mag <- structural_zeros %>% 
+  filter(present %in% c("accli","post2")) %>% 
+  select(genome) %>% 
+  pull()
+struct_mag_meta <- structural_zeros %>% 
+  filter(present %in% c("accli","post2"))
+```
+
+
 ```{r zero_phylo1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
 #phyloseq object considering structual zeros
 phylo_samples <- sample_metadata %>% 
@@ -15,7 +57,7 @@ phylo_samples <- sample_metadata %>%
                     column_to_rownames("Tube_code") %>% 
                     sample_data() #convert to phyloseq sample_data object
 phylo_genome <- genome_counts_filt %>% 
-                    #filter(genome %in% structural_zeros$genome) %>% # remove structural zeros
+                    filter(!genome %in% structural_zeros$genome) %>% # remove structural zeros
                     column_to_rownames("genome") %>% 
                     mutate_all(~ replace(., . == 0, 0.00001)) %>% #add pseudo counts to avoid structural zero issues (note this approach can be improved!)
                     otu_table(., taxa_are_rows = TRUE)
@@ -43,11 +85,11 @@ ancom_rand_output_mag_accli_post2_CC = ancombc2(data = physeq_sample_CC,
                   assay_name = "counts", 
                   tax_level = NULL, #change to agglomerate analysis to a higher taxonomic range
                   fix_formula = "time_point", #fixed variable(s)
- #                 rand_formula = "(1|individual)",
+                  rand_formula = "(1|individual)",
                   p_adj_method = "holm", 
                   pseudo_sens = TRUE,
-                  prv_cut = 0.10, 
-                        lib_cut = 1, 
+                  prv_cut = 0, 
+                        lib_cut = 0, 
                         s0_perc = 0.05,
                         group = NULL, 
                         struc_zero = FALSE, 
@@ -61,7 +103,7 @@ ancom_rand_output_mag_accli_post2_CC = ancombc2(data = physeq_sample_CC,
                   trend = FALSE,
                   iter_control = list(tol = 1e-5, max_iter = 20, verbose = FALSE),
                   em_control = list(tol = 1e-5, max_iter = 100),
-#                  lme_control = lme4::lmerControl(),
+                  lme_control = lme4::lmerControl(),
                   mdfdr_control = list(fwer_ctrl_method = "holm", B = 100), 
                   trend_control = NULL)
 ```
@@ -98,10 +140,10 @@ ancom_result_CC %>%
   ggplot(., aes(x=lfc_time_point6_Post_FMT2, y=forcats::fct_rev(genome), color=phylum)) +
   geom_jitter(size=3) +
   geom_vline(xintercept=0) + 
-  xlim(-max(ancom_result_CC$lfc_time_point6_Post_FMT2)-2,max(ancom_result_CC$lfc_time_point6_Post_FMT2)+2) +
+  xlim(-max(ancom_result_CC$lfc_time_point6_Post_FMT2)-3,max(ancom_result_CC$lfc_time_point6_Post_FMT2)+3) +
   scale_color_manual(values=phylum_colors) +
   geom_text(aes(-max(ancom_result_CC$lfc_time_point6_Post_FMT2)+1, 1.5), label = "Enriched\nin Accli", color="#666666") +
-  geom_text(aes(max(ancom_result_CC$lfc_time_point6_Post_FMT2)-2, 2), label = "Enriched\nin Post2", color="#666666") +
+  geom_text(aes(max(ancom_result_CC$lfc_time_point6_Post_FMT2)-2, 1.5), label = "Enriched\nin Post2", color="#666666") +
   theme(legend.position='right',
         panel.background = element_blank(),
         axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
@@ -186,6 +228,46 @@ ggplot(., aes(x=lfc_time_point6_Post_FMT2, y=forcats::fct_reorder(genus, lfc_tim
 
 ## WC acclimation vs post2
 ### Enrichment analysis: Ancombc2
+#### Structural zeros
+
+```{r struct_zero_wc_acclipost2, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+wc_accli_samples <- sample_metadata %>% 
+  filter(type== "Hot_control") %>% 
+  filter(time_point == "1_Acclimation") %>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+wc_post2_samples <- sample_metadata %>% 
+  filter(type== "Hot_control") %>% 
+  filter(time_point == "6_Post-FMT2")%>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+structural_zeros <- genome_counts_filt %>% 
+   rowwise() %>% #compute for each row (genome)
+   mutate(all_zeros_accli = all(c_across(all_of(wc_accli_samples)) == 0)) %>% # set true if all samples in accli have zeros
+   mutate(all_zeros_post2 = all(c_across(all_of(wc_post2_samples)) == 0)) %>% # set true if all samples in post2 have zeros
+   mutate(average_accli = mean(c_across(all_of(wc_accli_samples)), na.rm = TRUE)) %>% # get average genome counts across accli
+   mutate(average_post2 = mean(c_across(all_of(wc_post2_samples)), na.rm = TRUE)) %>% # get average genome counts across post2
+   filter(all_zeros_accli == TRUE || all_zeros_post2==TRUE)  %>% # filter only genomes with structural zeros
+   mutate(present = case_when(
+      all_zeros_accli & !all_zeros_post2 ~ "post2",
+      !all_zeros_accli & all_zeros_post2 ~ "accli",
+      !all_zeros_accli & !all_zeros_post2 ~ "None",
+      TRUE ~ NA_character_
+    )) %>%
+   mutate(average = ifelse(present == "accli", average_accli, average_post2)) %>%
+   dplyr::select(genome, present, average) %>%
+   left_join(genome_metadata, by=join_by(genome==genome)) %>%
+   arrange(present,-average)
+structural_zeros
+struct_mag <- structural_zeros %>% 
+  filter(present %in% c("accli","post2")) %>% 
+  select(genome) %>% 
+  pull()
+struct_mag_meta <- structural_zeros %>% 
+  filter(present %in% c("accli","post2"))
+```
 
 ```{r zero_phylo1_WC, comment="", echo=FALSE, message=FALSE, warning=FALSE}
 #phyloseq object considering structual zeros
@@ -195,7 +277,7 @@ phylo_samples <- sample_metadata %>%
                     column_to_rownames("Tube_code") %>% 
                     sample_data() #convert to phyloseq sample_data object
 phylo_genome <- genome_counts_filt %>% 
-                    #filter(genome %in% structural_zeros$genome) %>% # remove structural zeros
+                    filter(!genome %in% structural_zeros$genome) %>% # remove structural zeros
                     column_to_rownames("genome") %>% 
                     mutate_all(~ replace(., . == 0, 0.00001)) %>% #add pseudo counts to avoid structural zero issues (note this approach can be improved!)
                     otu_table(., taxa_are_rows = TRUE)
@@ -224,11 +306,11 @@ ancom_rand_output_mag_accli_post2_WC = ancombc2(data = physeq_sample_WC,
                   assay_name = "counts", 
                   tax_level = NULL, #change to agglomerate analysis to a higher taxonomic range
                   fix_formula = "time_point", #fixed variable(s)
- #                 rand_formula = "(1|individual)",
+                  rand_formula = "(1|individual)",
                   p_adj_method = "holm", 
                   pseudo_sens = TRUE,
-                  prv_cut = 0.10, 
-                        lib_cut = 1, 
+                  prv_cut = 0, 
+                        lib_cut = 0, 
                         s0_perc = 0.05,
                         group = NULL, 
                         struc_zero = FALSE, 
@@ -242,7 +324,7 @@ ancom_rand_output_mag_accli_post2_WC = ancombc2(data = physeq_sample_WC,
                   trend = FALSE,
                   iter_control = list(tol = 1e-5, max_iter = 20, verbose = FALSE),
                   em_control = list(tol = 1e-5, max_iter = 100),
-#                  lme_control = lme4::lmerControl(),
+                  lme_control = lme4::lmerControl(),
                   mdfdr_control = list(fwer_ctrl_method = "holm", B = 100), 
                   trend_control = NULL)
 ```
@@ -357,6 +439,46 @@ ggplot(., aes(x=lfc_time_point6_Post_FMT2, y=forcats::fct_reorder(species, lfc_t
 
 ## CI acclimation vs post2
 ### Enrichment analysis: Ancombc2
+#### Structural zeros
+
+```{r struct_zero_ci_acclipost2, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+ci_accli_samples <- sample_metadata %>% 
+  filter(type== "Treatment") %>% 
+  filter(time_point == "1_Acclimation") %>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+ci_post2_samples <- sample_metadata %>% 
+  filter(type== "Treatment") %>% 
+  filter(time_point == "6_Post-FMT2")%>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+structural_zeros <- genome_counts_filt %>% 
+   rowwise() %>% #compute for each row (genome)
+   mutate(all_zeros_accli = all(c_across(all_of(ci_accli_samples)) == 0)) %>% # set true if all samples in accli have zeros
+   mutate(all_zeros_post2 = all(c_across(all_of(ci_post2_samples)) == 0)) %>% # set true if all samples in post2 have zeros
+   mutate(average_accli = mean(c_across(all_of(ci_accli_samples)), na.rm = TRUE)) %>% # get average genome counts across accli
+   mutate(average_post2 = mean(c_across(all_of(ci_post2_samples)), na.rm = TRUE)) %>% # get average genome counts across post2
+   filter(all_zeros_accli == TRUE || all_zeros_post2==TRUE)  %>% # filter only genomes with structural zeros
+   mutate(present = case_when(
+      all_zeros_accli & !all_zeros_post2 ~ "post2",
+      !all_zeros_accli & all_zeros_post2 ~ "accli",
+      !all_zeros_accli & !all_zeros_post2 ~ "None",
+      TRUE ~ NA_character_
+    )) %>%
+   mutate(average = ifelse(present == "accli", average_accli, average_post2)) %>%
+   dplyr::select(genome, present, average) %>%
+   left_join(genome_metadata, by=join_by(genome==genome)) %>%
+   arrange(present,-average)
+structural_zeros
+struct_mag <- structural_zeros %>% 
+  filter(present %in% c("accli","post2")) %>% 
+  select(genome) %>% 
+  pull()
+struct_mag_meta <- structural_zeros %>% 
+  filter(present %in% c("accli","post2"))
+```
 
 ```{r zero_phylo1_CI, comment="", echo=FALSE, message=FALSE, warning=FALSE}
 #phyloseq object considering structual zeros
@@ -366,7 +488,7 @@ phylo_samples <- sample_metadata %>%
                     column_to_rownames("Tube_code") %>% 
                     sample_data() #convert to phyloseq sample_data object
 phylo_genome <- genome_counts_filt %>% 
-                    #filter(genome %in% structural_zeros$genome) %>% # remove structural zeros
+                    filter(!genome %in% structural_zeros$genome) %>% # remove structural zeros
                     column_to_rownames("genome") %>% 
                     mutate_all(~ replace(., . == 0, 0.00001)) %>% #add pseudo counts to avoid structural zero issues (note this approach can be improved!)
                     otu_table(., taxa_are_rows = TRUE)
@@ -395,11 +517,11 @@ ancom_rand_output_mag_accli_post2_CI = ancombc2(data = physeq_sample_CI,
                   assay_name = "counts", 
                   tax_level = NULL, #change to agglomerate analysis to a higher taxonomic range
                   fix_formula = "time_point", #fixed variable(s)
- #                 rand_formula = "(1|individual)",
+                  rand_formula = "(1|individual)",
                   p_adj_method = "holm", 
                   pseudo_sens = TRUE,
-                  prv_cut = 0.10, 
-                        lib_cut = 1, 
+                  prv_cut = 0, 
+                        lib_cut = 0, 
                         s0_perc = 0.05,
                         group = NULL, 
                         struc_zero = FALSE, 
@@ -413,7 +535,7 @@ ancom_rand_output_mag_accli_post2_CI = ancombc2(data = physeq_sample_CI,
                   trend = FALSE,
                   iter_control = list(tol = 1e-5, max_iter = 20, verbose = FALSE),
                   em_control = list(tol = 1e-5, max_iter = 100),
-#                  lme_control = lme4::lmerControl(),
+                  lme_control = lme4::lmerControl(),
                   mdfdr_control = list(fwer_ctrl_method = "holm", B = 100), 
                   trend_control = NULL)
 ```
@@ -527,6 +649,47 @@ ggplot(., aes(x=lfc_time_point6_Post_FMT2, y=forcats::fct_reorder(species, lfc_t
 ## post2 CC and CI
 ### Enrichment analysis: Ancombc2
 
+#### Structural zeros
+
+```{r struct_zero_ci_cc_post2, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+ci_post2 <- sample_metadata %>% 
+  filter(type== "Treatment") %>% 
+  filter(time_point == "6_Post-FMT2") %>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+cc_post2 <- sample_metadata %>% 
+  filter(type== "Control") %>% 
+  filter(time_point == "6_Post-FMT2")%>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+structural_zeros <- genome_counts_filt %>% 
+   rowwise() %>% #compute for each row (genome)
+   mutate(all_zeros_ci_post2 = all(c_across(all_of(ci_post2)) == 0)) %>% # set true if all samples in accli have zeros
+   mutate(all_zeros_cc_post2 = all(c_across(all_of(cc_post2)) == 0)) %>% # set true if all samples in post2 have zeros
+   mutate(average_ci_post2 = mean(c_across(all_of(ci_post2)), na.rm = TRUE)) %>% # get average genome counts across accli
+   mutate(average_cc_post2 = mean(c_across(all_of(cc_post2)), na.rm = TRUE)) %>% # get average genome counts across post2
+   filter(all_zeros_ci_post2 == TRUE || all_zeros_cc_post2==TRUE)  %>% # filter only genomes with structural zeros
+   mutate(present = case_when(
+      all_zeros_ci_post2 & !all_zeros_cc_post2 ~ "cc_post2",
+      !all_zeros_ci_post2 & all_zeros_cc_post2 ~ "ci_post2",
+      !all_zeros_ci_post2 & !all_zeros_cc_post2 ~ "None",
+      TRUE ~ NA_character_
+    )) %>%
+   mutate(average = ifelse(present == "ci_post2", average_ci_post2, average_cc_post2)) %>%
+   dplyr::select(genome, present, average) %>%
+   left_join(genome_metadata, by=join_by(genome==genome)) %>%
+   arrange(present,-average)
+structural_zeros
+struct_mag <- structural_zeros %>% 
+  filter(present %in% c("ci_post2","cc_post2")) %>% 
+  select(genome) %>% 
+  pull()
+struct_mag_meta <- structural_zeros %>% 
+  filter(present %in% c("ci_post2","cc_post2"))
+```
+
 ```{r zero_phylo1_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE}
 #phyloseq object considering structual zeros
 phylo_samples <- sample_metadata %>% 
@@ -535,7 +698,7 @@ phylo_samples <- sample_metadata %>%
                     column_to_rownames("Tube_code") %>% 
                     sample_data() #convert to phyloseq sample_data object
 phylo_genome <- genome_counts_filt %>% 
-                    #filter(genome %in% structural_zeros$genome) %>% # remove structural zeros
+                    filter(!genome %in% structural_zeros$genome) %>% # remove structural zeros
                     column_to_rownames("genome") %>% 
                     mutate_all(~ replace(., . == 0, 0.00001)) %>% #add pseudo counts to avoid structural zero issues (note this approach can be improved!)
                     otu_table(., taxa_are_rows = TRUE)
@@ -567,8 +730,8 @@ ancom_rand_output_mag_post2_cold = ancombc2(data = physeq_sample_cold,
  #                 rand_formula = "(1|individual)",
                   p_adj_method = "holm", 
                   pseudo_sens = TRUE,
-                  prv_cut = 0.10, 
-                        lib_cut = 1, 
+                  prv_cut = 0, 
+                        lib_cut = 0, 
                         s0_perc = 0.05,
                         group = NULL, 
                         struc_zero = FALSE, 
@@ -695,6 +858,45 @@ ggplot(., aes(x=lfc_typeTreatment, y=forcats::fct_reorder(species, lfc_typeTreat
 
 ## post2 WC and CI
 ### Enrichment analysis: Ancombc2
+####Structural zeros
+```{r struct_zero_ci_wc_post2, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+ci_post2 <- sample_metadata %>% 
+  filter(type== "Treatment") %>% 
+  filter(time_point == "6_Post-FMT2") %>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+wc_post2 <- sample_metadata %>% 
+  filter(type== "Hot_control") %>% 
+  filter(time_point == "6_Post-FMT2")%>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+structural_zeros <- genome_counts_filt %>% 
+   rowwise() %>% #compute for each row (genome)
+   mutate(all_zeros_ci_post2 = all(c_across(all_of(ci_post2)) == 0)) %>% # set true if all samples in accli have zeros
+   mutate(all_zeros_wc_post2 = all(c_across(all_of(wc_post2)) == 0)) %>% # set true if all samples in post2 have zeros
+   mutate(average_ci_post2 = mean(c_across(all_of(ci_post2)), na.rm = TRUE)) %>% # get average genome counts across accli
+   mutate(average_wc_post2 = mean(c_across(all_of(wc_post2)), na.rm = TRUE)) %>% # get average genome counts across post2
+   filter(all_zeros_ci_post2 == TRUE || all_zeros_wc_post2==TRUE)  %>% # filter only genomes with structural zeros
+   mutate(present = case_when(
+      all_zeros_ci_post2 & !all_zeros_wc_post2 ~ "wc_post2",
+      !all_zeros_ci_post2 & all_zeros_wc_post2 ~ "ci_post2",
+      !all_zeros_ci_post2 & !all_zeros_wc_post2 ~ "None",
+      TRUE ~ NA_character_
+    )) %>%
+   mutate(average = ifelse(present == "ci_post2", average_ci_post2, average_wc_post2)) %>%
+   dplyr::select(genome, present, average) %>%
+   left_join(genome_metadata, by=join_by(genome==genome)) %>%
+   arrange(present,-average)
+structural_zeros
+struct_mag <- structural_zeros %>% 
+  filter(present %in% c("ci_post2","wc_post2")) %>% 
+  select(genome) %>% 
+  pull()
+struct_mag_meta <- structural_zeros %>% 
+  filter(present %in% c("ci_post2","wc_post2"))
+```
 
 ```{r zero_phylo1_treat, comment="", echo=FALSE, message=FALSE, warning=FALSE}
 #phyloseq object considering structual zeros
@@ -704,7 +906,7 @@ phylo_samples <- sample_metadata %>%
                     column_to_rownames("Tube_code") %>% 
                     sample_data() #convert to phyloseq sample_data object
 phylo_genome <- genome_counts_filt %>% 
-                    #filter(genome %in% structural_zeros$genome) %>% # remove structural zeros
+                    filter(!genome %in% structural_zeros$genome) %>% # remove structural zeros
                     column_to_rownames("genome") %>% 
                     mutate_all(~ replace(., . == 0, 0.00001)) %>% #add pseudo counts to avoid structural zero issues (note this approach can be improved!)
                     otu_table(., taxa_are_rows = TRUE)
@@ -736,8 +938,8 @@ ancom_rand_output_mag_post2_treat = ancombc2(data = physeq_sample_treat,
  #                 rand_formula = "(1|individual)",
                   p_adj_method = "holm", 
                   pseudo_sens = TRUE,
-                  prv_cut = 0.10, 
-                        lib_cut = 1, 
+                  prv_cut = 0, 
+                        lib_cut = 0, 
                         s0_perc = 0.05,
                         group = NULL, 
                         struc_zero = FALSE, 
