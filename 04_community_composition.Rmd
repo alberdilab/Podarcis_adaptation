@@ -241,7 +241,7 @@ phylogenetic <- genome_counts_filt %>%
 
 # Aggregate basal GIFT into elements
 dist <- genome_gifts %>%
-  to.elements(., GIFT_db) %>%
+  to.elements(., GIFT_db3) %>%
   traits2dist(., method = "gower")
 
 functional <- genome_counts_filt %>%

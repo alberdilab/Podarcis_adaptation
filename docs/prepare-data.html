@@ -1874,7 +1874,7 @@ a.anchor-section::before {content: '#';font-size: 80%;}
 
 <style type="text/css">
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -1884,7 +1884,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
 { counter-reset: source-line 0; }
@@ -2407,7 +2407,7 @@ color: #a52929;
 </div>
 <div id="distill-annotations-into-gifts" class="section level3 hasAnchor" number="2.3.3">
 <h3><span class="header-section-number">2.3.3</span> Distill annotations into GIFTs<a href="prepare-data.html#distill-annotations-into-gifts" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r script-source"><code class="sourceCode r"><span id="cb17-1"><a href="prepare-data.html#cb17-1" tabindex="-1"></a>genome_gifts <span class="ot">&lt;-</span> <span class="fu">distill</span>(genome_annotations,GIFT_db,<span class="at">genomecol=</span><span class="dv">2</span>,<span class="at">annotcol=</span><span class="fu">c</span>(<span class="dv">9</span>,<span class="dv">10</span>,<span class="dv">19</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r script-source"><code class="sourceCode r"><span id="cb17-1"><a href="prepare-data.html#cb17-1" tabindex="-1"></a>genome_gifts <span class="ot">&lt;-</span> <span class="fu">distill</span>(genome_annotations,GIFT_db3,<span class="at">genomecol=</span><span class="dv">2</span>,<span class="at">annotcol=</span><span class="fu">c</span>(<span class="dv">9</span>,<span class="dv">10</span>,<span class="dv">19</span>))</span></code></pre></div>
 </div>
 </div>
 <div id="load-data-statistics" class="section level2 hasAnchor" number="2.4">

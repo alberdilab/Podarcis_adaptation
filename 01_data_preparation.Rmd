@@ -207,7 +207,7 @@ genome_counts_filt <- read_counts_filt %>%
 ### Distill annotations into GIFTs 
 
 ```{r distill_annotations, comment="", message=FALSE, warning=FALSE, eval=FALSE}
-genome_gifts <- distill(genome_annotations,GIFT_db,genomecol=2,annotcol=c(9,10,19))
+genome_gifts <- distill(genome_annotations,GIFT_db3,genomecol=2,annotcol=c(9,10,19))
 ```
 
 ## Load data statistics
