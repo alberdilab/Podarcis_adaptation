@@ -2176,6 +2176,7 @@ post2_nmds <- sample_metadata %>%
   filter(time_point == "6_Post-FMT2")
 ```
 
+
 #### Number of samples used
 
 ```{r beta_div_neutral_treat_samples_2, echo=FALSE, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE}
