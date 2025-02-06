@@ -422,6 +422,12 @@ beta_div_phylo_accli1<-hillpair(data=accli1.counts, q=1, tree=genome_tree)
 beta_div_func_accli1<-hillpair(data=accli1.counts, q=1, dist=dist)
 ```
 
+```{r data_accli1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE}
+#Arrange of metadata dataframe
+accli1_arrange<-accli1[labels(beta_div_neutral_accli1$S),]
+accli1_arrange$Population_time <- interaction(accli1_arrange$Population, accli1_arrange$time_point)
+```
+
 ##### Richness
 
 ```{r beta_div_richness_accli1_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
@@ -429,9 +435,15 @@ betadisper(beta_div_richness_accli1$S, accli1$time_point) %>% permutest(., pairw
 ```
 
 ```{r beta_div_richness_accli1_4, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_richness_accli1$S ~ time_point*Population, data=accli1[labels(beta_div_neutral_accli1$S),], permutations=999, strata=accli1$individual) %>%
+adonis2(formula=beta_div_richness_accli1$S ~ time_point*Population, data=accli1[labels(beta_div_richness_accli1$S),], permutations=999, strata=accli1$individual) %>%
 		as.matrix() %>%
 		kable()
+```
+
+```{r beta_richness_permanova_accli1_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
+pairwise<-pairwise.adonis(beta_div_richness_accli1$S,accli1_arrange$Population_time, perm=999)
+pairwise%>%
+  tt()
 ```
 
 ##### Neutral
@@ -446,6 +458,12 @@ adonis2(formula=beta_div_neutral_accli1$S ~ time_point*Population, data=accli1[l
 		kable()
 ```
 
+```{r beta_neutral_permanova_accli1_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
+pairwise<-pairwise.adonis(beta_div_neutral_accli1$S,accli1_arrange$Population_time, perm=999)
+pairwise%>%
+  tt()
+```
+
 ##### Phylogenetic
 
 ```{r beta_div_phylo_accli1_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
@@ -458,6 +476,12 @@ adonis2(formula=beta_div_phylo_accli1$S ~ time_point*Population, data=accli1[lab
 		kable()
 ```
 
+```{r beta_phylo_permanova_accli1_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
+pairwise<-pairwise.adonis(beta_div_phylo_accli1$S,accli1_arrange$Population_time, perm=999)
+pairwise%>%
+  tt()
+```
+
 ##### Functional
 
 ```{r beta_div_func_accli1_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
@@ -468,6 +492,12 @@ betadisper(beta_div_func_accli1$S, accli1$time_point) %>% permutest(., pairwise 
 adonis2(formula=beta_div_func_accli1$S ~ time_point*Population, data=accli1[labels(beta_div_func_accli1$S),], permutations=999, strata=accli1$individual) %>%
 		as.matrix() %>%
 		kable()
+```
+
+```{r beta_func_permanova_accli1_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
+pairwise<-pairwise.adonis(beta_div_func_accli1$S,accli1_arrange$Population_time, perm=999)
+pairwise%>%
+  tt()
 ```
 
 
