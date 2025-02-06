@@ -1275,7 +1275,7 @@ p3 <-merge_gift_TM6 %>%
 
 #Transport
 p4 <-merge_gift_TM6 %>%
-  ggplot(aes(x=species,y=Transport,color=species,fill=species))+
+  ggplot(aes(x=type,y=Transport,color=type,fill=type))+
   geom_jitter(width = 0.2, size = 1.5, show.legend = FALSE)+ 
   geom_boxplot(alpha=0.2,outlier.shape = NA, width = 0.5, show.legend = FALSE, coef=0)+
   stat_compare_means() +
