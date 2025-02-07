@@ -2115,9 +2115,8 @@ color: #a52929;
 <li class="chapter" data-level="6.3.1" data-path="diversity-analysis.html"><a href="diversity-analysis.html#are-the-wild-populations-similar"><i class="fa fa-check"></i><b>6.3.1</b> 1. Are the wild populations similar?</a></li>
 <li class="chapter" data-level="6.3.2" data-path="diversity-analysis.html"><a href="diversity-analysis.html#effect-of-acclimation"><i class="fa fa-check"></i><b>6.3.2</b> 2. Effect of acclimation</a></li>
 <li class="chapter" data-level="6.3.3" data-path="diversity-analysis.html"><a href="diversity-analysis.html#comparison-between-wild-and-acclimation"><i class="fa fa-check"></i><b>6.3.3</b> 3. Comparison between Wild and Acclimation</a></li>
-<li class="chapter" data-level="6.3.4" data-path="diversity-analysis.html"><a href="diversity-analysis.html#do-the-antibiotics-work"><i class="fa fa-check"></i><b>6.3.4</b> 4. Do the antibiotics work?</a></li>
-<li class="chapter" data-level="6.3.5" data-path="diversity-analysis.html"><a href="diversity-analysis.html#does-the-fmt-work"><i class="fa fa-check"></i><b>6.3.5</b> 5. Does the FMT work?</a></li>
-<li class="chapter" data-level="6.3.6" data-path="diversity-analysis.html"><a href="diversity-analysis.html#are-there-differences-between-the-control-and-the-treatment-group"><i class="fa fa-check"></i><b>6.3.6</b> 6. Are there differences between the control and the treatment group?</a></li>
+<li class="chapter" data-level="6.3.4" data-path="diversity-analysis.html"><a href="diversity-analysis.html#effect-of-fmt-on-microbiota-community"><i class="fa fa-check"></i><b>6.3.4</b> 4. Effect of FMT on microbiota community</a></li>
+<li class="chapter" data-level="6.3.5" data-path="diversity-analysis.html"><a href="diversity-analysis.html#are-there-differences-between-the-control-and-the-treatment-group"><i class="fa fa-check"></i><b>6.3.5</b> 5. Are there differences between the control and the treatment group?</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="7" data-path="functional-differences.html"><a href="functional-differences.html"><i class="fa fa-check"></i><b>7</b> Functional differences</a>
@@ -2350,8 +2349,8 @@ color: #a52929;
 
     <script>
 
-      function styleCell_ahfz7yzzggwkqkpuqf4g(i, j, css_id) {
-          var table = document.getElementById("tinytable_ahfz7yzzggwkqkpuqf4g");
+      function styleCell_3eeve4ohsjv1w49gd5dy(i, j, css_id) {
+          var table = document.getElementById("tinytable_3eeve4ohsjv1w49gd5dy");
           var cell = table.rows[i]?.cells[j];  // Safe navigation to avoid errors
           if (cell) {
               console.log(`Styling cell at (${i}, ${j}) with class ${css_id}`);
@@ -2361,7 +2360,7 @@ color: #a52929;
           }
       }
       function insertSpanRow(i, colspan, content) {
-        var table = document.getElementById('tinytable_ahfz7yzzggwkqkpuqf4g');
+        var table = document.getElementById('tinytable_3eeve4ohsjv1w49gd5dy');
         var newRow = table.insertRow(i);
         var newCell = newRow.insertCell(0);
         newCell.setAttribute("colspan", colspan);
@@ -2369,8 +2368,8 @@ color: #a52929;
         // this may be unsafe, but innerText does not interpret <br>
         newCell.innerHTML = content;
       }
-      function spanCell_ahfz7yzzggwkqkpuqf4g(i, j, rowspan, colspan) {
-        var table = document.getElementById("tinytable_ahfz7yzzggwkqkpuqf4g");
+      function spanCell_3eeve4ohsjv1w49gd5dy(i, j, rowspan, colspan) {
+        var table = document.getElementById("tinytable_3eeve4ohsjv1w49gd5dy");
         const targetRow = table.rows[i];
         const targetCell = targetRow.cells[j];
         for (let r = 0; r < rowspan; r++) {
@@ -2400,14 +2399,14 @@ color: #a52929;
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: 0, j: 0 }, { i: 0, j: 1 }, { i: 0, j: 2 }, { i: 0, j: 3 }, { i: 0, j: 4 },  ], css_id: 'tinytable_css_qdtugrm2xdxkokdavpbd',}, 
-          { positions: [ { i: 163, j: 0 }, { i: 163, j: 1 }, { i: 163, j: 2 }, { i: 163, j: 3 }, { i: 163, j: 4 },  ], css_id: 'tinytable_css_1haycz0qkdc42m40onxc',}, 
+          { positions: [ { i: 0, j: 0 }, { i: 0, j: 1 }, { i: 0, j: 2 }, { i: 0, j: 3 }, { i: 0, j: 4 },  ], css_id: 'tinytable_css_you7cixnooepwtdm74x8',}, 
+          { positions: [ { i: 163, j: 0 }, { i: 163, j: 1 }, { i: 163, j: 2 }, { i: 163, j: 3 }, { i: 163, j: 4 },  ], css_id: 'tinytable_css_5xharqb0xe3av982ah6o',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  styleCell_ahfz7yzzggwkqkpuqf4g(cell.i, cell.j, group.css_id);
+                  styleCell_3eeve4ohsjv1w49gd5dy(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -2415,11 +2414,11 @@ color: #a52929;
 
     <style>
 
-.table td.tinytable_css_qdtugrm2xdxkokdavpbd, .table th.tinytable_css_qdtugrm2xdxkokdavpbd { border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
-.table td.tinytable_css_1haycz0qkdc42m40onxc, .table th.tinytable_css_1haycz0qkdc42m40onxc { border-bottom: solid #d3d8dc 0.1em; }
+.table td.tinytable_css_you7cixnooepwtdm74x8, .table th.tinytable_css_you7cixnooepwtdm74x8 { border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
+.table td.tinytable_css_5xharqb0xe3av982ah6o, .table th.tinytable_css_5xharqb0xe3av982ah6o { border-bottom: solid #d3d8dc 0.1em; }
 </style>
     <div class="container">
-      <table class="table table-borderless" id="tinytable_ahfz7yzzggwkqkpuqf4g" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="table table-borderless" id="tinytable_3eeve4ohsjv1w49gd5dy" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         <thead>
         
               <tr>
