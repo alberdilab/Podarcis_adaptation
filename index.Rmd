@@ -1,8 +1,8 @@
 ---
-title: "AlberdiLab | Martin-Bideguren et al. 2024"
+title: "AlberdiLab | Martin-Bideguren et al. 2025"
 subtitle: "Study title to be added"
 author:
-  - Garazi Martin-Bideguren^[University of Copenhagen, garazi.bideguren@sund.ku.dk],Carlos Cabido^[Sociedad de Ciencias Aranzadi-Departamento de Herpetología, ccabido@aranzadi.eus], Antton Alberdi^[University of Copenhagen, antton.alberdi@sund.ku.dk] and Ostaizka Aizpurua^[University of Copenhagen, ostaizka.aizpurua@sund.ku.dk]
+  - Garazi Martin-Bideguren^[University of Copenhagen, garazi.bideguren@sund.ku.dk],Carlos Cabido^[Sociedad de Ciencias Aranzadi-Departamento de Herpetología, ccabido@aranzadi.eus], Kevin Kohl^[University of Pittsburgh, kkohl78@gmail.com], Antton Alberdi^[University of Copenhagen, antton.alberdi@sund.ku.dk] and Ostaizka Aizpurua^[University of Copenhagen, ostaizka.aizpurua@sund.ku.dk]
 date: "Last update: `r Sys.Date()`"
 site: bookdown::bookdown_site
 documentclass: book

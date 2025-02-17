@@ -1563,13 +1563,14 @@ p1<-beta_neutral_nmds_post5 %>%
 			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
 			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
 			ungroup() %>%
-			ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point)) +
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=type, shape=time_point, label=sample)) +
         scale_color_manual(name="Type",
                        breaks=c("Control", "Hot_control", "Treatment"),
                        labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
                        values=c("#4477AA","#d57d2c","#76b183")) +
 				geom_point(size=2) +
 				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+        geom_text()
         labs(y = "NMDS2", x="NMDS1 \n Neutral beta diversity") +
 				theme_classic() +
 				theme(legend.position="none")

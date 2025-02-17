@@ -63,7 +63,7 @@ respirometry_resp2 %>%
   filter(r2!=0.808)%>%
   filter(QC_normalized!=0.000036) %>% #r2 low
   filter(r2!=0.728) %>%  #r2 low
-  ggplot(aes(x = time_point, y = QC_normalized, color=time_point, fill=time_point, alpha=0.2)) +
+  ggplot(aes(x = time_point, y = QC_normalized, color=time_point, fill=time_point, alpha=0.2, label=cage)) +
     geom_boxplot()+
     geom_jitter() +
       scale_color_manual(name="Time_point",
@@ -74,6 +74,7 @@ respirometry_resp2 %>%
           breaks=c("0","1","2"),
           labels=c("Acclimation","1 week post FMT", "2 weeks post FMT"),
           values=c('#BFA36650', "#dec14b50","#6E524450"))+
+    geom_text()+
     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
     facet_wrap(~ factor(type))+
     stat_compare_means(size=3)+
