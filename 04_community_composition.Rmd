@@ -372,7 +372,7 @@ alpha_div %>%
   ylab("Alpha diversity")
 ```
 
-### Transplant_1 samples
+### Transplant_1 samples (chapter 4)
 
 ```{r alpha_div_plot_3, comment="", message=FALSE, warning=FALSE, fig.height=7, fig.width=10, fig.fullwidth=TRUE}
 alpha_div %>%
@@ -409,7 +409,7 @@ alpha_div %>%
   ylab("Alpha diversity")
 ```
 
-### Transplant_2 samples
+### Transplant_2 samples (chapter 4)
 
 ```{r alpha_div_plot_4, comment="", message=FALSE, warning=FALSE, fig.height=7, fig.width=10, fig.fullwidth=TRUE}
 alpha_div %>%
@@ -449,7 +449,7 @@ alpha_div %>%
 ### Post-Transplant_1 samples
 
 ```{r alpha_div_plot_5, comment="", message=FALSE, warning=FALSE, fig.height=7, fig.width=10, fig.fullwidth=TRUE}
-alpha_div %>%
+bxp1<-alpha_div %>%
   pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
   left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
   filter(time_point=="5_Post-FMT1") %>%
@@ -465,6 +465,7 @@ alpha_div %>%
           breaks=c("Control","Hot_control", "Treatment"),
           labels=c("Cold-Cold","Hot-Hot", "Cold-Hot"),
           values=c("#4477AA50","#d57d2c50","#76b18350")) +
+        scale_x_discrete(labels = c("Control" = "Cold-Cold", "Hot_control" = "Hot-Hot", "Treatment" = "Cold-Hot")) +
       facet_wrap(. ~ metric,scales = "free") +
       coord_cartesian(xlim = c(1, NA)) +
       stat_compare_means(size=3, label.x=.7) +
@@ -481,12 +482,18 @@ alpha_div %>%
     axis.title = element_text(size = 8)
       ) +
   ylab("Alpha diversity")
+
+
+# Add significance bars with p-values
+bxp1 + 
+  geom_signif(comparisons = list(c("Control", "Hot_control"), c("Control", "Treatment"), c("Hot_control", "Treatment")),
+              map_signif_level = TRUE)
 ```
 
 ### Post-Transplant_2 samples
 
 ```{r alpha_div_plot_6, comment="", message=FALSE, warning=FALSE, fig.height=7, fig.width=10, fig.fullwidth=TRUE}
-alpha_div %>%
+bxp1<-alpha_div %>%
   pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
   left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
   filter(time_point=="6_Post-FMT2") %>%
@@ -502,6 +509,7 @@ alpha_div %>%
           breaks=c("Control","Hot_control", "Treatment"),
           labels=c("Cold-control","Warm-control", "Cold-intervention"),
           values=c("#4477AA50","#d57d2c50","#76b18350")) +
+          scale_x_discrete(labels = c("Control" = "Cold-Cold", "Hot_control" = "Hot-Hot", "Treatment" = "Cold-Hot")) +
       facet_wrap(. ~ metric,scales = "free") +
       coord_cartesian(xlim = c(1, NA)) +
       stat_compare_means(size=3, label.x=.7) +
@@ -518,6 +526,11 @@ alpha_div %>%
     axis.title = element_text(size = 8)
       ) +
   ylab("Alpha diversity")
+
+# Add significance bars with p-values
+bxp1 + 
+  geom_signif(comparisons = list(c("Control", "Hot_control"), c("Control", "Treatment"), c("Hot_control", "Treatment")),
+              map_signif_level = TRUE)
 ```
 
 ## Beta diversity

@@ -1045,7 +1045,7 @@ betadisper(beta_div_richness_post1$S, post1$type) %>% permutest(., pairwise = TR
 ```
 
 ```{r beta_richness_permanova_post1_1, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_richness_post1$S ~ Population+type, data=post1[labels(beta_div_richness_post1$S),], permutations=999) %>%
+adonis2(formula=beta_div_richness_post1$S ~ type, data=post1[labels(beta_div_richness_post1$S),], permutations=999) %>%
 		as.matrix() %>%
 		kable()
 ```
@@ -1062,7 +1062,7 @@ betadisper(beta_div_neutral_post1$S, post1$type) %>% permutest(., pairwise = TRU
 ```
 
 ```{r beta_neutral_permanova_post1_1, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_neutral_post1$S ~ Population+type, data=post1[labels(beta_div_neutral_post1$S),], permutations=999) %>%
+adonis2(formula=beta_div_neutral_post1$S ~ type, data=post1[labels(beta_div_neutral_post1$S),], permutations=999) %>%
 		as.matrix() %>%
 		kable()
 ```
@@ -1079,7 +1079,7 @@ betadisper(beta_div_phylo_post1$S, post1$type) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_phylo_permanova_post1_1, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_phylo_post1$S ~ Population+type, data=post1[labels(beta_div_phylo_post1$S),], permutations=999) %>%
+adonis2(formula=beta_div_phylo_post1$S ~ type, data=post1[labels(beta_div_phylo_post1$S),], permutations=999) %>%
 		as.matrix() %>%
 		kable()
 ```
@@ -1096,7 +1096,7 @@ betadisper(beta_div_func_post1$S, post1$type) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_func_permanova_post1_1, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_func_post1$S ~ Population+type, data=post1[labels(beta_div_func_post1$S),], permutations=999) %>%
+adonis2(formula=beta_div_func_post1$S ~ type, data=post1[labels(beta_div_func_post1$S),], permutations=999) %>%
 		as.matrix() %>%
 		kable()
 ```
