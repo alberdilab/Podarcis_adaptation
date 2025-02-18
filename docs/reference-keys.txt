@@ -50,9 +50,6 @@ diversity-analysis
 alpha-diversity
 wild-samples-2
 acclimation-samples
-antibiotics-samples
-transplant_1-samples-chapter-4
-transplant_2-samples-chapter-4
 post-transplant_1-samples
 post-transplant_2-samples
 beta-diversity
@@ -144,7 +141,6 @@ comparison-of-samples-from-the-6th-time_point-6_post-fmt2-1
 ci-vs-cc-1
 ci-vs-wc-1
 differential-abundance-functional
-community-level-plots
 wilcoxon-comparison
 comparison-of-both-population-in-wild-samples
 comparison-of-both-population-in-acclimation-samples
