@@ -2331,7 +2331,7 @@ color: #a52929;
 <h2><span class="header-section-number">2.3</span> Filtering<a href="prepare-data.html#filtering" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>4 samples are removed from the analysis due to their low sequencing depth.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r script-source"><code class="sourceCode r"><span id="cb12-1"><a href="prepare-data.html#cb12-1" tabindex="-1"></a><span class="co">#Counts_raw</span></span>
-<span id="cb12-2"><a href="prepare-data.html#cb12-2" tabindex="-1"></a>columns_to_exclude <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;AD16&quot;</span>,<span class="st">&quot;AD23&quot;</span>, <span class="st">&quot;AD25&quot;</span>, <span class="st">&quot;AD91&quot;</span>) <span class="co"># Columns to exclude</span></span>
+<span id="cb12-2"><a href="prepare-data.html#cb12-2" tabindex="-1"></a>columns_to_exclude <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;AD16&quot;</span>,<span class="st">&quot;AD23&quot;</span>, <span class="st">&quot;AD25&quot;</span>, <span class="st">&quot;AD91&quot;</span>, <span class="st">&quot;AC85&quot;</span>) <span class="co"># Columns to exclude</span></span>
 <span id="cb12-3"><a href="prepare-data.html#cb12-3" tabindex="-1"></a>read_counts <span class="ot">&lt;-</span> read_counts <span class="sc">%&gt;%</span></span>
 <span id="cb12-4"><a href="prepare-data.html#cb12-4" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>columns_to_exclude)</span>
 <span id="cb12-5"><a href="prepare-data.html#cb12-5" tabindex="-1"></a></span>
@@ -2340,12 +2340,13 @@ color: #a52929;
 <span id="cb12-8"><a href="prepare-data.html#cb12-8" tabindex="-1"></a>  <span class="fu">filter</span>(Tube_code <span class="sc">!=</span> <span class="st">&quot;AD16&quot;</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb12-9"><a href="prepare-data.html#cb12-9" tabindex="-1"></a>  <span class="fu">filter</span>(Tube_code <span class="sc">!=</span> <span class="st">&quot;AD23&quot;</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb12-10"><a href="prepare-data.html#cb12-10" tabindex="-1"></a>  <span class="fu">filter</span>(Tube_code <span class="sc">!=</span> <span class="st">&quot;AD25&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb12-11"><a href="prepare-data.html#cb12-11" tabindex="-1"></a>  <span class="fu">filter</span>(Tube_code <span class="sc">!=</span> <span class="st">&quot;AD91&quot;</span>)</span>
-<span id="cb12-12"><a href="prepare-data.html#cb12-12" tabindex="-1"></a></span>
-<span id="cb12-13"><a href="prepare-data.html#cb12-13" tabindex="-1"></a><span class="co">#Coverage_table</span></span>
-<span id="cb12-14"><a href="prepare-data.html#cb12-14" tabindex="-1"></a>columns_to_exclude <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;AD16&quot;</span>, <span class="st">&quot;AD23&quot;</span>, <span class="st">&quot;AD25&quot;</span>, <span class="st">&quot;AD91&quot;</span>)  <span class="co"># Columns to exclude</span></span>
-<span id="cb12-15"><a href="prepare-data.html#cb12-15" tabindex="-1"></a>genome_coverage <span class="ot">&lt;-</span> genome_coverage <span class="sc">%&gt;%</span></span>
-<span id="cb12-16"><a href="prepare-data.html#cb12-16" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>columns_to_exclude)</span></code></pre></div>
+<span id="cb12-11"><a href="prepare-data.html#cb12-11" tabindex="-1"></a>  <span class="fu">filter</span>(Tube_code <span class="sc">!=</span> <span class="st">&quot;AD91&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-12"><a href="prepare-data.html#cb12-12" tabindex="-1"></a>  <span class="fu">filter</span>(Tube_code <span class="sc">!=</span> <span class="st">&quot;AC85&quot;</span>)</span>
+<span id="cb12-13"><a href="prepare-data.html#cb12-13" tabindex="-1"></a></span>
+<span id="cb12-14"><a href="prepare-data.html#cb12-14" tabindex="-1"></a><span class="co">#Coverage_table</span></span>
+<span id="cb12-15"><a href="prepare-data.html#cb12-15" tabindex="-1"></a>columns_to_exclude <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;AD16&quot;</span>, <span class="st">&quot;AD23&quot;</span>, <span class="st">&quot;AD25&quot;</span>, <span class="st">&quot;AD91&quot;</span>,<span class="st">&quot;AC85&quot;</span>)  <span class="co"># Columns to exclude</span></span>
+<span id="cb12-16"><a href="prepare-data.html#cb12-16" tabindex="-1"></a>genome_coverage <span class="ot">&lt;-</span> genome_coverage <span class="sc">%&gt;%</span></span>
+<span id="cb12-17"><a href="prepare-data.html#cb12-17" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>columns_to_exclude)</span></code></pre></div>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r script-source"><code class="sourceCode r"><span id="cb13-1"><a href="prepare-data.html#cb13-1" tabindex="-1"></a><span class="do">##Removal of samples of individual LI1_2nd_6</span></span>
 <span id="cb13-2"><a href="prepare-data.html#cb13-2" tabindex="-1"></a><span class="co">#Counts_raw</span></span>
 <span id="cb13-3"><a href="prepare-data.html#cb13-3" tabindex="-1"></a>columns_to_exclude <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;AFV13&quot;</span>,<span class="st">&quot;AD06&quot;</span>, <span class="st">&quot;AD31&quot;</span>, <span class="st">&quot;AE03&quot;</span>, <span class="st">&quot;AF12&quot;</span>) <span class="co"># Columns to exclude</span></span>

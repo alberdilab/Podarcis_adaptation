@@ -334,7 +334,7 @@ alpha_div %>%
       ) +
   ylab("Alpha diversity")
 ```
-
+ 
 ### Post-Transplant_1 samples
 
 ```{r alpha_div_plot_5, comment="", message=FALSE, warning=FALSE, fig.height=7, fig.width=10, fig.fullwidth=TRUE}
