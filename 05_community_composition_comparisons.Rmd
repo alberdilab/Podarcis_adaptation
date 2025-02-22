@@ -10,115 +10,115 @@ set.seed(1802)
 
 #### Load required data
 
-```{r loaddata_2}
-meta <- column_to_rownames(sample_metadata, "Tube_code")
-```
-
 ### 1. Are the wild populations similar?
 
-#### Wild: P.muralis vs P.liolepis
-
-```{r beta_div_neutral_wild_, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE}
-wild <- meta %>%
-  filter(time_point == "0_Wild")
-
-# Create a temporary modified version of genome_counts_filt
-temp_genome_counts <- transform(genome_counts_filt, row.names = genome_counts_filt$genome)
-temp_genome_counts$genome <- NULL
-
-wild.counts <- temp_genome_counts[, which(colnames(temp_genome_counts) %in% rownames(wild))]
-identical(sort(colnames(wild.counts)), sort(as.character(rownames(wild))))
-
-wild_nmds <- sample_metadata %>%
-  filter(time_point == "0_Wild")
-```
+#### Wild: cold vs warm adapted lizards
 
 ##### Number of samples used
 
 ```{r beta_div_neutral_wild_samples, echo=FALSE, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE}
 nrow(wild)
-```
 
-```{r beta_div_neutral_wild_1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE}
-beta_div_richness_wild<-hillpair(data=wild.counts, q=0)
-beta_div_neutral_wild<-hillpair(data=wild.counts, q=1)
-beta_div_phylo_wild<-hillpair(data=wild.counts, q=1, tree=genome_tree)
-beta_div_func_wild<-hillpair(data=wild.counts, q=1, dist=dist)
+samples_to_keep <- sample_metadata %>%
+  filter(time_point == "0_Wild") %>% 
+  select(Tube_code) %>% 
+  pull()
+subset_meta <- sample_metadata %>%
+  filter(time_point == "0_Wild")
 ```
 
 #### Richness
 
 ```{r beta_richness_permanova_1, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_richness_wild$S, wild$Population) %>% permutest(., pairwise = TRUE)
+richness <- as.matrix(beta_q0n$S)
+richness <- as.dist(richness[rownames(richness) %in% samples_to_keep,
+               colnames(richness) %in% samples_to_keep])
+betadisper(richness, subset_meta$Population) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_richness_permanova, echo=TRUE, warning=FALSE, comments="", message=FALSE, results=TRUE}
-adonis2(formula=beta_div_richness_wild$S ~ Population, data=wild[labels(beta_div_richness_wild$S),], permutations=999) %>%
-			as.matrix() %>%
-			kable()
+adonis2(richness ~ Population,
+        data = subset_meta %>% arrange(match(Tube_code,labels(richness))),
+        permutations = 999) %>%
+        broom::tidy() %>%
+        tt()
 ```
-
 
 #### Neutral
 
 ```{r beta_neutral_permanova_1, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_neutral_wild$S, wild$Population) %>% permutest(., pairwise = TRUE)
+neutral <- as.matrix(beta_q1n$S)
+neutral <- as.dist(neutral[rownames(neutral) %in% samples_to_keep,
+               colnames(neutral) %in% samples_to_keep])
+betadisper(neutral, subset_meta$Population) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_neutral_permanova, echo=TRUE, warning=FALSE, comments="", message=FALSE, results=TRUE}
-adonis2(formula=beta_div_neutral_wild$S ~ Population, data=wild[labels(beta_div_neutral_wild$S),], permutations=999) %>%
-			as.matrix() %>%
-			kable()
+adonis2(neutral ~ Population,
+        data = subset_meta %>% arrange(match(Tube_code,labels(neutral))),
+        permutations = 999) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 #### Phylogenetic
 
 ```{r beta_phylo_permanova_1, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_phylo_wild$S, wild$Population) %>% permutest(., pairwise = TRUE)
+phylo <- as.matrix(beta_q1p$S)
+phylo <- as.dist(phylo[rownames(phylo) %in% samples_to_keep,
+               colnames(phylo) %in% samples_to_keep])
+betadisper(phylo, subset_meta$Population) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_phylo_permanova, echo=TRUE, warning=FALSE, comments="", message=FALSE, results=TRUE}
-adonis2(formula=beta_div_phylo_wild$S ~ Population, data=wild[labels(beta_div_phylo_wild$S),], permutations=999) %>%
-			as.matrix() %>%
-			kable()
+adonis2(phylo ~ Population,
+        data = subset_meta %>% arrange(match(Tube_code,labels(phylo))),
+        permutations = 999) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 #### Functional
 
 ```{r beta_func_permanova_!, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_func_wild$S, wild$Population) %>% permutest(., pairwise = TRUE)
+func <- as.matrix(beta_q1f$S)
+func <- as.dist(func[rownames(func) %in% samples_to_keep,
+               colnames(func) %in% samples_to_keep])
+betadisper(func, subset_meta$Population) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_func_permanova, echo=TRUE, warning=FALSE, comments="", message=FALSE, results=TRUE}
-adonis2(formula=beta_div_func_wild$S ~ Population, data=wild[labels(beta_div_func_wild$S),], permutations=999) %>%
-			as.matrix() %>%
-			kable()
+adonis2(func ~ Population,
+        data = subset_meta %>% arrange(match(Tube_code,labels(func))),
+        permutations = 999) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_neutral_nmds, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
-beta_q0n_nmds_wild <- beta_div_richness_wild$S %>%
+beta_q0n_nmds_wild <- richness %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace=FALSE) %>%
 				vegan::scores() %>%
 				as_tibble(., rownames = "sample") %>%
-				left_join(wild_nmds, by = join_by(sample == Tube_code))
+				left_join(subset_meta, by = join_by(sample == Tube_code))
 
-beta_q1n_nmds_wild <- beta_div_neutral_wild$S %>%
+beta_q1n_nmds_wild <- neutral %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace=FALSE) %>%
 				vegan::scores() %>%
 				as_tibble(., rownames = "sample") %>%
-				left_join(wild_nmds, by = join_by(sample == Tube_code))
+				left_join(subset_meta, by = join_by(sample == Tube_code))
 
-beta_q1p_nmds_wild <- beta_div_phylo_wild$S %>%
+beta_q1p_nmds_wild <- phylo %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				vegan::scores() %>%
 				as_tibble(., rownames = "sample") %>%
-				left_join(wild_nmds, by = join_by(sample == Tube_code))
+				left_join(subset_meta, by = join_by(sample == Tube_code))
 
-beta_q1f_nmds_wild <- beta_div_func_wild$S %>%
+beta_q1f_nmds_wild <- func %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				vegan::scores() %>%
 				as_tibble(., rownames = "sample") %>%
-				left_join(wild_nmds, by = join_by(sample == Tube_code))
+				left_join(subset_meta, by = join_by(sample == Tube_code))
 ```
 
 ```{r beta_neutral_nmds_plot, echo=FALSE, results=TRUE}
@@ -209,109 +209,111 @@ ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 ```
 
 ### 2. Effect of acclimation
-
-```{r beta_div_neutral_accli, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE}
-accli <- meta %>%
-  filter(time_point == "1_Acclimation")
-
-# Create a temporary modified version of genome_counts_filt
-temp_genome_counts <- transform(genome_counts_filt, row.names = genome_counts_filt$genome)
-temp_genome_counts$genome <- NULL
-
-accli.counts <- temp_genome_counts[, which(colnames(temp_genome_counts) %in% rownames(accli))]
-identical(sort(colnames(accli.counts)), sort(as.character(rownames(accli))))
-
-accli_nmds <- sample_metadata %>%
-  filter(time_point == "1_Acclimation")
-```
-
 ##### Number of samples used
 
 ```{r beta_div_neutral_accli_samples, echo=FALSE, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE}
 nrow(accli)
-```
 
-```{r beta_div_neutral_accli_1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE}
-beta_div_richness_accli<-hillpair(data=accli.counts, q=0)
-beta_div_neutral_accli<-hillpair(data=accli.counts, q=1)
-beta_div_phylo_accli<-hillpair(data=accli.counts, q=1, tree=genome_tree)
-beta_div_func_accli<-hillpair(data=accli.counts, q=1, dist=dist)
+samples_to_keep_accli <- sample_metadata %>%
+  filter(time_point == "1_Acclimation") %>% 
+  select(Tube_code) %>% 
+  pull()
+subset_meta_accli <- sample_metadata %>%
+  filter(time_point == "1_Acclimation")
 ```
 
 #### Richness
 
 ```{r beta_richness_permanova_1_accli, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_richness_accli$S, accli$Population) %>% permutest(., pairwise = TRUE)
+richness_accli <- as.matrix(beta_q0n$S)
+richness_accli <- as.dist(richness_accli[rownames(richness_accli) %in% samples_to_keep_accli,
+               colnames(richness_accli) %in% samples_to_keep_accli])
+betadisper(richness_accli, subset_meta_accli$Population) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_richness_permanova_accli, echo=TRUE, warning=FALSE, comments="", message=FALSE, results=TRUE}
-adonis2(formula=beta_div_richness_accli$S ~ Population, data=accli[labels(beta_div_richness_accli$S),], permutations=999) %>%
-  as.matrix() %>%
-  kable()
+adonis2(richness_accli ~ Population,
+        data = subset_meta_accli %>% arrange(match(Tube_code,labels(richness_accli))),
+        permutations = 999) %>%
+        broom::tidy() %>%
+        tt()
 ```
-
 
 #### Neutral
 
 ```{r beta_neutral_permanova_1_accli, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_neutral_accli$S, accli$Population) %>% permutest(., pairwise = TRUE)
+neutral_accli <- as.matrix(beta_q1n$S)
+neutral_accli <- as.dist(neutral_accli[rownames(neutral_accli) %in% samples_to_keep_accli,
+               colnames(neutral_accli) %in% samples_to_keep_accli])
+betadisper(neutral_accli, subset_meta_accli$Population) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_neutral_permanova_accli, echo=TRUE, warning=FALSE, comments="", message=FALSE, results=TRUE}
-adonis2(formula=beta_div_neutral_accli$S ~ Population, data=accli[labels(beta_div_neutral_accli$S),], permutations=999) %>%
-  as.matrix() %>%
-  kable()
+adonis2(neutral_accli ~ Population,
+        data = subset_meta_accli %>% arrange(match(Tube_code,labels(neutral_accli))),
+        permutations = 999) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 #### Phylogenetic
 
 ```{r beta_phylo_permanova_1_accli, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_phylo_accli$S, accli$Population) %>% permutest(., pairwise = TRUE)
+phylo_accli <- as.matrix(beta_q1p$S)
+phylo_accli <- as.dist(phylo_accli[rownames(phylo_accli) %in% samples_to_keep_accli,
+               colnames(phylo_accli) %in% samples_to_keep_accli])
+betadisper(phylo_accli, subset_meta_accli$Population) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_phylo_permanova_accli, echo=TRUE, warning=FALSE, comments="", message=FALSE, results=TRUE}
-adonis2(formula=beta_div_phylo_accli$S ~ Population, data=accli[labels(beta_div_phylo_accli$S),], permutations=999) %>%
-  as.matrix() %>%
-  kable()
+adonis2(phylo_accli ~ Population,
+        data = subset_meta_accli %>% arrange(match(Tube_code,labels(phylo_accli))),
+        permutations = 999) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 #### Functional
 
 ```{r beta_func_permanova_accli_1, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_func_accli$S, accli$Population) %>% permutest(., pairwise = TRUE)
+func_accli <- as.matrix(beta_q1f$S)
+func_accli <- as.dist(func_accli[rownames(func_accli) %in% samples_to_keep_accli,
+               colnames(func_accli) %in% samples_to_keep_accli])
+betadisper(func_accli, subset_meta_accli$Population) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_func_permanova_accli, echo=TRUE, warning=FALSE, comments="", message=FALSE, results=TRUE}
-adonis2(formula=beta_div_func_accli$S ~ Population, data=accli[labels(beta_div_func_accli$S),], permutations=999) %>%
-  as.matrix() %>%
-  kable()
+adonis2(func_accli ~ Population,
+        data = subset_meta_accli %>% arrange(match(Tube_code,labels(func_accli))),
+        permutations = 999) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
-
 ```{r beta_neutral_nmds_accli, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
-beta_q0n_nmds_accli <- beta_div_richness_accli$S %>%
+beta_q0n_nmds_accli <- richness_accli %>%
   metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace=FALSE) %>%
   vegan::scores() %>%
   as_tibble(., rownames = "sample") %>%
-  left_join(accli_nmds, by = join_by(sample == Tube_code))
+  left_join(subset_meta_accli, by = join_by(sample == Tube_code))
 
-beta_q1n_nmds_accli <- beta_div_neutral_accli$S %>%
+beta_q1n_nmds_accli <- neutral_accli %>%
   metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace=FALSE) %>%
   vegan::scores() %>%
   as_tibble(., rownames = "sample") %>%
-  left_join(accli_nmds, by = join_by(sample == Tube_code))
+  left_join(subset_meta_accli, by = join_by(sample == Tube_code))
 
-beta_q1p_nmds_accli <- beta_div_phylo_accli$S %>%
+beta_q1p_nmds_accli <- phylo_accli %>%
   metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
   vegan::scores() %>%
   as_tibble(., rownames = "sample") %>%
-  left_join(accli_nmds, by = join_by(sample == Tube_code))
+  left_join(subset_meta_accli, by = join_by(sample == Tube_code))
 
-beta_q1f_nmds_accli <- beta_div_func_accli$S %>%
+beta_q1f_nmds_accli <- func_accli %>%
   metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
   vegan::scores() %>%
   as_tibble(., rownames = "sample") %>%
-  left_join(accli_nmds, by = join_by(sample == Tube_code))
+  left_join(subset_meta_accli, by = join_by(sample == Tube_code))
 ```
 
 ```{r beta_neutral_nmds_plot_accli, echo=FALSE, results=TRUE}
@@ -402,54 +404,44 @@ ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 ```
 
 ### 3. Comparison between Wild and Acclimation
-
-```{r beta_div_neutral_accli1, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE}
-accli1 <- meta  %>%
-  filter(time_point == "0_Wild" | time_point == "1_Acclimation")
-
-temp_genome_counts <- transform(genome_counts_filt, row.names = genome_counts_filt$genome)
-temp_genome_counts$genome <- NULL
-
-accli1.counts <- temp_genome_counts[,which(colnames(temp_genome_counts) %in% rownames(accli1))]
-identical(sort(colnames(accli1.counts)),sort(as.character(rownames(accli1))))
-
-accli1_nmds <- sample_metadata %>%
-  filter(time_point == "0_Wild" | time_point == "1_Acclimation")
-```
-
 ##### Number of samples used
 
 ```{r beta_div_neutral_accli1_samples, echo=FALSE, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE}
 nrow(accli1)
-```
+samples_to_keep_accli1 <- sample_metadata %>%
+  filter(time_point == "1_Acclimation"| time_point == "0_Wild") %>% 
+  select(Tube_code) %>% 
+  pull()
+subset_meta_accli1 <- sample_metadata %>%
+  filter(time_point == "1_Acclimation"| time_point == "0_Wild")
 
-```{r beta_div_neutral_accli1_1, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE}
-beta_div_richness_accli1<-hillpair(data=accli1.counts, q=0)
-beta_div_neutral_accli1<-hillpair(data=accli1.counts, q=1)
-beta_div_phylo_accli1<-hillpair(data=accli1.counts, q=1, tree=genome_tree)
-beta_div_func_accli1<-hillpair(data=accli1.counts, q=1, dist=dist)
-```
-
-```{r data_accli1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE}
-#Arrange of metadata dataframe
-accli1_arrange<-accli1[labels(beta_div_neutral_accli1$S),]
-accli1_arrange$Population_time <- interaction(accli1_arrange$Population, accli1_arrange$time_point)
+subset_meta_accli1$Population_time <- interaction(subset_meta_accli1$Population, subset_meta_accli1$time_point)
 ```
 
 ##### Richness
 
 ```{r beta_div_richness_accli1_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_richness_accli1$S, accli1$time_point) %>% permutest(., pairwise = TRUE)
+richness_accli1 <- as.matrix(beta_q0n$S)
+richness_accli1 <- as.dist(richness_accli1[rownames(richness_accli1) %in% samples_to_keep_accli1,
+               colnames(richness_accli1) %in% samples_to_keep_accli1])
+betadisper(richness_accli1, subset_meta_accli1$Population) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_div_richness_accli1_4, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_richness_accli1$S ~ time_point*Population, data=accli1[labels(beta_div_richness_accli1$S),], permutations=999, strata=accli1$individual) %>%
-		as.matrix() %>%
-		kable()
+adonis2(richness_accli1 ~ Population*time_point,
+        data = subset_meta_accli1 %>% arrange(match(Tube_code,labels(richness_accli1))),
+        permutations = 999,
+        strata = subset_meta_accli1 %>% arrange(match(Tube_code,labels(richness_accli1))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_richness_permanova_accli1_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise<-pairwise.adonis(beta_div_richness_accli1$S,accli1_arrange$Population_time, perm=999)
+#Arrange of metadata dataframe
+subset_meta_accli1_arrange <- column_to_rownames(subset_meta_accli1, "Tube_code")
+subset_meta_accli1_arrange<-subset_meta_accli1_arrange[labels(richness_accli1),]
+
+pairwise<-pairwise.adonis(richness_accli1,subset_meta_accli1_arrange$Population_time, perm=999)
 pairwise%>%
   tt()
 ```
@@ -457,17 +449,23 @@ pairwise%>%
 ##### Neutral
 
 ```{r beta_div_neutral_accli1_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_neutral_accli1$S, accli1$time_point) %>% permutest(., pairwise = TRUE)
+neutral_accli1 <- as.matrix(beta_q1n$S)
+neutral_accli1 <- as.dist(neutral_accli1[rownames(neutral_accli1) %in% samples_to_keep_accli1,
+               colnames(neutral_accli1) %in% samples_to_keep_accli1])
+betadisper(neutral_accli1, subset_meta_accli1$Population) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_div_neutral_accli1_4, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_neutral_accli1$S ~ time_point*Population, data=accli1[labels(beta_div_neutral_accli1$S),], permutations=999, strata=accli1$individual) %>%
-		as.matrix() %>%
-		kable()
+adonis2(neutral_accli1 ~ Population*time_point,
+        data = subset_meta_accli1 %>% arrange(match(Tube_code,labels(neutral_accli1))),
+        permutations = 999,
+        strata = subset_meta_accli1 %>% arrange(match(Tube_code,labels(neutral_accli1))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_neutral_permanova_accli1_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise<-pairwise.adonis(beta_div_neutral_accli1$S,accli1_arrange$Population_time, perm=999)
+pairwise<-pairwise.adonis(neutral_accli1,subset_meta_accli1_arrange$Population_time, perm=999)
 pairwise%>%
   tt()
 ```
@@ -475,17 +473,23 @@ pairwise%>%
 ##### Phylogenetic
 
 ```{r beta_div_phylo_accli1_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_phylo_accli1$S, accli1$time_point) %>% permutest(., pairwise = TRUE)
+phylo_accli1 <- as.matrix(beta_q1p$S)
+phylo_accli1 <- as.dist(phylo_accli1[rownames(phylo_accli1) %in% samples_to_keep_accli1,
+               colnames(phylo_accli1) %in% samples_to_keep_accli1])
+betadisper(phylo_accli1, subset_meta_accli1$Population) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_div_phylo_accli1_4, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_phylo_accli1$S ~ time_point*Population, data=accli1[labels(beta_div_phylo_accli1$S),], permutations=999, strata=accli1$individual) %>%
-		as.matrix() %>%
-		kable()
+adonis2(phylo_accli1 ~ Population*time_point,
+        data = subset_meta_accli1 %>% arrange(match(Tube_code,labels(phylo_accli1))),
+        permutations = 999,
+        strata = subset_meta_accli1 %>% arrange(match(Tube_code,labels(phylo_accli1))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_phylo_permanova_accli1_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise<-pairwise.adonis(beta_div_phylo_accli1$S,accli1_arrange$Population_time, perm=999)
+pairwise<-pairwise.adonis(phylo_accli1,subset_meta_accli1_arrange$Population_time, perm=999)
 pairwise%>%
   tt()
 ```
@@ -493,46 +497,51 @@ pairwise%>%
 ##### Functional
 
 ```{r beta_div_func_accli1_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_func_accli1$S, accli1$time_point) %>% permutest(., pairwise = TRUE)
+func_accli1 <- as.matrix(beta_q1f$S)
+func_accli1 <- as.dist(func_accli1[rownames(func_accli1) %in% samples_to_keep_accli1,
+               colnames(func_accli1) %in% samples_to_keep_accli1])
+betadisper(func_accli1, subset_meta_accli1$Population) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_div_func_accli1_4, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_func_accli1$S ~ time_point*Population, data=accli1[labels(beta_div_func_accli1$S),], permutations=999, strata=accli1$individual) %>%
-		as.matrix() %>%
-		kable()
+adonis2(func_accli1 ~ Population*time_point,
+        data = subset_meta_accli1 %>% arrange(match(Tube_code,labels(func_accli1))),
+        permutations = 999,
+        strata = subset_meta_accli1 %>% arrange(match(Tube_code,labels(func_accli1))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_func_permanova_accli1_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise<-pairwise.adonis(beta_div_func_accli1$S,accli1_arrange$Population_time, perm=999)
+pairwise<-pairwise.adonis(func_accli1,subset_meta_accli1_arrange$Population_time, perm=999)
 pairwise%>%
   tt()
 ```
 
-
 ```{r beta_neutral_nmds_accli1, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
-beta_richness_nmds_accli1 <- beta_div_richness_accli1$S %>%
+beta_richness_nmds_accli1 <- richness_accli1 %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
 				as_tibble(., rownames = "sample") %>%
-				left_join(accli1_nmds, by = c("sample" = "Tube_code"))
+				left_join(subset_meta_accli1, by = c("sample" = "Tube_code"))
 
-beta_neutral_nmds_accli1 <- beta_div_neutral_accli1$S %>%
+beta_neutral_nmds_accli1 <- neutral_accli1 %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
 				as_tibble(., rownames = "sample") %>%
-				left_join(accli1_nmds, by = c("sample" = "Tube_code"))
+				left_join(subset_meta_accli1, by = c("sample" = "Tube_code"))
 
-beta_phylo_nmds_accli1 <- beta_div_phylo_accli1$S %>%
+beta_phylo_nmds_accli1 <- phylo_accli1 %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
 				as_tibble(., rownames = "sample") %>%
-				left_join(accli1_nmds, by = join_by(sample == Tube_code))
+				left_join(subset_meta_accli1, by = join_by(sample == Tube_code))
 
-beta_func_nmds_accli1 <- beta_div_func_accli1$S %>%
+beta_func_nmds_accli1 <- func_accli1 %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
 				as_tibble(., rownames = "sample") %>%
-				left_join(accli1_nmds, by = join_by(sample == Tube_code))
+				left_join(subset_meta_accli1, by = join_by(sample == Tube_code))
 ```
 
 ```{r beta_neutral_nmds_accli1_plot, echo=FALSE, results=FALSE}
@@ -609,53 +618,44 @@ ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 ### 4. Effect of FMT on microbiota community
 
 #### Comparison between Acclimation vs Post-FMT1
-```{r beta_div_neutral_post3_data, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE}
-post3 <- meta  %>%
-  filter(time_point == "1_Acclimation" | time_point == "5_Post-FMT1")
-
-temp_genome_counts <- transform(genome_counts_filt, row.names = genome_counts_filt$genome)
-temp_genome_counts$genome <- NULL
-
-post3.counts <- temp_genome_counts[,which(colnames(temp_genome_counts) %in% rownames(post3))]
-identical(sort(colnames(post3.counts)),sort(as.character(rownames(post3))))
-
-post3_nmds <- sample_metadata %>%
-  filter(time_point == "1_Acclimation" | time_point == "5_Post-FMT1")
-```
-
 ##### Number of samples used
 
 ```{r beta_div_neutral_post3_samples, echo=FALSE, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE}
 nrow(post3)
-```
+samples_to_keep_post3 <- sample_metadata %>%
+  filter(time_point == "1_Acclimation"| time_point == "5_Post-FMT1") %>% 
+  select(Tube_code) %>% 
+  pull()
+subset_meta_post3 <- sample_metadata %>%
+  filter(time_point == "1_Acclimation"| time_point == "5_Post-FMT1")
 
-```{r beta_div_neutral_post3_1, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE}
-beta_div_richness_post3<-hillpair(data=post3.counts, q=0)
-beta_div_neutral_post3<-hillpair(data=post3.counts, q=1)
-beta_div_phylo_post3<-hillpair(data=post3.counts, q=1, tree=genome_tree)
-beta_div_func_post3<-hillpair(data=post3.counts, q=1, dist=dist)
-```
-
-```{r data_post3_2, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE}
-#Arrange of metadata dataframe
-post3_arrange<-post3[labels(beta_div_neutral_post3$S),]
-post3_arrange$type_time <- interaction(post3_arrange$type, post3_arrange$time_point)
+subset_meta_post3$type_time <- interaction(subset_meta_post3$type, subset_meta_post3$time_point)
 ```
 
 ##### Richness
 
 ```{r beta_div_richness_post3_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_richness_post3$S, post3_arrange$type) %>% permutest(., pairwise = TRUE)
+richness_post3 <- as.matrix(beta_q0n$S)
+richness_post3 <- as.dist(richness_post3[rownames(richness_post3) %in% samples_to_keep_post3,
+               colnames(richness_post3) %in% samples_to_keep_post3])
+betadisper(richness_post3, subset_meta_post3$Population) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_div_richness_post3_4, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_richness_post3$S ~ time_point*type, data=post3[labels(beta_div_neutral_post3$S),], permutations=999,strata=post3$individual) %>%
-  as.matrix() %>%
-  kable()
+adonis2(richness_post3 ~ Population*time_point,
+        data = subset_meta_post3 %>% arrange(match(Tube_code,labels(richness_post3))),
+        permutations = 999,
+        strata = subset_meta_post3 %>% arrange(match(Tube_code,labels(richness_post3))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_div_pairwise_post3_8, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise <- pairwise.adonis(beta_div_richness_post3$S, post3_arrange$type_time, perm=999)
+#Arrange of metadata dataframe
+subset_meta_post3_arrange <- column_to_rownames(subset_meta_post3, "Tube_code")
+subset_meta_post3_arrange<-subset_meta_post3_arrange[labels(richness_post3),]
+
+pairwise <- pairwise.adonis(richness_post3, subset_meta_post3_arrange$type_time, perm=999)
 pairwise%>%
   tt()
 ```
@@ -663,17 +663,23 @@ pairwise%>%
 ##### Neutral
 
 ```{r beta_div_neutral_post3_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_neutral_post3$S, post3$time_point) %>% permutest(., pairwise = TRUE)
+neutral_post3 <- as.matrix(beta_q1n$S)
+neutral_post3 <- as.dist(neutral_post3[rownames(neutral_post3) %in% samples_to_keep_post3,
+               colnames(neutral_post3) %in% samples_to_keep_post3])
+betadisper(neutral_post3, subset_meta_post3$Population) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_div_neutral_post3_4, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_neutral_post3$S ~ time_point*type, data=post3[labels(beta_div_neutral_post3$S),], permutations=999,strata=post3$individual) %>%
-  as.matrix() %>%
-  kable()
+adonis2(neutral_post3 ~ Population*time_point,
+        data = subset_meta_post3 %>% arrange(match(Tube_code,labels(neutral_post3))),
+        permutations = 999,
+        strata = subset_meta_post3 %>% arrange(match(Tube_code,labels(neutral_post3))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_div_pairwise_post3_9, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise <- pairwise.adonis(beta_div_neutral_post3$S, post3_arrange$type_time, perm=999)
+pairwise <- pairwise.adonis(neutral_post3, subset_meta_post3_arrange$type_time, perm=999)
 pairwise%>%
   tt()
 ```
@@ -681,17 +687,23 @@ pairwise%>%
 ##### Phylogenetic
 
 ```{r beta_div_phylo_post3_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_phylo_post3$S, post3$time_point) %>% permutest(., pairwise = TRUE)
+phylo_post3 <- as.matrix(beta_q1p$S)
+phylo_post3 <- as.dist(phylo_post3[rownames(phylo_post3) %in% samples_to_keep_post3,
+               colnames(phylo_post3) %in% samples_to_keep_post3])
+betadisper(phylo_post3, subset_meta_post3$Population) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_div_phylo_post3_4, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_phylo_post3$S ~ time_point*type, data=post3[labels(beta_div_phylo_post3$S),], permutations=999,strata=post3$individual) %>%
-  as.matrix() %>%
-  kable()
+adonis2(phylo_post3 ~ Population*time_point,
+        data = subset_meta_post3 %>% arrange(match(Tube_code,labels(phylo_post3))),
+        permutations = 999,
+        strata = subset_meta_post3 %>% arrange(match(Tube_code,labels(phylo_post3))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_div_pairwise_post3_6, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise <- pairwise.adonis(beta_div_phylo_post3$S, post3_arrange$type_time, perm=999)
+pairwise <- pairwise.adonis(phylo_post3, subset_meta_post3_arrange$type_time, perm=999)
 pairwise%>%
   tt()
 ```
@@ -699,45 +711,51 @@ pairwise%>%
 ##### Functional
 
 ```{r beta_div_func_post3_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_func_post3$S, post3$time_point) %>% permutest(., pairwise = TRUE)
+func_post3 <- as.matrix(beta_q1f$S)
+func_post3 <- as.dist(func_post3[rownames(func_post3) %in% samples_to_keep_post3,
+               colnames(func_post3) %in% samples_to_keep_post3])
+betadisper(func_post3, subset_meta_post3$Population) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_div_func_post3_4, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_func_post3$S ~ time_point*type, data=post3[labels(beta_div_func_post3$S),], permutations=999,strata=post3$individual) %>%
-  as.matrix() %>%
-  kable()
+adonis2(func_post3 ~ Population*time_point,
+        data = subset_meta_post3 %>% arrange(match(Tube_code,labels(func_post3))),
+        permutations = 999,
+        strata = subset_meta_post3 %>% arrange(match(Tube_code,labels(func_post3))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_div_pairwise_post3_7, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise <- pairwise.adonis(beta_div_func_post3$S, post3_arrange$type_time, perm=999)
+pairwise <- pairwise.adonis(func_post3, subset_meta_post3_arrange$type_time, perm=999)
 pairwise%>%
   tt()
 ```
 
 ```{r beta_neutral_nmds_post3, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
-beta_richness_nmds_post3 <- beta_div_richness_post3$S %>%
+beta_richness_nmds_post3 <- richness_post3 %>%
   metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
   scores() %>%
   as_tibble(., rownames = "sample") %>%
-  left_join(post3_nmds, by = c("sample" = "Tube_code"))
+  left_join(subset_meta_post3, by = c("sample" = "Tube_code"))
 
-beta_neutral_nmds_post3 <- beta_div_neutral_post3$S %>%
+beta_neutral_nmds_post3 <- neutral_post3 %>%
   metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
   scores() %>%
   as_tibble(., rownames = "sample") %>%
-  left_join(post3_nmds, by = c("sample" = "Tube_code"))
+  left_join(subset_meta_post3, by = c("sample" = "Tube_code"))
 
-beta_phylo_nmds_post3 <- beta_div_phylo_post3$S %>%
+beta_phylo_nmds_post3 <- phylo_post3 %>%
   metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
   scores() %>%
   as_tibble(., rownames = "sample") %>%
-  left_join(post3_nmds, by = join_by(sample == Tube_code))
+  left_join(subset_meta_post3, by = join_by(sample == Tube_code))
 
-beta_func_nmds_post3 <- beta_div_func_post3$S %>%
+beta_func_nmds_post3 <- func_post3 %>%
   metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
   scores() %>%
   as_tibble(., rownames = "sample") %>%
-  left_join(post3_nmds, by = join_by(sample == Tube_code))
+  left_join(subset_meta_post3, by = join_by(sample == Tube_code))
 ```
 
 ```{r beta_neutral_nmds_post3_plot, echo=FALSE, results=FALSE}
@@ -812,53 +830,44 @@ ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 
 #### Comparison between Acclimation vs Post-FMT2
 
-```{r beta_div_neutral_post3, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE}
-post4 <- meta  %>%
-  filter(time_point == "1_Acclimation" | time_point == "6_Post-FMT2")
-
-temp_genome_counts <- transform(genome_counts_filt, row.names = genome_counts_filt$genome)
-temp_genome_counts$genome <- NULL
-
-post4.counts <- temp_genome_counts[,which(colnames(temp_genome_counts) %in% rownames(post4))]
-identical(sort(colnames(post4.counts)),sort(as.character(rownames(post4))))
-
-post4_nmds <- sample_metadata %>%
-  filter(time_point == "1_Acclimation" | time_point == "6_Post-FMT2")
-```
-
 ##### Number of samples used
 
 ```{r beta_div_neutral_post4_samples, echo=FALSE, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE}
 nrow(post4)
-```
+samples_to_keep_post4 <- sample_metadata %>%
+  filter(time_point == "1_Acclimation"| time_point == "6_Post-FMT2") %>% 
+  select(Tube_code) %>% 
+  pull()
+subset_meta_post4 <- sample_metadata %>%
+  filter(time_point == "1_Acclimation"| time_point == "6_Post-FMT2")
 
-```{r beta_div_neutral_post4_1, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE}
-beta_div_richness_post4<-hillpair(data=post4.counts, q=0)
-beta_div_neutral_post4<-hillpair(data=post4.counts, q=1)
-beta_div_phylo_post4<-hillpair(data=post4.counts, q=1, tree=genome_tree)
-beta_div_func_post4<-hillpair(data=post4.counts, q=1, dist=dist)
-```
-
-```{r data_post4_2, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE}
-#Arrange of metadata dataframe
-post4_arrange<-post4[labels(beta_div_neutral_post4$S),]
-post4_arrange$type_time <- interaction(post4_arrange$type, post4_arrange$time_point)
+subset_meta_post4$type_time <- interaction(subset_meta_post4$type, subset_meta_post4$time_point)
 ```
 
 ##### Richness
 
 ```{r beta_div_richness_post4_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_richness_post4$S, post4_arrange$type) %>% permutest(., pairwise = TRUE)
+richness_post4 <- as.matrix(beta_q0n$S)
+richness_post4 <- as.dist(richness_post4[rownames(richness_post4) %in% samples_to_keep_post4,
+               colnames(richness_post4) %in% samples_to_keep_post4])
+betadisper(richness_post4, subset_meta_post4$Population) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_div_richness_post4_4, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_richness_post4$S ~ time_point*Population, data=post4[labels(beta_div_neutral_post4$S),], permutations=999,strata=post4$individual) %>%
-  as.matrix() %>%
-  kable()
+adonis2(richness_post4 ~ Population*time_point,
+        data = subset_meta_post4 %>% arrange(match(Tube_code,labels(richness_post4))),
+        permutations = 999,
+        strata = subset_meta_post4 %>% arrange(match(Tube_code,labels(richness_post4))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_div_pairwise_post4_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise <- pairwise.adonis(beta_div_richness_post4$S, post4_arrange$type_time, perm=999)
+#Arrange of metadata dataframe
+subset_meta_post4_arrange <- column_to_rownames(subset_meta_post4, "Tube_code")
+subset_meta_post4_arrange<-subset_meta_post4_arrange[labels(richness_post4),]
+
+pairwise <- pairwise.adonis(richness_post4, subset_meta_post4_arrange$type_time, perm=999)
 pairwise%>%
   tt()
 ```
@@ -866,17 +875,23 @@ pairwise%>%
 ##### Neutral
 
 ```{r beta_div_neutral_post4_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_neutral_post4$S, post4_arrange$time_point) %>% permutest(., pairwise = TRUE)
+neutral_post4 <- as.matrix(beta_q1n$S)
+neutral_post4 <- as.dist(neutral_post4[rownames(neutral_post4) %in% samples_to_keep_post4,
+               colnames(neutral_post4) %in% samples_to_keep_post4])
+betadisper(neutral_post4, subset_meta_post4$Population) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_div_neutral_post4_4, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_neutral_post4$S ~ time_point*Population, data=post4[labels(beta_div_neutral_post4$S),], permutations=999,strata=post4$individual) %>%
-  as.matrix() %>%
-  kable()
+adonis2(neutral_post4 ~ Population*time_point,
+        data = subset_meta_post4 %>% arrange(match(Tube_code,labels(neutral_post4))),
+        permutations = 999,
+        strata = subset_meta_post4 %>% arrange(match(Tube_code,labels(neutral_post4))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_div_pairwise_post4_6, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise <- pairwise.adonis(beta_div_neutral_post4$S, post4_arrange$type_time, perm=999)
+pairwise <- pairwise.adonis(neutral_post4, subset_meta_post4_arrange$type_time, perm=999)
 pairwise%>%
   tt()
 ```
@@ -884,17 +899,23 @@ pairwise%>%
 ##### Phylogenetic
 
 ```{r beta_div_phylo_post4_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_phylo_post4$S, post4$time_point) %>% permutest(., pairwise = TRUE)
+phylo_post4 <- as.matrix(beta_q1p$S)
+phylo_post4 <- as.dist(phylo_post4[rownames(phylo_post4) %in% samples_to_keep_post4,
+               colnames(phylo_post4) %in% samples_to_keep_post4])
+betadisper(phylo_post4, subset_meta_post4$Population) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_div_phylo_post4_4, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_phylo_post4$S ~ time_point*Population, data=post4[labels(beta_div_phylo_post4$S),], permutations=999,strata=post4$individual) %>%
-  as.matrix() %>%
-  kable()
+adonis2(phylo_post4 ~ Population*time_point,
+        data = subset_meta_post4 %>% arrange(match(Tube_code,labels(phylo_post4))),
+        permutations = 999,
+        strata = subset_meta_post4 %>% arrange(match(Tube_code,labels(phylo_post4))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_div_pairwise_post4_7, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise <- pairwise.adonis(beta_div_phylo_post4$S, post4_arrange$type_time, perm=999)
+pairwise <- pairwise.adonis(phylo_post4, subset_meta_post4_arrange$type_time, perm=999)
 pairwise%>%
   tt()
 ```
@@ -902,45 +923,51 @@ pairwise%>%
 ##### Functional
 
 ```{r beta_div_func_post4_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_func_post4$S, post4$time_point) %>% permutest(., pairwise = TRUE)
+func_post4 <- as.matrix(beta_q1f$S)
+func_post4 <- as.dist(func_post4[rownames(func_post4) %in% samples_to_keep_post4,
+               colnames(func_post4) %in% samples_to_keep_post4])
+betadisper(func_post4, subset_meta_post4$Population) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_div_func_post4_4, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_func_post4$S ~ time_point*Population, data=post4[labels(beta_div_func_post4$S),], permutations=999,strata=post4$individual) %>%
-  as.matrix() %>%
-  kable()
+adonis2(func_post4 ~ Population*time_point,
+        data = subset_meta_post4 %>% arrange(match(Tube_code,labels(func_post4))),
+        permutations = 999,
+        strata = subset_meta_post4 %>% arrange(match(Tube_code,labels(func_post4))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_div_pairwise_post4_8, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise <- pairwise.adonis(beta_div_func_post4$S, post4_arrange$type_time, perm=999)
+pairwise <- pairwise.adonis(func_post4, subset_meta_post4_arrange$type_time, perm=999)
 pairwise%>%
   tt()
 ```
 
 ```{r beta_neutral_nmds_post4, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
-beta_richness_nmds_post4 <- beta_div_richness_post4$S %>%
+beta_richness_nmds_post4 <- richness_post4 %>%
   metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
   scores() %>%
   as_tibble(., rownames = "sample") %>%
-  left_join(post4_nmds, by = c("sample" = "Tube_code"))
+  left_join(subset_meta_post4, by = c("sample" = "Tube_code"))
 
-beta_neutral_nmds_post4 <- beta_div_neutral_post4$S %>%
+beta_neutral_nmds_post4 <- neutral_post4 %>%
   metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
   scores() %>%
   as_tibble(., rownames = "sample") %>%
-  left_join(post4_nmds, by = c("sample" = "Tube_code"))
+  left_join(subset_meta_post4, by = c("sample" = "Tube_code"))
 
-beta_phylo_nmds_post4 <- beta_div_phylo_post4$S %>%
+beta_phylo_nmds_post4 <- phylo_post4 %>%
   metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
   scores() %>%
   as_tibble(., rownames = "sample") %>%
-  left_join(post4_nmds, by = join_by(sample == Tube_code))
+  left_join(subset_meta_post4, by = join_by(sample == Tube_code))
 
-beta_func_nmds_post4 <- beta_div_func_post4$S %>%
+beta_func_nmds_post4 <- func_post4 %>%
   metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
   scores() %>%
   as_tibble(., rownames = "sample") %>%
-  left_join(post4_nmds, by = join_by(sample == Tube_code))
+  left_join(subset_meta_post4, by = join_by(sample == Tube_code))
 ```
 
 ```{r beta_neutral_nmds_post4_plot, echo=FALSE, results=FALSE}
@@ -1015,53 +1042,44 @@ ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 
 #### Comparison between Acclimation vs Post-FMT1 and Post-FMT2
 
-```{r beta_div_neutral_post6, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE}
-post6 <- meta  %>%
-  filter(time_point == "1_Acclimation" | time_point == "6_Post-FMT2"| time_point == "5_Post-FMT1")
-
-temp_genome_counts <- transform(genome_counts_filt, row.names = genome_counts_filt$genome)
-temp_genome_counts$genome <- NULL
-
-post6.counts <- temp_genome_counts[,which(colnames(temp_genome_counts) %in% rownames(post6))]
-identical(sort(colnames(post6.counts)),sort(as.character(rownames(post6))))
-
-post6_nmds <- sample_metadata %>%
-  filter(time_point == "1_Acclimation" | time_point == "6_Post-FMT2"| time_point == "5_Post-FMT1")
-```
-
 ##### Number of samples used
 
 ```{r beta_div_neutral_post6_samples, echo=FALSE, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE}
 nrow(post6)
-```
+samples_to_keep_post6 <- sample_metadata %>%
+  filter(time_point == "1_Acclimation"| time_point == "6_Post-FMT2"| time_point == "5_Post-FMT1") %>% 
+  select(Tube_code) %>% 
+  pull()
+subset_meta_post6 <- sample_metadata %>%
+  filter(time_point == "1_Acclimation"| time_point == "6_Post-FMT2"| time_point == "5_Post-FMT1")
 
-```{r beta_div_neutral_post6_1, echo=TRUE, results=FALSE,message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE}
-beta_div_richness_post6<-hillpair(data=post6.counts, q=0)
-beta_div_neutral_post6<-hillpair(data=post6.counts, q=1)
-beta_div_phylo_post6<-hillpair(data=post6.counts, q=1, tree=genome_tree)
-beta_div_func_post6<-hillpair(data=post6.counts, q=1, dist=dist)
-```
-
-```{r data_post6_2, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE}
-#Arrange of metadata dataframe
-post6_arrange<-post6[labels(beta_div_neutral_post6$S),]
-post6_arrange$type_time <- interaction(post6_arrange$type, post6_arrange$time_point)
+subset_meta_post6$type_time <- interaction(subset_meta_post6$type, subset_meta_post6$time_point)
 ```
 
 ##### Richness
 
 ```{r beta_div_richness_post6_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_richness_post6$S, post6_arrange$type) %>% permutest(., pairwise = TRUE)
+richness_post6 <- as.matrix(beta_q0n$S)
+richness_post6 <- as.dist(richness_post6[rownames(richness_post6) %in% samples_to_keep_post6,
+               colnames(richness_post6) %in% samples_to_keep_post6])
+betadisper(richness_post6, subset_meta_post6$Population) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_div_richness_post6_4, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_richness_post6$S ~ time_point*type, data=post6[labels(beta_div_richness_post6$S),], permutations=999,strata=post6$individual) %>%
-  as.matrix() %>%
-  kable()
+adonis2(richness_post6 ~ type*time_point,
+        data = subset_meta_post6 %>% arrange(match(Tube_code,labels(richness_post6))),
+        permutations = 999,
+        strata = subset_meta_post6 %>% arrange(match(Tube_code,labels(richness_post6))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_div_pairwise_post6_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise <- pairwise.adonis(beta_div_richness_post6$S, post6_arrange$type_time, perm=999)
+#Arrange of metadata dataframe
+subset_meta_post6_arrange <- column_to_rownames(subset_meta_post6, "Tube_code")
+subset_meta_post6_arrange<-subset_meta_post6_arrange[labels(richness_post6),]
+
+pairwise <- pairwise.adonis(richness_post6, subset_meta_post6_arrange$type_time, perm=999)
 pairwise%>%
   tt()
 ```
@@ -1069,17 +1087,23 @@ pairwise%>%
 ##### Neutral
 
 ```{r beta_div_neutral_post6_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_neutral_post6$S, post6_arrange$time_point) %>% permutest(., pairwise = TRUE)
+neutral_post6 <- as.matrix(beta_q1n$S)
+neutral_post6 <- as.dist(neutral_post6[rownames(neutral_post6) %in% samples_to_keep_post6,
+               colnames(neutral_post6) %in% samples_to_keep_post6])
+betadisper(neutral_post6, subset_meta_post6$Population) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_div_neutral_post6_4, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_neutral_post6$S ~ time_point*type, data=post6[labels(beta_div_neutral_post6$S),], permutations=999,strata=post6$individual) %>%
-  as.matrix() %>%
-  kable()
+adonis2(neutral_post6 ~ type*time_point,
+        data = subset_meta_post6 %>% arrange(match(Tube_code,labels(neutral_post6))),
+        permutations = 999,
+        strata = subset_meta_post6 %>% arrange(match(Tube_code,labels(neutral_post6))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_div_pairwise_post6_6, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise <- pairwise.adonis(beta_div_neutral_post6$S, post6_arrange$type_time, perm=999)
+pairwise <- pairwise.adonis(neutral_post6, subset_meta_post6_arrange$type_time, perm=999)
 pairwise%>%
   tt()
 ```
@@ -1087,17 +1111,23 @@ pairwise%>%
 ##### Phylogenetic
 
 ```{r beta_div_phylo_post6_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_phylo_post6$S, post6$time_point) %>% permutest(., pairwise = TRUE)
+phylo_post6 <- as.matrix(beta_q1p$S)
+phylo_post6 <- as.dist(phylo_post6[rownames(phylo_post6) %in% samples_to_keep_post6,
+               colnames(phylo_post6) %in% samples_to_keep_post6])
+betadisper(phylo_post6, subset_meta_post6$Population) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_div_phylo_post6_4, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_phylo_post6$S ~ time_point*type, data=post6[labels(beta_div_phylo_post6$S),], permutations=999,strata=post6$individual) %>%
-  as.matrix() %>%
-  kable()
+adonis2(phylo_post6 ~ type*time_point,
+        data = subset_meta_post6 %>% arrange(match(Tube_code,labels(phylo_post6))),
+        permutations = 999,
+        strata = subset_meta_post6 %>% arrange(match(Tube_code,labels(phylo_post6))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_div_pairwise_post6_7, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise <- pairwise.adonis(beta_div_phylo_post6$S, post6_arrange$type_time, perm=999)
+pairwise <- pairwise.adonis(phylo_post6, subset_meta_post6_arrange$type_time, perm=999)
 pairwise%>%
   tt()
 ```
@@ -1105,45 +1135,51 @@ pairwise%>%
 ##### Functional
 
 ```{r beta_div_func_post6_5, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_func_post6$S, post6$time_point) %>% permutest(., pairwise = TRUE)
+func_post6 <- as.matrix(beta_q1f$S)
+func_post6 <- as.dist(func_post6[rownames(func_post6) %in% samples_to_keep_post6,
+               colnames(func_post6) %in% samples_to_keep_post6])
+betadisper(func_post6, subset_meta_post6$Population) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_div_func_post6_4, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_func_post6$S ~ time_point*type, data=post6[labels(beta_div_func_post6$S),], permutations=999,strata=post6$individual) %>%
-  as.matrix() %>%
-  kable()
+adonis2(func_post6 ~ type*time_point,
+        data = subset_meta_post6 %>% arrange(match(Tube_code,labels(func_post6))),
+        permutations = 999,
+        strata = subset_meta_post6 %>% arrange(match(Tube_code,labels(func_post6))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_div_pairwise_post6_8, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise <- pairwise.adonis(beta_div_func_post6$S, post6_arrange$type_time, perm=999)
+pairwise <- pairwise.adonis(func_post6, subset_meta_post6_arrange$type_time, perm=999)
 pairwise%>%
   tt()
 ```
 
 ```{r beta_neutral_nmds_post6, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
-beta_richness_nmds_post6 <- beta_div_richness_post6$S %>%
+beta_richness_nmds_post6 <- richness_post6 %>%
   metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
   scores() %>%
   as_tibble(., rownames = "sample") %>%
-  left_join(post6_nmds, by = c("sample" = "Tube_code"))
+  left_join(subset_meta_post6, by = c("sample" = "Tube_code"))
 
-beta_neutral_nmds_post6 <- beta_div_neutral_post6$S %>%
+beta_neutral_nmds_post6 <- neutral_post6 %>%
   metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
   scores() %>%
   as_tibble(., rownames = "sample") %>%
-  left_join(post6_nmds, by = c("sample" = "Tube_code"))
+  left_join(subset_meta_post6, by = c("sample" = "Tube_code"))
 
-beta_phylo_nmds_post6 <- beta_div_phylo_post6$S %>%
+beta_phylo_nmds_post6 <- phylo_post6 %>%
   metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
   scores() %>%
   as_tibble(., rownames = "sample") %>%
-  left_join(post6_nmds, by = join_by(sample == Tube_code))
+  left_join(subset_meta_post6, by = join_by(sample == Tube_code))
 
-beta_func_nmds_post6 <- beta_div_func_post6$S %>%
+beta_func_nmds_post6 <- func_post6 %>%
   metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
   scores() %>%
   as_tibble(., rownames = "sample") %>%
-  left_join(post6_nmds, by = join_by(sample == Tube_code))
+  left_join(subset_meta_post6, by = join_by(sample == Tube_code))
 ```
 
 ```{r beta_neutral_nmds_post6_plot, echo=FALSE, results=FALSE}
@@ -1219,129 +1255,143 @@ ggarrange(p0, p1, p2, p3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 ### 5. Are there differences between the control and the treatment group?
 
 #### After 1 week --> Post-FMT1
-
-```{r beta_div_phylo_post1, echo=TRUE, results=FALSE}
-post1 <- meta %>%
-  filter(time_point == "5_Post-FMT1")
-
-post1.counts <- temp_genome_counts[,which(colnames(temp_genome_counts) %in% rownames(post1))]
-identical(sort(colnames(post1.counts)),sort(as.character(rownames(post1))))
-
-post1_nmds <- sample_metadata %>%
-  filter(time_point == "5_Post-FMT1")
-```
-
 ##### Number of samples used
 
 ```{r beta_div_neutral_treat1_samples_2, echo=FALSE, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE}
 nrow(post1)
-```
-
-```{r beta_div_phylo_post1_1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE}
-beta_div_richness_post1<-hillpair(data=post1.counts, q=0)
-beta_div_neutral_post1<-hillpair(data=post1.counts, q=1)
-beta_div_phylo_post1<-hillpair(data=post1.counts, q=1, tree=genome_tree)
-beta_div_func_post1<-hillpair(data=post1.counts, q=1, dist=dist)
-```
-
-```{r beta_div_phylo_post1_2, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE}
-#Arrange of metadata dataframe
-post1_arrange<-post1[labels(beta_div_neutral_post1$S),]
+samples_to_keep_post1 <- sample_metadata %>%
+  filter(time_point == "5_Post-FMT1") %>% 
+  select(Tube_code) %>% 
+  pull()
+subset_meta_post1 <- sample_metadata %>%
+  filter(time_point == "5_Post-FMT1")
 ```
 
 ##### Richness
 
 ```{r beta_richness_permanova_post1_2, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_richness_post1$S, post1$type) %>% permutest(., pairwise = TRUE)
+richness_post1 <- as.matrix(beta_q0n$S)
+richness_post1 <- as.dist(richness_post1[rownames(richness_post1) %in% samples_to_keep_post1,
+               colnames(richness_post1) %in% samples_to_keep_post1])
+betadisper(richness_post1, subset_meta_post1$type) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_richness_permanova_post1_1, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_richness_post1$S ~ type, data=post1[labels(beta_div_richness_post1$S),], permutations=999) %>%
-		as.matrix() %>%
-		kable()
+adonis2(richness_post1 ~ type,
+        data = subset_meta_post1 %>% arrange(match(Tube_code,labels(richness_post1))),
+        permutations = 999,
+        strata = subset_meta_post1 %>% arrange(match(Tube_code,labels(richness_post1))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_richness_permanova_post1_3, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise<-pairwise.adonis(beta_div_richness_post1$S,post1_arrange$type, perm=999)
-pairwise
+#Arrange of metadata dataframe
+subset_meta_post1_arrange <- column_to_rownames(subset_meta_post1, "Tube_code")
+subset_meta_post1_arrange<-subset_meta_post1_arrange[labels(richness_post1),]
+
+pairwise <- pairwise.adonis(richness_post1, subset_meta_post1_arrange$type, perm=999)
+pairwise%>%
+  tt()
 ```
 
 ##### Neutral
 
 ```{r beta_neutral_permanova_post1_2, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_neutral_post1$S, post1$type) %>% permutest(., pairwise = TRUE)
+neutral_post1 <- as.matrix(beta_q1n$S)
+neutral_post1 <- as.dist(neutral_post1[rownames(neutral_post1) %in% samples_to_keep_post1,
+               colnames(neutral_post1) %in% samples_to_keep_post1])
+betadisper(neutral_post1, subset_meta_post1$type) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_neutral_permanova_post1_1, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_neutral_post1$S ~ type, data=post1[labels(beta_div_neutral_post1$S),], permutations=999) %>%
-		as.matrix() %>%
-		kable()
+adonis2(neutral_post1 ~ type,
+        data = subset_meta_post1 %>% arrange(match(Tube_code,labels(neutral_post1))),
+        permutations = 999,
+        strata = subset_meta_post1 %>% arrange(match(Tube_code,labels(neutral_post1))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_neutral_permanova_post1_3, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise<-pairwise.adonis(beta_div_neutral_post1$S,post1_arrange$type, perm=999)
-pairwise
+pairwise <- pairwise.adonis(neutral_post1, subset_meta_post1_arrange$type, perm=999)
+pairwise%>%
+  tt()
 ```
 
 ##### Phylogenetic
 
 ```{r beta_phylo_permanova_post1_2, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_phylo_post1$S, post1$type) %>% permutest(., pairwise = TRUE)
+phylo_post1 <- as.matrix(beta_q1p$S)
+phylo_post1 <- as.dist(phylo_post1[rownames(phylo_post1) %in% samples_to_keep_post1,
+               colnames(phylo_post1) %in% samples_to_keep_post1])
+betadisper(phylo_post1, subset_meta_post1$type) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_phylo_permanova_post1_1, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_phylo_post1$S ~ type, data=post1[labels(beta_div_phylo_post1$S),], permutations=999) %>%
-		as.matrix() %>%
-		kable()
+adonis2(phylo_post1 ~ type,
+        data = subset_meta_post1 %>% arrange(match(Tube_code,labels(phylo_post1))),
+        permutations = 999,
+        strata = subset_meta_post1 %>% arrange(match(Tube_code,labels(phylo_post1))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_phylo_permanova_post1_3, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise<-pairwise.adonis(beta_div_phylo_post1$S,post1_arrange$type, perm=999)
-pairwise
+pairwise <- pairwise.adonis(phylo_post1, subset_meta_post1_arrange$type, perm=999)
+pairwise%>%
+  tt()
 ```
 
 ##### Functional
 
 ```{r beta_func_permanova_post1_2, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_func_post1$S, post1$type) %>% permutest(., pairwise = TRUE)
+func_post1 <- as.matrix(beta_q1f$S)
+func_post1 <- as.dist(func_post1[rownames(func_post1) %in% samples_to_keep_post1,
+               colnames(func_post1) %in% samples_to_keep_post1])
+betadisper(func_post1, subset_meta_post1$type) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_func_permanova_post1_1, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_func_post1$S ~ type, data=post1[labels(beta_div_func_post1$S),], permutations=999) %>%
-		as.matrix() %>%
-		kable()
+adonis2(func_post1 ~ type,
+        data = subset_meta_post1 %>% arrange(match(Tube_code,labels(func_post1))),
+        permutations = 999,
+        strata = subset_meta_post1 %>% arrange(match(Tube_code,labels(func_post1))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_func_permanova_post1_3, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise<-pairwise.adonis(beta_div_func_post1$S,post1_arrange$type, perm=999)
-pairwise
+pairwise <- pairwise.adonis(func_post1, subset_meta_post1_arrange$type, perm=999)
+pairwise%>%
+  tt()
 ```
 
 
 ```{r beta_neutral_nmds_post1, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
-beta_richness_nmds_post1 <- beta_div_richness_post1$S %>%
+beta_richness_nmds_post1 <- richness_post1 %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
 				as_tibble(., rownames = "sample") %>%
-				left_join(post1_nmds, by = join_by(sample == Tube_code))
+				left_join(subset_meta_post1, by = join_by(sample == Tube_code))
 
-beta_neutral_nmds_post1 <- beta_div_neutral_post1$S %>%
+beta_neutral_nmds_post1 <- neutral_post1 %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
 				as_tibble(., rownames = "sample") %>%
-				left_join(post1_nmds, by = join_by(sample == Tube_code))
+				left_join(subset_meta_post1, by = join_by(sample == Tube_code))
 
-beta_phylogenetic_nmds_post1 <- beta_div_phylo_post1$S %>%
+beta_phylogenetic_nmds_post1 <- phylo_post1 %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
 				as_tibble(., rownames = "sample") %>%
-				left_join(post1_nmds, by = join_by(sample == Tube_code))
+				left_join(subset_meta_post1, by = join_by(sample == Tube_code))
 
-beta_functional_nmds_post1 <- beta_div_func_post1$S %>%
+beta_functional_nmds_post1 <- func_post1 %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
 				as_tibble(., rownames = "sample") %>%
-				left_join(post1_nmds, by = join_by(sample == Tube_code))
+				left_join(subset_meta_post1, by = join_by(sample == Tube_code))
 ```
 
 ```{r beta_neutral_nmds_post1_plot, eho=FALSE, results=FALSE}
@@ -1433,34 +1483,38 @@ post2_nmds <- sample_metadata %>%
 
 ```{r beta_div_neutral_treat_samples_2, echo=FALSE, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE}
 nrow(post2)
-```
-
-```{r beta_div_phylo_post2_1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE}
-beta_div_richness_post2<-hillpair(data=post2.counts, q=0)
-beta_div_neutral_post2<-hillpair(data=post2.counts, q=1)
-beta_div_phylo_post2<-hillpair(data=post2.counts, q=1, tree=genome_tree)
-beta_div_func_post2<-hillpair(data=post2.counts, q=1, dist=dist)
-```
-
-```{r beta_div_phylo_post2_2, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE}
-#Arrange of metadata dataframe
-post2_arrange<-post2[labels(beta_div_neutral_post2$S),]
+samples_to_keep_post2 <- sample_metadata %>%
+  filter(time_point == "6_Post-FMT2") %>% 
+  select(Tube_code) %>% 
+  pull()
+subset_meta_post2 <- sample_metadata %>%
+  filter(time_point == "6_Post-FMT2")
 ```
 
 ##### Richness
 
 ```{r beta_richness_permanova_post2_2, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_richness_post2$S, post2$type) %>% permutest(., pairwise = TRUE)
+richness_post2 <- as.matrix(beta_q0n$S)
+richness_post2 <- as.dist(richness_post2[rownames(richness_post2) %in% samples_to_keep_post2,
+               colnames(richness_post2) %in% samples_to_keep_post2])
+betadisper(richness_post2, subset_meta_post2$type) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_richness_permanova_post2_1, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_richness_post2$S ~ type, data=post2[labels(beta_div_richness_post2$S),], permutations=999) %>%
-		as.matrix() %>%
-		kable()
+adonis2(richness_post2 ~ type,
+        data = subset_meta_post2 %>% arrange(match(Tube_code,labels(richness_post2))),
+        permutations = 999,
+        strata = subset_meta_post2 %>% arrange(match(Tube_code,labels(richness_post2))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_richness_permanova_post2_3, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise<-pairwise.adonis(beta_div_richness_post2$S,post2_arrange$type, perm=999)
+#Arrange of metadata dataframe
+subset_meta_post2_arrange <- column_to_rownames(subset_meta_post2, "Tube_code")
+subset_meta_post2_arrange<-subset_meta_post2_arrange[labels(richness_post2),]
+
+pairwise <- pairwise.adonis(richness_post2, subset_meta_post2_arrange$type, perm=999)
 pairwise%>%
   tt()
 ```
@@ -1468,17 +1522,23 @@ pairwise%>%
 ##### Neutral
 
 ```{r beta_neutral_permanova_post2_2, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_neutral_post2$S, post2$type) %>% permutest(., pairwise = TRUE)
+neutral_post2 <- as.matrix(beta_q1n$S)
+neutral_post2 <- as.dist(neutral_post2[rownames(neutral_post2) %in% samples_to_keep_post2,
+               colnames(neutral_post2) %in% samples_to_keep_post2])
+betadisper(neutral_post2, subset_meta_post2$type) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_neutral_permanova_post2_1, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_neutral_post2$S ~ type, data=post2[labels(beta_div_neutral_post2$S),], permutations=999) %>%
-		as.matrix() %>%
-		kable()
+adonis2(neutral_post2 ~ type,
+        data = subset_meta_post2 %>% arrange(match(Tube_code,labels(neutral_post2))),
+        permutations = 999,
+        strata = subset_meta_post2 %>% arrange(match(Tube_code,labels(neutral_post2))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_neutral_permanova_post2_3, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise<-pairwise.adonis(beta_div_neutral_post2$S,post2_arrange$type, perm=999)
+pairwise <- pairwise.adonis(neutral_post2, subset_meta_post2_arrange$type, perm=999)
 pairwise%>%
   tt()
 ```
@@ -1486,18 +1546,24 @@ pairwise%>%
 ##### Phylogenetic
 
 ```{r beta_phylo_permanova_post2_3, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_phylo_post2$S, post2$type) %>% permutest(., pairwise = TRUE)
+phylo_post2 <- as.matrix(beta_q1p$S)
+phylo_post2 <- as.dist(phylo_post2[rownames(phylo_post2) %in% samples_to_keep_post2,
+               colnames(phylo_post2) %in% samples_to_keep_post2])
+betadisper(phylo_post2, subset_meta_post2$type) %>% permutest(., pairwise = TRUE)
 ```
 
 
 ```{r beta_phylo_permanova_post2_1, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_phylo_post2$S ~ type, data=post2[labels(beta_div_phylo_post2$S),], permutations=999) %>%
-		as.matrix() %>%
-		kable()
+adonis2(phylo_post2 ~ type,
+        data = subset_meta_post2 %>% arrange(match(Tube_code,labels(phylo_post2))),
+        permutations = 999,
+        strata = subset_meta_post2 %>% arrange(match(Tube_code,labels(phylo_post2))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_phylo_permanova_post2_2, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise<-pairwise.adonis(beta_div_phylo_post2$S,post2_arrange$type, perm=999)
+pairwise <- pairwise.adonis(phylo_post2, subset_meta_post2_arrange$type, perm=999)
 pairwise%>%
   tt()
 ```
@@ -1505,46 +1571,52 @@ pairwise%>%
 ##### Functional
 
 ```{r beta_func_permanova_post2_2, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_func_post2$S, post2$type) %>% permutest(., pairwise = TRUE)
+func_post2 <- as.matrix(beta_q1f$S)
+func_post2 <- as.dist(func_post2[rownames(func_post2) %in% samples_to_keep_post2,
+               colnames(func_post2) %in% samples_to_keep_post2])
+betadisper(func_post2, subset_meta_post2$type) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_func_permanova_post2_1, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_func_post2$S ~ type, data=post2[labels(beta_div_func_post2$S),], permutations=999) %>%
-		as.matrix() %>%
-		kable()
+adonis2(func_post2 ~ type,
+        data = subset_meta_post2 %>% arrange(match(Tube_code,labels(func_post2))),
+        permutations = 999,
+        strata = subset_meta_post2 %>% arrange(match(Tube_code,labels(func_post2))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_func_permanova_post2_3, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise<-pairwise.adonis(beta_div_func_post2$S,post2_arrange$type, perm=999)
+pairwise <- pairwise.adonis(func_post2, subset_meta_post2_arrange$type, perm=999)
 pairwise%>%
   tt()
 ```
 
 
 ```{r beta_neutral_nmds_post2, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
-beta_richness_nmds_post2 <- beta_div_richness_post2$S %>%
+beta_richness_nmds_post2 <- richness_post2 %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
 				as_tibble(., rownames = "sample") %>%
-				left_join(post2_nmds, by = join_by(sample == Tube_code))
+				left_join(subset_meta_post2, by = join_by(sample == Tube_code))
 
-beta_neutral_nmds_post2 <- beta_div_neutral_post2$S %>%
+beta_neutral_nmds_post2 <- neutral_post2 %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
 				as_tibble(., rownames = "sample") %>%
-				left_join(post2_nmds, by = join_by(sample == Tube_code))
+				left_join(subset_meta_post2, by = join_by(sample == Tube_code))
 
-beta_phylogenetic_nmds_post2 <- beta_div_phylo_post2$S %>%
+beta_phylogenetic_nmds_post2 <- phylo_post2 %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
 				as_tibble(., rownames = "sample") %>%
-				left_join(post2_nmds, by = join_by(sample == Tube_code))
+				left_join(subset_meta_post2, by = join_by(sample == Tube_code))
 
-beta_functional_nmds_post2 <- beta_div_func_post2$S %>%
+beta_functional_nmds_post2 <- func_post2 %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
 				as_tibble(., rownames = "sample") %>%
-				left_join(post2_nmds, by = join_by(sample == Tube_code))
+				left_join(subset_meta_post2, by = join_by(sample == Tube_code))
 ```
 
 
@@ -1636,35 +1708,40 @@ post5_nmds <- sample_metadata %>%
 
 ```{r post5_samples_, echo=FALSE, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE}
 nrow(post5)
-```
+samples_to_keep_post5 <- sample_metadata %>%
+  filter(time_point == "6_Post-FMT2"| time_point == "5_Post-FMT1") %>% 
+  select(Tube_code) %>% 
+  pull()
+subset_meta_post5 <- sample_metadata %>%
+  filter(time_point == "6_Post-FMT2"| time_point == "5_Post-FMT1")
 
-```{r beta_div_phylo_post5_1, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE, eval=FALSE}
-beta_div_richness_post5<-hillpair(data=post5.counts, q=0)
-beta_div_neutral_post5<-hillpair(data=post5.counts, q=1)
-beta_div_phylo_post5<-hillpair(data=post5.counts, q=1, tree=genome_tree)
-beta_div_func_post5<-hillpair(data=post5.counts, q=1, dist=dist)
-```
-
-```{r beta_div_phylo_post5_2, echo=TRUE, results = FALSE, message=FALSE, warning=FALSE, comments=FALSE}
-#Arrange of metadata dataframe
-post5_arrange<-post5[labels(beta_div_neutral_post5$S),]
-post5_arrange$type_time <- interaction(post5_arrange$type, post5_arrange$time_point)
+subset_meta_post5$type_time <- interaction(subset_meta_post5$type, subset_meta_post5$time_point)
 ```
 
 ##### Richness
 
 ```{r beta_richness_permanova_post5_2, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_richness_post5$S, post5$type) %>% permutest(., pairwise = TRUE)
+richness_post5 <- as.matrix(beta_q0n$S)
+richness_post5 <- as.dist(richness_post5[rownames(richness_post5) %in% samples_to_keep_post5,
+               colnames(richness_post5) %in% samples_to_keep_post5])
+betadisper(richness_post5, subset_meta_post5$type) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_richness_permanova_post5_1, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_richness_post5$S ~ type*time_point, data=post5[labels(beta_div_richness_post5$S),], permutations=999,strata=post5$individual) %>%
-		as.matrix() %>%
-		kable()
+adonis2(richness_post5 ~ type*time_point,
+        data = subset_meta_post5 %>% arrange(match(Tube_code,labels(richness_post5))),
+        permutations = 999,
+        strata = subset_meta_post5 %>% arrange(match(Tube_code,labels(richness_post5))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_richness_permanova_post5_3, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise<-pairwise.adonis(beta_div_richness_post5$S,post5_arrange$type_time, perm=999)
+#Arrange of metadata dataframe
+subset_meta_post5_arrange <- column_to_rownames(subset_meta_post5, "Tube_code")
+subset_meta_post5_arrange<-subset_meta_post5_arrange[labels(richness_post5),]
+
+pairwise <- pairwise.adonis(richness_post5, subset_meta_post5_arrange$type_time, perm=999)
 pairwise%>%
   tt()
 ```
@@ -1672,17 +1749,23 @@ pairwise%>%
 ##### Neutral
 
 ```{r beta_neutral_permanova_post5_2, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_neutral_post5$S, post5$type) %>% permutest(., pairwise = TRUE)
+neutral_post5 <- as.matrix(beta_q1n$S)
+neutral_post5 <- as.dist(neutral_post5[rownames(neutral_post5) %in% samples_to_keep_post5,
+               colnames(neutral_post5) %in% samples_to_keep_post5])
+betadisper(neutral_post5, subset_meta_post5$type) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_neutral_permanova_post5_1, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_neutral_post5$S ~ type*time_point, data=post5[labels(beta_div_neutral_post5$S),], permutations=999,strata=post5$individual) %>%
-		as.matrix() %>%
-		kable()
+adonis2(neutral_post5 ~ type*time_point,
+        data = subset_meta_post5 %>% arrange(match(Tube_code,labels(neutral_post5))),
+        permutations = 999,
+        strata = subset_meta_post5 %>% arrange(match(Tube_code,labels(neutral_post5))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_neutral_permanova_post5_3, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise<-pairwise.adonis(beta_div_neutral_post5$S,post5_arrange$type_time, perm=999)
+pairwise <- pairwise.adonis(neutral_post5, subset_meta_post5_arrange$type_time, perm=999)
 pairwise%>%
   tt()
 ```
@@ -1690,18 +1773,24 @@ pairwise%>%
 ##### Phylogenetic
 
 ```{r beta_phylo_permanova_post5_3, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_phylo_post5$S, post5$type) %>% permutest(., pairwise = TRUE)
+phylo_post5 <- as.matrix(beta_q1p$S)
+phylo_post5 <- as.dist(phylo_post5[rownames(phylo_post5) %in% samples_to_keep_post5,
+               colnames(phylo_post5) %in% samples_to_keep_post5])
+betadisper(phylo_post5, subset_meta_post5$type) %>% permutest(., pairwise = TRUE)
 ```
 
 
 ```{r beta_phylo_permanova_post5_1, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_phylo_post5$S ~ type*time_point, data=post5[labels(beta_div_phylo_post5$S),], permutations=999,strata=post5$individual) %>%
-		as.matrix() %>%
-		kable()
+adonis2(phylo_post5 ~ type*time_point,
+        data = subset_meta_post5 %>% arrange(match(Tube_code,labels(phylo_post5))),
+        permutations = 999,
+        strata = subset_meta_post5 %>% arrange(match(Tube_code,labels(phylo_post5))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_phylo_permanova_post5_2, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise<-pairwise.adonis(beta_div_phylo_post5$S,post5_arrange$type_time, perm=999)
+pairwise <- pairwise.adonis(phylo_post5, subset_meta_post5_arrange$type_time, perm=999)
 pairwise%>%
   tt()
 ```
@@ -1709,46 +1798,52 @@ pairwise%>%
 ##### Functional
 
 ```{r beta_func_permanova_post5_2, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-betadisper(beta_div_func_post5$S, post5$type) %>% permutest(., pairwise = TRUE)
+func_post5 <- as.matrix(beta_q1f$S)
+func_post5 <- as.dist(func_post5[rownames(func_post5) %in% samples_to_keep_post5,
+               colnames(func_post5) %in% samples_to_keep_post5])
+betadisper(func_post5, subset_meta_post5$type) %>% permutest(., pairwise = TRUE)
 ```
 
 ```{r beta_func_permanova_post5_1, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-adonis2(formula=beta_div_func_post5$S ~ type*time_point, data=post5[labels(beta_div_func_post5$S),], permutations=999,strata=post5$individual) %>%
-		as.matrix() %>%
-		kable()
+adonis2(func_post5 ~ type*time_point,
+        data = subset_meta_post5 %>% arrange(match(Tube_code,labels(func_post5))),
+        permutations = 999,
+        strata = subset_meta_post5 %>% arrange(match(Tube_code,labels(func_post5))) %>% pull(individual)) %>%
+        broom::tidy() %>%
+        tt()
 ```
 
 ```{r beta_func_permanova_post5_3, echo=TRUE, warning=FALSE, comments="", message=FALSE}
-pairwise<-pairwise.adonis(beta_div_func_post5$S,post5_arrange$type_time, perm=999)
+pairwise <- pairwise.adonis(func_post5, subset_meta_post5_arrange$type_time, perm=999)
 pairwise%>%
   tt()
 ```
 
 
 ```{r beta_neutral_nmds_post5, echo=TRUE, warning=FALSE, comments="", message=FALSE, results="hide"}
-beta_richness_nmds_post5 <- beta_div_richness_post5$S %>%
+beta_richness_nmds_post5 <- richness_post5 %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
 				as_tibble(., rownames = "sample") %>%
-				left_join(post5_nmds, by = join_by(sample == Tube_code))
+				left_join(subset_meta_post5, by = join_by(sample == Tube_code))
 
-beta_neutral_nmds_post5 <- beta_div_neutral_post5$S %>%
+beta_neutral_nmds_post5 <- neutral_post5 %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
 				as_tibble(., rownames = "sample") %>%
-				left_join(post5_nmds, by = join_by(sample == Tube_code))
+				left_join(subset_meta_post5, by = join_by(sample == Tube_code))
 
-beta_phylogenetic_nmds_post5 <- beta_div_phylo_post5$S %>%
+beta_phylogenetic_nmds_post5 <- phylo_post5 %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
 				as_tibble(., rownames = "sample") %>%
-				left_join(post5_nmds, by = join_by(sample == Tube_code))
+				left_join(subset_meta_post5, by = join_by(sample == Tube_code))
 
-beta_functional_nmds_post5 <- beta_div_func_post5$S %>%
+beta_functional_nmds_post5 <- func_post5 %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE) %>%
 				scores() %>%
 				as_tibble(., rownames = "sample") %>%
-				left_join(post5_nmds, by = join_by(sample == Tube_code))
+				left_join(subset_meta_post5, by = join_by(sample == Tube_code))
 ```
 
 

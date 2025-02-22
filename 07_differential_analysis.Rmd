@@ -413,7 +413,7 @@ element_gift_names_accli <- element_gift_filt_accli%>%
   left_join(., sample_metadata_accli[c(1,4)], by = join_by(Tube_code == Tube_code))
 
 
-colNames <- names(element_gift_names_accli)[2:53] #check the column that has the last code
+colNames <- names(element_gift_names_accli)[2:57] #check the column that has the last code
 for(i in colNames){
   plt <- ggplot(element_gift_names_accli, aes(x=Population, y=.data[[i]], color = Population, fill=Population)) +
     geom_boxplot(alpha = 0.2, outlier.shape = NA, width = 0.3, show.legend = FALSE) +

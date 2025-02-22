@@ -56,7 +56,7 @@ beta-diversity
 permanovas
 load-required-data
 are-the-wild-populations-similar
-wild-p.muralis-vs-p.liolepis
+wild-cold-vs-warm-adapted-lizards
 number-of-samples-used
 richness
 neutral
