@@ -112,21 +112,28 @@ respirometry_resp2 %>%
 
 ### Data modelling 
 
-#### Raw data modelling (LMM)
+#### CC vs CI Raw data modelling (LMM)
 
 ```{r model, eval=TRUE}
 #subset all the wrong measurements
 respirometry_resp2_subset<-respirometry_resp2%>%
+  filter(type!="WC")%>%
   filter(weight!=5.19)%>%
   filter(weight!=5.91)%>%
   filter(weight!=5.03)%>%
   filter(r2!=0.808)%>%
   filter(QC_normalized!=0.000036) %>% #r2 low
-  filter(r2!=0.728)#r2 low
+  filter(r2!=0.728) %>%
+  filter(cage!="Cold_17") %>%
+  filter(cage!="Cold_3") %>%
+  filter(cage!="Cold_6") %>%
+  filter(cage!="Cold_9") %>%
+  filter(cage!="Hot_2") %>%
+  filter(cage!="Hot_8")
 
 #Create linear model formula
-model <- lme(fixed = QC_normalized ~  time_point*type, data = respirometry_resp2_subset,
-               random = ~ 1 | individual)
+model <- lme(fixed = QC_normalized ~  time_point+type, data = respirometry_resp2_subset,
+             random = ~ 1 | individual)
 
 #Print the model summary
 summary(model)
@@ -134,53 +141,32 @@ MuMIn::r.squaredGLMM(model)
 ```
 
 
-#### Raw data modelling (LM) without random effect
+#### CI vs WC Raw data modelling (LMM)
 
-```{r model_1}
-#Create linear model formula
-formula1 <- formula(QC_normalized ~ time_point*type) #QC_normalized=o2 consumption normalized (ml/s)
-
-#Fit the linear model
-model1 <- lm(formula1, data = respirometry_resp2)
-
-#Print the model summary
-summary(model1)
-```
-
-### Data modeling without WC
-
-#### Raw data modelling (LMM)
-
-```{r model_2}
+```{r model_2, eval=TRUE}
 #Filter out WC from the dataframe and create a subset
-respirometry_resp2_cold<-respirometry_resp2%>%
-  filter(type!="WC")%>%
+respirometry_resp2_subset<-respirometry_resp2%>%
+  filter(weight!=5.19)%>%
+  filter(weight!=5.91)%>%
+  filter(weight!=5.03)%>%
+  filter(r2!=0.808)%>%
   filter(QC_normalized!=0.000036) %>% #r2 low
-  filter(r2!=0.728) #r2 low
+  filter(r2!=0.728) %>%
+  filter(cage!="Cold_17") %>%
+  filter(cage!="Cold_3") %>%
+  filter(cage!="Cold_6") %>%
+  filter(cage!="Cold_9") %>%
+  filter(cage!="Hot_2") %>%
+  filter(cage!="Hot_8")
 
-
-model4 <- lme(fixed = QC_normalized ~  time_point*type, data = respirometry_resp2_cold,
-               random = ~ 1 | individual)
-
-#Print the model summary
-summary(model4)
-MuMIn::r.squaredGLMM(model4)
-```
-
-
-#### Raw data modelling (LM) without random effect
-
-```{r model_3}
 #Create linear model formula
-formula5 <- formula(QC_normalized ~ time_point*type)
-
-#Fit the linear model
-model5 <- lm(formula5, data = respirometry_resp2_cold)
+model <- lme(fixed = QC_normalized ~  time_point+type, data = respirometry_resp2_subset,
+             random = ~ 1 | individual)
 
 #Print the model summary
-summary(model5)
+summary(model)
+MuMIn::r.squaredGLMM(model)
 ```
-
 
 ## PHA test
 

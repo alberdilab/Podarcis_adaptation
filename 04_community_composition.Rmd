@@ -241,7 +241,7 @@ phylogenetic <- genome_counts_filt %>%
 
 # Aggregate basal GIFT into elements
 dist <- genome_gifts %>%
-  to.elements(., GIFT_db3) %>%
+  to.elements(., GIFT_db2) %>%
   traits2dist(., method = "gower")
 
 functional <- genome_counts_filt %>%
@@ -377,6 +377,42 @@ bxp1<-alpha_div %>%
 bxp1 + 
   geom_signif(comparisons = list(c("Control", "Hot_control"), c("Control", "Treatment"), c("Hot_control", "Treatment")),
               map_signif_level = TRUE)
+```
+
+#### Richness
+
+```{r alpha_div_data, comment="", message=FALSE, warning=FALSE}
+alpha_div_meta <- alpha_div %>%
+  left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point =="5_Post-FMT1") 
+
+
+Modelq0GLMMNB <- glmer.nb(richness ~ type+(1|individual), data = alpha_div_meta)
+summary(Modelq0GLMMNB)
+```
+
+#### Neutral
+
+```{r alpha_div_data_1, comment="", message=FALSE, warning=FALSE}
+Model_neutral <- lme(fixed = neutral ~ type, data = alpha_div_meta,
+               random = ~ 1 | individual)
+summary(Model_neutral)
+```
+
+#### Phylogenetic
+
+```{r alpha_div_data_2, comment="", message=FALSE, warning=FALSE}
+Model_phylo <- lme(fixed = phylogenetic ~ Population, data = alpha_div_meta,
+               random = ~ 1 | individual)
+summary(Model_phylo)
+```
+
+#### Functional
+
+```{r alpha_div_data_3, comment="", message=FALSE, warning=FALSE}
+Model_func <- lme(fixed = functional ~ type, data = alpha_div_meta,
+               random = ~ 1 | individual)
+summary(Model_func)
 ```
 
 ### Post-Transplant_2 samples

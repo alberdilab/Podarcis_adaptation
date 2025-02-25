@@ -1,6 +1,6 @@
 # Differential abundance functional
 
-```{r load_data_mag_filtdamr_diffe, comment="", echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+```{r load_data_mag_filtdamr_diffe, comment="", echo=FALSE, message=FALSE, warning=FALSE}
 load("data/data.Rdata")
 ```
 
@@ -30,7 +30,7 @@ element_gift_wild_filter <- element_gift_wild[, !numeric_cols | colnames(element
 ```
 
 ```{r commun_wilcox_elem_6, comment="", echo=FALSE, message=FALSE, warning=FALSE}
-uniqueGIFT_db<- unique(GIFT_db3[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
+uniqueGIFT_db<- unique(GIFT_db2[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
 
 significant_elements_wild <- element_gift_wild_filter %>%
   pivot_longer(-c(Tube_code,Population), names_to = "trait", values_to = "value") %>%
@@ -103,7 +103,7 @@ difference_table_wild %>%
 ```
 
 ```{r plot3_6, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=5, fig.width=10, fig.fullwidth=TRUE}
-uniqueGIFT <- unique(GIFT_db3[c(2,3,4,5,6)])
+uniqueGIFT <- unique(GIFT_db2[c(2,3,4,5,6)])
 
 code_function_wild <- difference_table_wild %>%
   left_join(uniqueGIFT[c(1:3)], by=join_by(Elements==Code_element))
@@ -200,7 +200,7 @@ element_gift_names_wild <- element_gift_filt_wild%>%
   left_join(., sample_metadata_wild[c(1,4)], by = join_by(Tube_code == Tube_code))
 
 
-colNames <- names(element_gift_names_wild)[2:73] #check the column that has the last code
+colNames <- names(element_gift_names_wild)[2:38] #check the column that has the last code
 for(i in colNames){
   plt <- ggplot(element_gift_names_wild, aes(x=Population, y=.data[[i]], color = Population, fill=Population)) +
     geom_boxplot(alpha = 0.2, outlier.shape = NA, width = 0.3, show.legend = FALSE) +
@@ -242,7 +242,7 @@ element_gift_accli_filter <- element_gift_accli[, !numeric_cols | colnames(eleme
 ```
 
 ```{r commun_wilcox_elem_7, comment="", echo=FALSE, message=FALSE, warning=FALSE}
-uniqueGIFT_db<- unique(GIFT_db3[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
+uniqueGIFT_db<- unique(GIFT_db2[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
 
 significant_elements_accli <- element_gift_accli_filter %>%
   pivot_longer(-c(Tube_code,Population), names_to = "trait", values_to = "value") %>%
@@ -315,7 +315,7 @@ difference_table_accli %>%
 ```
 
 ```{r plot3_7, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=5, fig.width=10, fig.fullwidth=TRUE}
-uniqueGIFT <- unique(GIFT_db3[c(2,3,4,5,6)])
+uniqueGIFT <- unique(GIFT_db2[c(2,3,4,5,6)])
 
 code_function_accli <- difference_table_accli %>%
   left_join(uniqueGIFT[c(1:3)], by=join_by(Elements==Code_element))
@@ -413,7 +413,7 @@ element_gift_names_accli <- element_gift_filt_accli%>%
   left_join(., sample_metadata_accli[c(1,4)], by = join_by(Tube_code == Tube_code))
 
 
-colNames <- names(element_gift_names_accli)[2:57] #check the column that has the last code
+colNames <- names(element_gift_names_accli)[2:17] #check the column that has the last code
 for(i in colNames){
   plt <- ggplot(element_gift_names_accli, aes(x=Population, y=.data[[i]], color = Population, fill=Population)) +
     geom_boxplot(alpha = 0.2, outlier.shape = NA, width = 0.3, show.legend = FALSE) +
@@ -454,7 +454,7 @@ element_gift_post1_filter <- element_gift_post1[, !numeric_cols | colnames(eleme
 ```
 
 ```{r commun_wilcox_elem_7_1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
-uniqueGIFT_db<- unique(GIFT_db3[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
+uniqueGIFT_db<- unique(GIFT_db2[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
 
 significant_elements_post1 <- element_gift_post1_filter %>%
   pivot_longer(-c(Tube_code,type), names_to = "trait", values_to = "value") %>%
@@ -494,7 +494,7 @@ element_gift_post1_1_filter <- element_gift_post1_1[, !numeric_cols | colnames(e
 ```
 
 ```{r commun_wilcox_elem_7_1_1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
-uniqueGIFT_db<- unique(GIFT_db3[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
+uniqueGIFT_db<- unique(GIFT_db2[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
 
 significant_elements_post1_1 <- element_gift_post1_1_filter %>%
   pivot_longer(-c(Tube_code,type), names_to = "trait", values_to = "value") %>%
@@ -539,7 +539,7 @@ element_gift_CI_accli_post1_filter <- element_gift_CI_accli_post1[, !numeric_col
 ```
 
 ```{r commun_wilcox_elem_7_1_1_1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
-uniqueGIFT_db<- unique(GIFT_db3[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
+uniqueGIFT_db<- unique(GIFT_db2[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
 
 significant_elements_CI_accli_post1 <- element_gift_CI_accli_post1_filter %>%
   pivot_longer(-c(Tube_code,time_point), names_to = "trait", values_to = "value") %>%
@@ -612,7 +612,7 @@ difference_table_CI_accli_post1 %>%
 ```
 
 ```{r plot3_7_1_1_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=5, fig.width=10, fig.fullwidth=TRUE}
-uniqueGIFT <- unique(GIFT_db3[c(2,3,4,5,6)])
+uniqueGIFT <- unique(GIFT_db2[c(2,3,4,5,6)])
 
 code_function_CI_accli_post1 <- difference_table_CI_accli_post1 %>%
   left_join(uniqueGIFT[c(1:3)], by=join_by(Elements==Code_element))
@@ -759,7 +759,7 @@ element_gift_CC_accli_post1_filter <- element_gift_CC_accli_post1[, !numeric_col
 ```
 
 ```{r commun_wilcox_elem_9_1_1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
-uniqueGIFT_db<- unique(GIFT_db3[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
+uniqueGIFT_db<- unique(GIFT_db2[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
 
 significant_elements_CC_accli_post1 <- element_gift_CC_accli_post1_filter %>%
   pivot_longer(-c(Tube_code,time_point), names_to = "trait", values_to = "value") %>%
@@ -832,7 +832,7 @@ difference_table_CC_accli_post1 %>%
 ```
 
 ```{r plot3_7_1_2, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=5, fig.width=10, fig.fullwidth=TRUE}
-uniqueGIFT <- unique(GIFT_db3[c(2,3,4,5,6)])
+uniqueGIFT <- unique(GIFT_db2[c(2,3,4,5,6)])
 
 code_function_CC_accli_post1 <- difference_table_CC_accli_post1 %>%
   left_join(uniqueGIFT[c(1:3)], by=join_by(Elements==Code_element))
@@ -971,7 +971,7 @@ element_gift_post2_1_filter <- element_gift_post2_1[, !numeric_cols | colnames(e
 ```
 
 ```{r commun_wilcox_elem_3_1_1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
-uniqueGIFT_db<- unique(GIFT_db3[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
+uniqueGIFT_db<- unique(GIFT_db2[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
 
 significant_elements_post2_1 <- element_gift_post2_1_filter %>%
   pivot_longer(-c(Tube_code,type), names_to = "trait", values_to = "value") %>%
@@ -1009,7 +1009,7 @@ element_gift_post2_2_filter <- element_gift_post2_2[, !numeric_cols | colnames(e
 ```
 
 ```{r commun_wilcox_elem_6_1_1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
-uniqueGIFT_db<- unique(GIFT_db3[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
+uniqueGIFT_db<- unique(GIFT_db2[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
 
 significant_elements_post2_2 <- element_gift_post2_2_filter %>%
   pivot_longer(-c(Tube_code,type), names_to = "trait", values_to = "value") %>%
@@ -1054,7 +1054,7 @@ element_gift_CC_filter <- element_gift_CC[, !numeric_cols | colnames(element_gif
 ```
 
 ```{r commun_wilcox_elem, comment="", echo=FALSE, message=FALSE, warning=FALSE}
-uniqueGIFT_db<- unique(GIFT_db3[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
+uniqueGIFT_db<- unique(GIFT_db2[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
 
 significant_elements_CC <- element_gift_CC_filter %>%
   pivot_longer(-c(Tube_code,time_point), names_to = "trait", values_to = "value") %>%
@@ -1100,7 +1100,7 @@ element_gift_CI_filter <- element_gift_CI[, !numeric_cols | colnames(element_gif
 ```
 
 ```{r commun_wilcox_elem_1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
-uniqueGIFT_db<- unique(GIFT_db3[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
+uniqueGIFT_db<- unique(GIFT_db2[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
 
 significant_elements_CI <- element_gift_CI_filter %>%
   pivot_longer(-c(Tube_code,time_point), names_to = "trait", values_to = "value") %>%
@@ -1172,8 +1172,8 @@ difference_table_CI %>%
   geom_text_repel(aes(label = Elements), size=2)
 ```
 
-```{r plot3_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=5, fig.width=10, fig.fullwidth=TRUE, eval=FALSE}
-uniqueGIFT <- unique(GIFT_db3[c(2,3,4,5,6)])
+```{r plot3_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=5, fig.width=10, fig.fullwidth=TRUE}
+uniqueGIFT <- unique(GIFT_db2[c(2,3,4,5,6)])
 
 code_function_CI <- difference_table_CI %>%
   left_join(uniqueGIFT[c(1:3)], by=join_by(Elements==Code_element))
@@ -1219,7 +1219,7 @@ code_function_CI %>%
   geom_text_repel(aes(label = Element), min.segment.length = 0.4, size=2.5, max.overlaps = Inf)
 ```
 
-```{r plot4_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=8, fig.width=10, fig.fullwidth=TRUE, eval=FALSE}
+```{r plot4_1, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
 difference_table_CI %>%
   #  mutate(Difference_abs = abs(Difference)) %>% 
   left_join(significant_elements_CI, by=join_by(Elements==trait)) %>%
@@ -1319,7 +1319,7 @@ element_gift_WC_filter <- element_gift_WC[, !numeric_cols | colnames(element_gif
 ```
 
 ```{r commun_wilcox_elem_2, comment="", echo=FALSE, message=FALSE, warning=FALSE}
-uniqueGIFT_db<- unique(GIFT_db3[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
+uniqueGIFT_db<- unique(GIFT_db2[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
 
 significant_elements_WC <- element_gift_WC_filter %>%
   pivot_longer(-c(Tube_code,time_point), names_to = "trait", values_to = "value") %>%
