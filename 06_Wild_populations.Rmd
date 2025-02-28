@@ -1,0 +1,450 @@
+# Is the GM of cold- vs warm-adapted populations similar in the wild?
+```{r knitr_options_wild, include=FALSE}
+knitr::opts_chunk$set(fig.width=10, fig.height=7, fig.fullwidth=TRUE,
+fig.path='Figures/', warning=FALSE,
+message=FALSE)
+set.seed(2802)
+```
+```{r load_data_wild}
+load("data/data_27022025.Rdata")
+load("data/calculations_28022025.Rdata")
+```
+
+## Shared and unique MAGs
+```{r chart1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+locationcolors=c('#c4d7d1','#e08683')
+subset_meta <- sample_metadata %>%
+  filter(time_point=="Wild")
+
+genome_counts_rel_fil<- genome_counts_filt %>%
+  select(one_of(c("genome", subset_meta$Tube_code))) %>%
+  filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
+  select(genome, where( ~ is.numeric(.) && sum(.) > 0)) %>%
+  column_to_rownames(., "genome")
+  
+genome_counts_rel_pa=1*(genome_counts_rel_fil>0)
+table_upset_analysis_cont=t(aggregate(t(genome_counts_rel_pa),by=list(subset_meta$Population),FUN=sum)[,-1])
+colnames(table_upset_analysis_cont)=levels(as.factor(subset_meta$Population))
+table_upset_analysis=(table_upset_analysis_cont>0)*1
+table_upset_analysis=data.frame(table_upset_analysis)
+table_upset_analysis=apply(table_upset_analysis,2,as.integer)
+rownames(table_upset_analysis) <- rownames(genome_counts_rel_pa)
+
+upset(as.data.frame(table_upset_analysis),
+  keep.order = T,
+  sets = rev(c("Cold_wet","Hot_dry")),
+  sets.bar.color= rev(locationcolors),
+  mb.ratio = c(0.55, 0.45), order.by = "freq")
+```
+
+## Alpha diversity
+```{r alpha_div_plot_0, comment="", message=FALSE, warning=FALSE, fig.height=4, fig.width=10, fig.fullwidth=TRUE}
+alpha_div %>%
+  pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
+  left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point=="Wild") %>%
+  mutate(metric=factor(metric,levels=c("richness","neutral","phylogenetic","functional"))) %>%
+      ggplot(aes(y = value, x = Population, group=Population, color=Population, fill=Population)) +
+      geom_boxplot(outlier.shape = NA) +
+      geom_jitter(alpha=0.5) +
+      scale_color_manual(name="Population",
+          breaks=c("Cold_wet","Hot_dry"),
+          labels=c("Cold","Hot"),
+          values=c('#008080', "#d57d2c")) +
+      scale_fill_manual(name="Population",
+          breaks=c("Cold_wet","Hot_dry"),
+          labels=c("Cold","Hot"),
+          values=c('#00808050', "#d57d2c50")) +
+      facet_wrap(. ~ metric,scales = "free") +
+      coord_cartesian(xlim = c(1, NA)) +
+      stat_compare_means(size=3, label.x=.58) +
+      theme_classic() +
+        theme(
+    strip.background = element_blank(),
+    panel.grid.minor.x = element_line(size = .1, color = "grey"),
+    axis.title.x = element_blank(),
+    axis.title.y = element_text(size=10),
+    axis.text.x = element_blank(),
+    # Increase plot size
+    plot.title = element_text(size = 10),
+    axis.text = element_text(size = 8),
+    axis.title = element_text(size = 8)
+      ) +
+  ylab("Alpha diversity")
+```
+
+## Beta diversity
+
+***Number of samples used***
+```{r beta_div_neutral_wild_samples, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE}
+samples_to_keep <- sample_metadata %>%
+  filter(time_point == "Wild") %>% 
+  select(Tube_code) %>% 
+  pull()
+subset_meta <- sample_metadata %>%
+  filter(time_point == "Wild")
+
+length(samples_to_keep)
+```
+
+***Richness***
+```{r beta_richness_permanova_1, warning=FALSE, comments="", message=FALSE}
+richness <- as.matrix(beta_q0n$S)
+richness <- as.dist(richness[rownames(richness) %in% samples_to_keep,
+               colnames(richness) %in% samples_to_keep])
+betadisper(richness, subset_meta$Population) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_richness_permanova, warning=FALSE, comments="", message=FALSE, results=TRUE}
+adonis2(richness ~ Population,
+        data = subset_meta %>% arrange(match(Tube_code,labels(richness))),
+        permutations = 999) %>%
+        broom::tidy() %>%
+        tt()
+```
+
+***Neutral***
+```{r beta_neutral_permanova_1, warning=FALSE, comments="", message=FALSE}
+neutral <- as.matrix(beta_q1n$S)
+neutral <- as.dist(neutral[rownames(neutral) %in% samples_to_keep,
+               colnames(neutral) %in% samples_to_keep])
+betadisper(neutral, subset_meta$Population) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_neutral_permanova, warning=FALSE, comments="", message=FALSE, results=TRUE}
+adonis2(neutral ~ Population,
+        data = subset_meta %>% arrange(match(Tube_code,labels(neutral))),
+        permutations = 999) %>%
+        broom::tidy() %>%
+        tt()
+```
+
+***Phylogenetic***
+```{r beta_phylo_permanova_1, warning=FALSE, comments="", message=FALSE}
+phylo <- as.matrix(beta_q1p$S)
+phylo <- as.dist(phylo[rownames(phylo) %in% samples_to_keep,
+               colnames(phylo) %in% samples_to_keep])
+betadisper(phylo, subset_meta$Population) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_phylo_permanova, warning=FALSE, comments="", message=FALSE, results=TRUE}
+adonis2(phylo ~ Population,
+        data = subset_meta %>% arrange(match(Tube_code,labels(phylo))),
+        permutations = 999) %>%
+        broom::tidy() %>%
+        tt()
+```
+
+***NMDS***
+```{r beta_neutral_nmds, comments="", warning=FALSE, message=FALSE, results="hide"}
+beta_q0n_nmds_wild <- richness %>%
+				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace=FALSE) %>%
+				vegan::scores() %>%
+				as_tibble(., rownames = "sample") %>%
+				left_join(subset_meta, by = join_by(sample == Tube_code)) %>%
+			group_by(Population) %>%
+			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+			ungroup() %>%
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=Population, shape=type)) +
+				scale_color_manual(name="Population",
+                    breaks=c("Cold_wet","Hot_dry"),
+                    labels=c("Cold","Hot"),
+                    values=c('#008080',"#d57d2c")) +
+        scale_shape_manual(name="Type",
+                           breaks=c("Control", "Hot_control", "Treatment"),
+                           labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                         values=c("circle","square","triangle")) +
+				geom_point(size=2) +
+				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+        labs(y = "NMDS2", x="NMDS1 \n Richness beta diversity") +
+				theme_classic() +
+				theme(legend.position="none")
+
+beta_q1n_nmds_wild <- neutral %>%
+				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace=FALSE) %>%
+				vegan::scores() %>%
+				as_tibble(., rownames = "sample") %>%
+				left_join(subset_meta, by = join_by(sample == Tube_code))%>%
+			group_by(Population) %>%
+			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+			ungroup() %>%
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=Population, shape=type)) +
+				scale_color_manual(name="Population",
+                    breaks=c("Cold_wet","Hot_dry"),
+                    labels=c("Cold","Hot"),
+                    values=c('#008080',"#d57d2c")) +
+        scale_shape_manual(name="Type",
+                           breaks=c("Control", "Hot_control", "Treatment"),
+                           labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                         values=c("circle","square","triangle")) +
+				geom_point(size=2) +
+				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+        labs(y = "NMDS2", x="NMDS1 \n Neutral beta diversity") +
+				theme_classic() +
+				theme(legend.position="none")
+
+beta_q1p_nmds_wild <- phylo %>%
+				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace=FALSE) %>%
+				vegan::scores() %>%
+				as_tibble(., rownames = "sample") %>%
+				left_join(subset_meta, by = join_by(sample == Tube_code))%>%
+			group_by(Population) %>%
+			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+			ungroup() %>%
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=Population, shape=type)) +
+				scale_color_manual(name="Population",
+                    breaks=c("Cold_wet","Hot_dry"),
+                    labels=c("Cold","Hot"),
+                    values=c('#008080',"#d57d2c")) +
+        scale_shape_manual(name="Type",
+                           breaks=c("Control", "Hot_control", "Treatment"),
+                           labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                         values=c("circle","square","triangle")) +
+				geom_point(size=2) +
+				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+        labs(y= element_blank (),x="NMDS1 \n Phylogenetic beta diversity") +
+				theme_classic() +
+				theme(legend.position="none") 
+```
+
+```{r beta_neutral_nmds_plot_final, results=TRUE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
+ggarrange(beta_q0n_nmds_wild, beta_q1n_nmds_wild, beta_q1p_nmds_wild, ncol=2, nrow=2, common.legend = TRUE, legend="right")
+```
+
+## Differential abundance
+
+```{r}
+physeq_wild <- subset_samples(physeq_all, time_point == "Wild")
+physeq_wild <- prune_taxa(taxa_sums(physeq_wild)>0, physeq_wild)
+```
+
+### Phylum
+```{r ancom_rand_pond_phylum, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+ancom_rand_output_wild_phylum = ancombc2(data = physeq_wild, 
+                  assay_name = "counts", 
+                  tax_level = "phylum",
+                  fix_formula = "Population", 
+                  p_adj_method = "holm", 
+                  pseudo_sens = TRUE,
+                  prv_cut =0, 
+                  lib_cut = 0, 
+                  s0_perc = 0.05,
+                  group = "Population", 
+                  struc_zero = TRUE, 
+                  neg_lb = FALSE,
+                  alpha = 0.05, 
+                  n_cl = 2, 
+                  verbose = TRUE,
+                  global = FALSE, 
+                  pairwise = FALSE, 
+                  dunnet = FALSE, 
+                  trend = FALSE,
+                  iter_control = list(tol = 1e-5, max_iter = 20, verbose = FALSE),
+                  em_control = list(tol = 1e-5, max_iter = 100),
+                  mdfdr_control = list(fwer_ctrl_method = "holm", B = 100), 
+                  trend_control = NULL)
+
+```
+```{r}
+ancom_rand_output_wild_phylum$res %>%
+  dplyr::select(taxon, lfc_PopulationHot_dry, p_PopulationHot_dry) %>%
+  filter(p_PopulationHot_dry < 0.05)
+```
+
+### MAG level
+```{r ancom_rand_pond_mag_wild, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+ancom_rand_output = ancombc2(data = physeq_wild, 
+                  assay_name = "counts", 
+                  tax_level = NULL,
+                  fix_formula = "Population", 
+                  p_adj_method = "holm", 
+                  pseudo_sens = TRUE,
+                  prv_cut =0, 
+                  lib_cut = 0, 
+                  s0_perc = 0.05,
+                  group = "Population", 
+                  struc_zero = TRUE, 
+                  neg_lb = FALSE,
+                  alpha = 0.05, 
+                  n_cl = 2, 
+                  verbose = TRUE,
+                  global = FALSE, 
+                  pairwise = FALSE, 
+                  dunnet = FALSE, 
+                  trend = FALSE,
+                  iter_control = list(tol = 1e-5, max_iter = 20, verbose = FALSE),
+                  em_control = list(tol = 1e-5, max_iter = 100),
+                  mdfdr_control = list(fwer_ctrl_method = "holm", B = 100), 
+                  trend_control = NULL)
+
+```
+
+***Structural zeros***
+```{r}
+# Extract structural zeros
+structural_zeros <- ancom_rand_output$zero_ind
+
+# Convert to a data frame for better readability
+structural_zeros_df <- as.data.frame(structural_zeros) %>% 
+  column_to_rownames(., "taxon")
+
+# Find taxa that are structural zeros in at least one group
+structural_zero_taxa <- rownames(structural_zeros_df)[apply(structural_zeros_df, 1, any)]
+length(structural_zero_taxa)
+```
+
+***Differentially abundant MAGs***
+```{r ancom_rand, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+taxonomy <- data.frame(physeq_wild@tax_table) %>%
+  rownames_to_column(., "taxon") %>%
+  mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
+
+ancombc_rand_table_mag <- ancom_rand_output$res %>%
+  dplyr::select(taxon, lfc_PopulationHot_dry, p_PopulationHot_dry) %>%
+  filter(p_PopulationHot_dry < 0.05) %>%
+  dplyr::arrange(p_PopulationHot_dry) %>%
+  merge(., taxonomy, by="taxon") %>%
+  mutate_at(vars(phylum, species), ~ str_replace(., "[dpcofgs]__", ""))%>%
+  dplyr::arrange(lfc_PopulationHot_dry)
+
+ancombc_rand_table_mag
+  
+colors_alphabetic <- read_tsv("https://raw.githubusercontent.com/earthhologenome/EHI_taxonomy_colour/main/ehi_phylum_colors.tsv") %>%
+  mutate_at(vars(phylum), ~ str_replace(., "[dpcofgs]__", ""))  %>%
+  right_join(taxonomy, by=join_by(phylum == phylum)) %>%
+  dplyr::select(phylum, colors) %>%
+  mutate(colors = str_c(colors, "80"))  %>% #add 80% alpha
+	unique() %>%
+	dplyr::arrange(phylum)
+
+tax_table <- as.data.frame(unique(ancombc_rand_table_mag$phylum))
+  
+colnames(tax_table)[1] <- "phylum"
+tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
+	dplyr::arrange(phylum) %>%
+	dplyr::select(colors) %>%
+	pull()
+```
+```{r ancombc_rand_plot_phy, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
+ancombc_rand_table_mag%>%
+      mutate(genome=factor(taxon,levels=ancombc_rand_table_mag$taxon)) %>%
+ggplot(., aes(x=lfc_PopulationHot_dry, y=forcats::fct_reorder(genome,lfc_PopulationHot_dry), fill=phylum)) + #forcats::fct_rev()
+  geom_col() + 
+  scale_fill_manual(values=tax_color) + 
+  geom_hline(yintercept=0) + 
+#  coord_flip()+
+  theme(panel.background = element_blank(),
+        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
+        axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 8),
+        axis.title = element_text(size = 14, face = "bold"),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 14, face = "bold"),
+        legend.position = "right", legend.box = "vertical")+
+  xlab("log2FoldChange") + 
+  ylab("Species")+
+  guides(fill=guide_legend(title="Phylum"))
+```
+
+***Phyla of the significant MAGs in warm***
+```{r wild_sign_features_warm, comment="", message=FALSE, warning=FALSE}
+ancombc_rand_table_mag%>%
+  filter(lfc_PopulationHot_dry>0)  %>% 
+  count(phylum, name = "sample_count") %>%
+  arrange(desc(sample_count))  
+```
+
+***Phyla of the significant MAGs in cold***
+```{r wild_sign_features_cold, comment="", message=FALSE, warning=FALSE}
+ancombc_rand_table_mag%>%
+  filter(lfc_PopulationHot_dry<0)  %>% 
+  count(phylum, name = "sample_count") %>%
+  arrange(desc(sample_count))  
+```
+
+## Functional capacity
+### Metabolic capacity index at functional level
+
+```{r gitfs_elements_wild, warning=FALSE, comments="", message=FALSE}
+GIFTs_functions_community %>%
+  rowMeans() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point=="Wild") %>%
+  group_by(Population) %>%
+  summarise(MCI = mean(value), sd = sd(value))
+```
+```{r gitfs_functional_wild_3, warning=FALSE, comments="", message=FALSE}
+MCI_element_wild <- GIFTs_functions_community %>%
+  rowMeans() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point=="Wild")
+
+shapiro.test(MCI_element_wild$value) #normality test
+var.test(value ~ Population, data = MCI_element_wild)
+t.test(value ~ Population, data=MCI_element_wild, var.equal = TRUE)
+```
+
+### Differences in functional pathways
+```{r comunity_elem, comment="", message=FALSE, warning=FALSE}
+element_gift_wild <- element_gift %>% 
+  filter(time_point=="Wild") %>% 
+  select(-time_point,-type) %>%
+  filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
+  select(Tube_code, where(~ is.numeric(.) && sum(.) > 0)) %>%
+  left_join(sample_metadata[c(1, 4)], by = "Tube_code")
+```
+
+```{r commun_wilcox_elem_wild, comment="", message=FALSE, warning=FALSE}
+significant_elements_wild <- element_gift_wild %>%
+  pivot_longer(-c(Tube_code,Population), names_to = "trait", values_to = "value") %>%
+  group_by(trait) %>%
+  summarise(p_value = wilcox.test(value ~ Population)$p.value) %>%
+  mutate(p_adjust=p.adjust(p_value, method="BH")) %>%
+  filter(p_adjust < 0.05)%>%
+  rownames_to_column(., "Elements")  %>% 
+  select(-Elements)
+
+element_gift_sig_wild <- element_gift_wild %>%
+  select(Tube_code, all_of(intersect(
+    significant_elements_wild$trait,
+    colnames(element_gift_wild)
+  ))) %>%
+  left_join(., sample_metadata[c(1, 4)], by = join_by(Tube_code == Tube_code))
+
+difference_table_wild <- element_gift_sig_wild %>%
+  select(-Tube_code) %>%
+  group_by(Population) %>%
+  summarise(across(everything(), mean)) %>%
+  t() %>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric) %>%
+  rownames_to_column(., "Elements") %>%
+  left_join(.,uniqueGIFT_db[c(1,3,4)],by = join_by(Elements == Code_element)) %>% 
+  arrange(Function) %>% 
+  mutate(Difference=Cold_wet-Hot_dry)%>% 
+  mutate(group_color = ifelse(Difference <0, "Hot","Cold")) 
+```
+
+```{r commun_wilcox_elem_plot_wild, comment="", message=FALSE, warning=FALSE, fig.height=6, fig.width=12, fig.fullwidth=TRUE}
+difference_table_wild %>%
+  ggplot(aes(x=forcats::fct_reorder(Function,Difference), y=Difference, fill=group_color)) + 
+  geom_col() +
+  scale_fill_manual(values=c("#e5bd5b", "#6b7398")) + 
+  geom_hline(yintercept=0) + 
+  coord_flip()+
+  theme(axis.text = element_text(size = 10),
+        axis.title = element_text(size = 12),
+        legend.position = "right", 
+        legend.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major = element_line(size = 0.15, linetype = 'solid',
+                                        colour = "grey"))+
+  xlab("Function") + 
+  ylab("Mean difference")
+```

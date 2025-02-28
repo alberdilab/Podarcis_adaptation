@@ -1,0 +1,813 @@
+# FMT
+```{r knitr_options_FMT, include=FALSE}
+knitr::opts_chunk$set(fig.width=10, fig.height=7, fig.fullwidth=TRUE,
+fig.path='Figures/', warning=FALSE,
+message=FALSE)
+set.seed(2802)
+```
+```{r load_data_FMT}
+load("data/data_27022025.Rdata")
+load("data/beta_27022025.Rdata")
+```
+
+## FMT1
+### Is the GM of the intervention group more similar to warm population after one week from FMT?
+#### Alpha
+```{r alpha_div_plot_5, comment="", message=FALSE, warning=FALSE, fig.height=10, fig.width=10, fig.fullwidth=TRUE}
+bxp1<-alpha_div %>%
+  pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
+  left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point=="FMT1") %>%
+  mutate(metric=factor(metric,levels=c("richness","neutral","phylogenetic","functional"))) %>%
+      ggplot(aes(y = value, x = type, group=type, color=type, fill=type)) +
+      geom_boxplot(outlier.shape = NA) +
+      geom_jitter(alpha=0.5) +
+      scale_color_manual(name="Type",
+          breaks=c("Control","Hot_control", "Treatment"),
+          labels=c("Cold-control","Warm-control", "Cold-intervention"),
+          values=c("#4477AA","#d57d2c", "#76b183")) +
+      scale_fill_manual(name="Type",
+          breaks=c("Control","Hot_control", "Treatment"),
+          labels=c("Cold-control","Warm-control", "Cold-intervention"),
+          values=c("#4477AA50","#d57d2c50","#76b18350")) +
+        scale_x_discrete(labels = c("Control" = "Cold-Cold", "Hot_control" = "Hot-Hot", "Treatment" = "Cold-Hot")) +
+      facet_wrap(. ~ metric,scales = "free") +
+      coord_cartesian(xlim = c(1, NA)) +
+      stat_compare_means(size=3, label.x=.7) +
+      theme_classic() +
+        theme(
+    strip.background = element_blank(),
+    panel.grid.minor.x = element_line(size = .1, color = "grey"),
+    axis.title.x = element_blank(),
+    axis.title.y = element_text(size=10),
+    axis.text.x = element_blank(),
+    # Increase plot size
+    plot.title = element_text(size = 10),
+    axis.text = element_text(size = 8),
+    axis.title = element_text(size = 8)
+      ) +
+  ylab("Alpha diversity")
+
+
+# Add significance bars with p-values
+bxp1 + 
+  geom_signif(comparisons = list(c("Control", "Hot_control"), c("Control", "Treatment"), c("Hot_control", "Treatment")),
+              map_signif_level = TRUE)
+```
+
+```{r}
+alpha_div_meta <- alpha_div %>%
+  left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point =="FMT1") 
+```
+
+***Richness***
+```{r alpha_div_data, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+Modelq0GLMMNB <- glm.nb(richness ~ type, data = alpha_div_meta,trace=TRUE)
+summary(Modelq0GLMMNB)
+emmeans(Modelq0GLMMNB, pairwise ~ type)
+```
+
+***Neutral***
+```{r alpha_div_data_1, comment="", message=FALSE, warning=FALSE}
+Modelq1n <- lm(formula = neutral ~ type, data = alpha_div_meta) 
+summary(Modelq1n)
+```
+
+***Phylogenetic***
+```{r alpha_div_data_2, comment="", message=FALSE, warning=FALSE}
+Model_phylo <- lm(formula = phylogenetic ~ type, data = alpha_div_meta) 
+summary(Model_phylo)
+```
+
+#### Beta diversity
+
+***Number of samples used***
+```{r beta_div_neutral_treat1_samples_2, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE}
+samples_to_keep_post1 <- sample_metadata %>%
+  filter(time_point == "FMT1") %>% 
+  select(Tube_code) %>% 
+  pull()
+subset_meta_post1 <- sample_metadata %>%
+  filter(time_point == "FMT1")
+length(samples_to_keep_post1)
+```
+
+***Richness***
+```{r beta_richness_permanova_post1_2, warning=FALSE, comments="", message=FALSE}
+richness_post1 <- as.matrix(beta_q0n$S)
+richness_post1 <- as.dist(richness_post1[rownames(richness_post1) %in% samples_to_keep_post1,
+               colnames(richness_post1) %in% samples_to_keep_post1])
+betadisper(richness_post1, subset_meta_post1$type) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_richness_permanova_post1_1, warning=FALSE, comments="", message=FALSE}
+adonis2(richness_post1 ~ type,
+        data = subset_meta_post1 %>% arrange(match(Tube_code,labels(richness_post1))),
+        permutations = 999) %>%
+        broom::tidy() %>%
+        tt()
+```
+
+```{r beta_richness_permanova_post1_3, warning=FALSE, comments="", message=FALSE}
+subset_meta_post1_arrange <- column_to_rownames(subset_meta_post1, "Tube_code")
+subset_meta_post1_arrange<-subset_meta_post1_arrange[labels(richness_post1),]
+
+pairwise <- pairwise.adonis(richness_post1, subset_meta_post1_arrange$type, perm=999)
+pairwise%>%
+  tt()
+```
+
+***Neutral***
+```{r beta_neutral_permanova_post1_2, warning=FALSE, comments="", message=FALSE}
+neutral_post1 <- as.matrix(beta_q1n$S)
+neutral_post1 <- as.dist(neutral_post1[rownames(neutral_post1) %in% samples_to_keep_post1,
+               colnames(neutral_post1) %in% samples_to_keep_post1])
+betadisper(neutral_post1, subset_meta_post1$type) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_neutral_permanova_post1_1, warning=FALSE, comments="", message=FALSE}
+adonis2(neutral_post1 ~ type,
+        data = subset_meta_post1 %>% arrange(match(Tube_code,labels(neutral_post1))),
+        permutations = 999) %>%
+        broom::tidy() %>%
+        tt()
+```
+
+```{r beta_neutral_permanova_post1_3, warning=FALSE, comments="", message=FALSE}
+subset_meta_post1_arrange <- column_to_rownames(subset_meta_post1, "Tube_code")
+subset_meta_post1_arrange<-subset_meta_post1_arrange[labels(neutral_post1),]
+pairwise <- pairwise.adonis(neutral_post1, subset_meta_post1_arrange$type, perm=999)
+pairwise%>%
+  tt()
+```
+
+***Phylogenetic***
+```{r beta_phylo_permanova_post1_2, warning=FALSE, comments="", message=FALSE}
+phylo_post1 <- as.matrix(beta_q1p$S)
+phylo_post1 <- as.dist(phylo_post1[rownames(phylo_post1) %in% samples_to_keep_post1,
+               colnames(phylo_post1) %in% samples_to_keep_post1])
+betadisper(phylo_post1, subset_meta_post1$type) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_phylo_permanova_post1_1, warning=FALSE, comments="", message=FALSE}
+adonis2(phylo_post1 ~ type,
+        data = subset_meta_post1 %>% arrange(match(Tube_code,labels(phylo_post1))),
+        permutations = 999) %>%
+        broom::tidy() %>%
+        tt()
+```
+
+***NMDS***
+```{r beta_neutral_nmds_post1, warning=FALSE, comments="", message=FALSE, results="hide"}
+beta_richness_nmds_post1 <- richness_post1 %>%
+				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace = FALSE) %>%
+				scores() %>%
+				as_tibble(., rownames = "sample") %>%
+				left_join(subset_meta_post1, by = join_by(sample == Tube_code)) %>%
+			group_by(type) %>%
+			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+			ungroup() %>%
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=type)) +
+        scale_color_manual(name="Type",
+                       breaks=c("Control", "Hot_control", "Treatment"),
+                       labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                       values=c("#4477AA","#d57d2c","#76b183")) +
+				geom_point(size=2) +
+				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+        labs(y = "NMDS2", x="NMDS1 \n Richness beta diversity") +
+				theme_classic() +
+				theme(legend.position="none")
+
+beta_neutral_nmds_post1 <- neutral_post1 %>%
+				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace = FALSE) %>%
+				scores() %>%
+				as_tibble(., rownames = "sample") %>%
+				left_join(subset_meta_post1, by = join_by(sample == Tube_code))%>%
+			group_by(type) %>%
+			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+			ungroup() %>%
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=type)) +
+        scale_color_manual(name="Type",
+                       breaks=c("Control", "Hot_control", "Treatment"),
+                       labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                       values=c("#4477AA","#d57d2c","#76b183")) +
+				geom_point(size=2) +
+				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+        labs(y = "NMDS2", x="NMDS1 \n Neutral beta diversity") +
+				theme_classic() +
+				theme(legend.position="none")
+
+beta_phylogenetic_nmds_post1 <- phylo_post1 %>%
+				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace = FALSE) %>%
+				scores() %>%
+				as_tibble(., rownames = "sample") %>%
+				left_join(subset_meta_post1, by = join_by(sample == Tube_code))%>%
+			group_by(type) %>%
+			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+			ungroup() %>%
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=type)) +
+				scale_color_manual(name="Type",
+                       breaks=c("Control", "Hot_control", "Treatment"),
+                       labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                       values=c("#4477AA","#d57d2c","#76b183")) +
+				geom_point(size=2) +
+				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+        labs(y= element_blank (), x="NMDS1 \n Phylogenetic beta diversity") +
+				theme_classic() +
+				theme(legend.position="none")
+```
+
+```{r beta_neutral_nmds_plot_post1_final, fig.height=7}
+ggarrange(beta_richness_nmds_post1, beta_neutral_nmds_post1, beta_phylogenetic_nmds_post1, ncol=2, nrow=2, common.legend = TRUE, legend="right")
+```
+
+#### Functional differences
+***MCI***
+```{r gitfs_elements_tm5, warning=FALSE, comments="", message=FALSE}
+GIFTs_functions_community %>%
+  rowMeans() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point=="FMT1") %>%
+  group_by(type) %>%
+  summarise(MCI = mean(value), sd = sd(value))
+```
+
+```{r gitfs_functional_tm5_stats_2, warning=FALSE, comments="", message=FALSE}
+MCI_tm5_ele <- GIFTs_functions_community %>%
+  rowMeans() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point == "FMT1")
+
+shapiro.test(MCI_tm5_ele$value)#normality test
+
+res.aov <- aov(value ~ type, data = MCI_tm5_ele)#anova test
+summary(res.aov)
+```
+
+***Functional differences***
+CC and CI
+```{r comunity_elem_7_1, comment="", message=FALSE, warning=FALSE}
+element_gift %>%
+  filter(type %in% c("Control", "Treatment") & time_point == "FMT1") %>%
+  select(-time_point, -type) %>%
+  filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
+  select(Tube_code, where( ~ is.numeric(.) && sum(.) > 0)) %>%
+  left_join(sample_metadata[c(1, 7)], by = "Tube_code") %>% 
+  pivot_longer(-c(Tube_code, type),
+               names_to = "trait",
+               values_to = "value") %>%
+  group_by(trait) %>%
+  summarise(p_value = wilcox.test(value ~ type)$p.value) %>%
+  mutate(p_adjust = p.adjust(p_value, method = "BH")) %>%
+  filter(p_adjust < 0.05) %>%
+  remove_rownames()
+```
+
+CI and WC
+```{r comunity_elem_CI_WC, comment="", message=FALSE, warning=FALSE}
+element_gift %>%
+  filter(type %in% c("Hot_control", "Treatment") &
+           time_point == "FMT1") %>%
+  select(-time_point, -type) %>%
+  filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
+  select(Tube_code, where(~ is.numeric(.) && sum(.) > 0)) %>%
+  left_join(sample_metadata[c(1, 7)], by = "Tube_code") %>% 
+  pivot_longer(-c(Tube_code,type), names_to = "trait", values_to = "value") %>%
+  group_by(trait) %>%
+  summarise(p_value = wilcox.test(value ~ type)$p.value) %>%
+  mutate(p_adjust=p.adjust(p_value, method="BH")) %>%
+  filter(p_adjust < 0.05)%>%
+  remove_rownames()
+```
+
+CC and WC
+```{r comunity_elem_CC_WC, comment="", message=FALSE, warning=FALSE}
+element_gift %>%
+  filter(type %in% c("Hot_control", "Control") &
+           time_point == "FMT1") %>%
+  select(-time_point, -type) %>%
+  filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
+  select(Tube_code, where(~ is.numeric(.) && sum(.) > 0)) %>%
+  left_join(sample_metadata[c(1, 7)], by = "Tube_code") %>%
+  pivot_longer(-c(Tube_code,type), names_to = "trait", values_to = "value") %>%
+  group_by(trait) %>%
+  summarise(p_value = wilcox.test(value ~ type)$p.value) %>%
+  mutate(p_adjust=p.adjust(p_value, method="BH")) %>%
+  filter(p_adjust < 0.05)%>%
+  remove_rownames()
+```
+
+## FMT2
+### Is the GM of the intervention group still more similar to warm population after one week from FMT?
+#### Alpha
+```{r alpha_div_plot_FMT2, comment="", message=FALSE, warning=FALSE, fig.height=4, fig.width=10, fig.fullwidth=TRUE}
+bxp1<-alpha_div %>%
+  pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
+  left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point=="FMT2") %>%
+  mutate(metric=factor(metric,levels=c("richness","neutral","phylogenetic","functional"))) %>%
+      ggplot(aes(y = value, x = type, group=type, color=type, fill=type)) +
+      geom_boxplot(outlier.shape = NA) +
+      geom_jitter(alpha=0.5) +
+      scale_color_manual(name="Type",
+          breaks=c("Control","Hot_control", "Treatment"),
+          labels=c("Cold-control","Warm-control", "Cold-intervention"),
+          values=c("#4477AA","#d57d2c", "#76b183")) +
+      scale_fill_manual(name="Type",
+          breaks=c("Control","Hot_control", "Treatment"),
+          labels=c("Cold-control","Warm-control", "Cold-intervention"),
+          values=c("#4477AA50","#d57d2c50","#76b18350")) +
+        scale_x_discrete(labels = c("Control" = "Cold-Cold", "Hot_control" = "Hot-Hot", "Treatment" = "Cold-Hot")) +
+      facet_wrap(. ~ metric,scales = "free") +
+      coord_cartesian(xlim = c(1, NA)) +
+      stat_compare_means(size=3, label.x=.7) +
+      theme_classic() +
+        theme(
+    strip.background = element_blank(),
+    panel.grid.minor.x = element_line(size = .1, color = "grey"),
+    axis.title.x = element_blank(),
+    axis.title.y = element_text(size=10),
+    axis.text.x = element_blank(),
+    # Increase plot size
+    plot.title = element_text(size = 10),
+    axis.text = element_text(size = 8),
+    axis.title = element_text(size = 8)
+      ) +
+  ylab("Alpha diversity")
+
+
+# Add significance bars with p-values
+bxp1 + 
+  geom_signif(comparisons = list(c("Control", "Hot_control"), c("Control", "Treatment"), c("Hot_control", "Treatment")),
+              map_signif_level = TRUE)
+```
+
+```{r}
+alpha_div_meta <- alpha_div %>%
+  left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point =="FMT2") 
+```
+
+***Richness***
+```{r alpha_div_data_FMT2, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+Modelq0GLMMNB <- glm.nb(richness ~ type, data = alpha_div_meta,trace=TRUE)
+summary(Modelq0GLMMNB)
+emmeans(Modelq0GLMMNB, pairwise ~ type)
+```
+
+***Neutral***
+```{r alpha_div_data_1_FMT2, comment="", message=FALSE, warning=FALSE}
+Modelq1n <- lm(formula = neutral ~ type, data = alpha_div_meta) 
+summary(Modelq1n)
+```
+
+***Phylogenetic***
+```{r alpha_div_data_2_FMT2, comment="", message=FALSE, warning=FALSE}
+Model_phylo <- lm(formula = phylogenetic ~ type, data = alpha_div_meta) 
+summary(Model_phylo)
+```
+
+#### Beta diversity
+
+***Number of samples used***
+```{r beta_div_neutral_FMT2, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE}
+samples_to_keep_FMT2 <- sample_metadata %>%
+  filter(time_point == "FMT2") %>% 
+  select(Tube_code) %>% 
+  pull()
+subset_meta_FMT2 <- sample_metadata %>%
+  filter(time_point == "FMT2")
+length(samples_to_keep_FMT2)
+```
+
+***Richness***
+```{r beta_richness_permanova_FMT2_2, warning=FALSE, comments="", message=FALSE}
+richness_FMT2 <- as.matrix(beta_q0n$S)
+richness_FMT2 <- as.dist(richness_FMT2[rownames(richness_FMT2) %in% samples_to_keep_FMT2,
+               colnames(richness_FMT2) %in% samples_to_keep_FMT2])
+betadisper(richness_FMT2, subset_meta_FMT2$type) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_richness_permanova_FMT2_1, warning=FALSE, comments="", message=FALSE}
+adonis2(richness_FMT2 ~ type,
+        data = subset_meta_FMT2 %>% arrange(match(Tube_code,labels(richness_FMT2))),
+        permutations = 999) %>%
+        broom::tidy() %>%
+        tt()
+```
+
+```{r beta_richness_permanova_FMT2_3, warning=FALSE, comments="", message=FALSE}
+subset_meta_FMT2_arrange <- column_to_rownames(subset_meta_FMT2, "Tube_code")
+subset_meta_FMT2_arrange<-subset_meta_FMT2_arrange[labels(richness_FMT2),]
+
+pairwise <- pairwise.adonis(richness_FMT2, subset_meta_FMT2_arrange$type, perm=999)
+pairwise%>%
+  tt()
+```
+
+***Neutral***
+```{r beta_neutral_permanova_FMT2_2, warning=FALSE, comments="", message=FALSE}
+neutral_FMT2 <- as.matrix(beta_q1n$S)
+neutral_FMT2 <- as.dist(neutral_FMT2[rownames(neutral_FMT2) %in% samples_to_keep_FMT2,
+               colnames(neutral_FMT2) %in% samples_to_keep_FMT2])
+betadisper(neutral_FMT2, subset_meta_FMT2$type) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_neutral_permanova_FMT2_1, warning=FALSE, comments="", message=FALSE}
+adonis2(neutral_FMT2 ~ type,
+        data = subset_meta_FMT2 %>% arrange(match(Tube_code,labels(neutral_FMT2))),
+        permutations = 999) %>%
+        broom::tidy() %>%
+        tt()
+```
+
+```{r beta_neutral_permanova_FMT2_3, warning=FALSE, comments="", message=FALSE}
+subset_meta_FMT2_arrange <- column_to_rownames(subset_meta_FMT2, "Tube_code")
+subset_meta_FMT2_arrange<-subset_meta_FMT2_arrange[labels(neutral_FMT2),]
+pairwise <- pairwise.adonis(neutral_FMT2, subset_meta_FMT2_arrange$type, perm=999)
+pairwise%>%
+  tt()
+```
+
+***Phylogenetic***
+```{r beta_phylo_permanova_FMT2_2, warning=FALSE, comments="", message=FALSE}
+phylo_FMT2 <- as.matrix(beta_q1p$S)
+phylo_FMT2 <- as.dist(phylo_FMT2[rownames(phylo_FMT2) %in% samples_to_keep_FMT2,
+               colnames(phylo_FMT2) %in% samples_to_keep_FMT2])
+betadisper(phylo_FMT2, subset_meta_FMT2$type) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_phylo_permanova_FMT2_1, warning=FALSE, comments="", message=FALSE}
+adonis2(phylo_FMT2 ~ type,
+        data = subset_meta_FMT2 %>% arrange(match(Tube_code,labels(phylo_FMT2))),
+        permutations = 999) %>%
+        broom::tidy() %>%
+        tt()
+```
+```{r beta_phylo_permanova_FMT2_pair, warning=FALSE, comments="", message=FALSE}
+subset_meta_FMT2_arrange <- column_to_rownames(subset_meta_FMT2, "Tube_code")
+subset_meta_FMT2_arrange<-subset_meta_FMT2_arrange[labels(phylo_FMT2),]
+pairwise <- pairwise.adonis(phylo_FMT2, subset_meta_FMT2_arrange$type, perm=999)
+pairwise%>%
+  tt()
+```
+
+***NMDS***
+```{r beta_neutral_nmds_FMT2, warning=FALSE, comments="", message=FALSE, results="hide"}
+beta_richness_nmds_FMT2 <- richness_FMT2 %>%
+				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace = FALSE) %>%
+				scores() %>%
+				as_tibble(., rownames = "sample") %>%
+				left_join(subset_meta_FMT2, by = join_by(sample == Tube_code)) %>%
+			group_by(type) %>%
+			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+			ungroup() %>%
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=type)) +
+        scale_color_manual(name="Type",
+                       breaks=c("Control", "Hot_control", "Treatment"),
+                       labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                       values=c("#4477AA","#d57d2c","#76b183")) +
+				geom_point(size=2) +
+				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+        labs(y = "NMDS2", x="NMDS1 \n Richness beta diversity") +
+				theme_classic() +
+				theme(legend.position="none")
+
+beta_neutral_nmds_FMT2 <- neutral_FMT2 %>%
+				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace = FALSE) %>%
+				scores() %>%
+				as_tibble(., rownames = "sample") %>%
+				left_join(subset_meta_FMT2, by = join_by(sample == Tube_code))%>%
+			group_by(type) %>%
+			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+			ungroup() %>%
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=type)) +
+        scale_color_manual(name="Type",
+                       breaks=c("Control", "Hot_control", "Treatment"),
+                       labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                       values=c("#4477AA","#d57d2c","#76b183")) +
+				geom_point(size=2) +
+				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+        labs(y = "NMDS2", x="NMDS1 \n Neutral beta diversity") +
+				theme_classic() +
+				theme(legend.position="none")
+
+beta_phylogenetic_nmds_FMT2 <- phylo_FMT2 %>%
+				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace = FALSE) %>%
+				scores() %>%
+				as_tibble(., rownames = "sample") %>%
+				left_join(subset_meta_FMT2, by = join_by(sample == Tube_code))%>%
+			group_by(type) %>%
+			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+			ungroup() %>%
+			ggplot(., aes(x=NMDS1,y=NMDS2, color=type)) +
+				scale_color_manual(name="Type",
+                       breaks=c("Control", "Hot_control", "Treatment"),
+                       labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                       values=c("#4477AA","#d57d2c","#76b183")) +
+				geom_point(size=2) +
+				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+        labs(y= element_blank (), x="NMDS1 \n Phylogenetic beta diversity") +
+				theme_classic() +
+				theme(legend.position="none")
+```
+
+```{r beta_neutral_nmds_plot_FMT2_final, fig.height=7}
+ggarrange(beta_richness_nmds_FMT2, beta_neutral_nmds_FMT2, beta_phylogenetic_nmds_FMT2, ncol=2, nrow=2, common.legend = TRUE, legend="right")
+```
+
+#### Differentially abundant MAGs
+##### Warm vs Intervention
+```{r}
+physeq_FMT2 <- subset_samples(physeq_all, type %in% c("Hot_control", "Treatment") & time_point == "FMT2")
+physeq_FMT2 <- prune_taxa(taxa_sums(physeq_FMT2)>0, physeq_FMT2)
+```
+```{r ancom_rand_pond_FMT2, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+ancom_rand_output = ancombc2(data = physeq_FMT2, 
+                  assay_name = "counts", 
+                  tax_level = NULL,
+                  fix_formula = "Population", 
+                  p_adj_method = "holm", 
+                  pseudo_sens = TRUE,
+                  prv_cut =0, 
+                  lib_cut = 0, 
+                  s0_perc = 0.05,
+                  group = "Population", 
+                  struc_zero = TRUE, 
+                  neg_lb = FALSE,
+                  alpha = 0.05, 
+                  n_cl = 2, 
+                  verbose = TRUE,
+                  global = FALSE, 
+                  pairwise = FALSE, 
+                  dunnet = FALSE, 
+                  trend = FALSE,
+                  iter_control = list(tol = 1e-5, max_iter = 20, verbose = FALSE),
+                  em_control = list(tol = 1e-5, max_iter = 100),
+                  mdfdr_control = list(fwer_ctrl_method = "holm", B = 100), 
+                  trend_control = NULL)
+
+```
+```{r}
+ancom_rand_output$res %>%
+  dplyr::select(taxon, lfc_PopulationHot_dry, p_PopulationHot_dry) %>%
+  filter(p_PopulationHot_dry < 0.05)
+```
+```{r ancom_rand_FMT2, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+taxonomy <- data.frame(physeq_FMT2@tax_table) %>%
+  rownames_to_column(., "taxon") %>%
+  mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
+
+ancombc_rand_table_mag <- ancom_rand_output$res %>%
+  dplyr::select(taxon, lfc_PopulationHot_dry, p_PopulationHot_dry) %>%
+  filter(p_PopulationHot_dry < 0.05) %>%
+  dplyr::arrange(p_PopulationHot_dry) %>%
+  merge(., taxonomy, by="taxon") %>%
+  mutate_at(vars(phylum, species), ~ str_replace(., "[dpcofgs]__", ""))%>%
+  dplyr::arrange(lfc_PopulationHot_dry)
+
+ancombc_rand_table_mag
+  
+colors_alphabetic <- read_tsv("https://raw.githubusercontent.com/earthhologenome/EHI_taxonomy_colour/main/ehi_phylum_colors.tsv") %>%
+  mutate_at(vars(phylum), ~ str_replace(., "[dpcofgs]__", ""))  %>%
+  right_join(taxonomy, by=join_by(phylum == phylum)) %>%
+  dplyr::select(phylum, colors) %>%
+  mutate(colors = str_c(colors, "80"))  %>% #add 80% alpha
+	unique() %>%
+	dplyr::arrange(phylum)
+
+tax_table <- as.data.frame(unique(ancombc_rand_table_mag$phylum))
+  
+colnames(tax_table)[1] <- "phylum"
+tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
+	dplyr::arrange(phylum) %>%
+	dplyr::select(colors) %>%
+	pull()
+```
+```{r ancombc_rand_plot_phy_FMT2, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
+ancombc_rand_table_mag%>%
+      mutate(genome=factor(taxon,levels=ancombc_rand_table_mag$taxon)) %>%
+ggplot(., aes(x=lfc_PopulationHot_dry, y=forcats::fct_reorder(genome,lfc_PopulationHot_dry), fill=phylum)) + #forcats::fct_rev()
+  geom_col() + 
+  scale_fill_manual(values=tax_color) + 
+  geom_hline(yintercept=0) + 
+#  coord_flip()+
+  theme(panel.background = element_blank(),
+        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
+        axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 8),
+        axis.title = element_text(size = 14, face = "bold"),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 14, face = "bold"),
+        legend.position = "right", legend.box = "vertical")+
+  xlab("log2FoldChange") + 
+  ylab("Species")+
+  guides(fill=guide_legend(title="Phylum"))
+```
+
+***Phyla of the significant MAGs in warm control***
+```{r sign_features_FMT2_warm, comment="", message=FALSE, warning=FALSE}
+ancombc_rand_table_mag%>%
+  filter(lfc_PopulationHot_dry>0)  %>% 
+  count(phylum, name = "sample_count") %>%
+  arrange(desc(sample_count))  
+```
+
+***Phyla of the significant MAGs in intervention group***
+```{r sign_features_FMT2_cold, comment="", message=FALSE, warning=FALSE}
+ancombc_rand_table_mag%>%
+  filter(lfc_PopulationHot_dry<0)  %>% 
+  count(phylum, name = "sample_count") %>%
+  arrange(desc(sample_count))  
+```
+
+##### Intervention vs cold control
+```{r}
+physeq_FMT2 <- subset_samples(physeq_all, type %in% c("Control", "Treatment") & time_point == "FMT2")
+physeq_FMT2 <- prune_taxa(taxa_sums(physeq_FMT2)>0, physeq_FMT2)
+```
+```{r ancom_rand_pond_FMT2_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+ancom_rand_output_cold = ancombc2(data = physeq_FMT2, 
+                  assay_name = "counts", 
+                  tax_level = NULL,
+                  fix_formula = "type", 
+                  p_adj_method = "holm", 
+                  pseudo_sens = TRUE,
+                  prv_cut =0, 
+                  lib_cut = 0, 
+                  s0_perc = 0.05,
+                  group = "type", 
+                  struc_zero = TRUE, 
+                  neg_lb = FALSE,
+                  alpha = 0.05, 
+                  n_cl = 2, 
+                  verbose = TRUE,
+                  global = FALSE, 
+                  pairwise = FALSE, 
+                  dunnet = FALSE, 
+                  trend = FALSE,
+                  iter_control = list(tol = 1e-5, max_iter = 20, verbose = FALSE),
+                  em_control = list(tol = 1e-5, max_iter = 100),
+                  mdfdr_control = list(fwer_ctrl_method = "holm", B = 100), 
+                  trend_control = NULL)
+
+```
+```{r}
+ancom_rand_output_cold$res %>%
+  dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
+  filter(p_typeTreatment < 0.05)
+```
+
+```{r ancom_rand_FMT2_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+taxonomy <- data.frame(physeq_FMT2@tax_table) %>%
+  rownames_to_column(., "taxon") %>%
+  mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
+
+ancombc_rand_table_mag <- ancom_rand_output_cold$res %>%
+  dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
+  filter(p_typeTreatment < 0.05) %>%
+  dplyr::arrange(p_typeTreatment) %>%
+  merge(., taxonomy, by="taxon") %>%
+  mutate_at(vars(phylum, species), ~ str_replace(., "[dpcofgs]__", ""))%>%
+  dplyr::arrange(lfc_typeTreatment)
+
+colors_alphabetic <- read_tsv("https://raw.githubusercontent.com/earthhologenome/EHI_taxonomy_colour/main/ehi_phylum_colors.tsv") %>%
+  mutate_at(vars(phylum), ~ str_replace(., "[dpcofgs]__", ""))  %>%
+  right_join(taxonomy, by=join_by(phylum == phylum)) %>%
+  dplyr::select(phylum, colors) %>%
+  mutate(colors = str_c(colors, "80"))  %>% #add 80% alpha
+	unique() %>%
+	dplyr::arrange(phylum)
+
+tax_table <- as.data.frame(unique(ancombc_rand_table_mag$phylum))
+  
+colnames(tax_table)[1] <- "phylum"
+tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
+	dplyr::arrange(phylum) %>%
+	dplyr::select(colors) %>%
+	pull()
+```
+```{r ancombc_rand_plot_phy_FMT2_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
+ancombc_rand_table_mag%>%
+      mutate(genome=factor(taxon,levels=ancombc_rand_table_mag$taxon)) %>%
+ggplot(., aes(x=lfc_typeTreatment, y=forcats::fct_reorder(genome,lfc_typeTreatment), fill=phylum)) + #forcats::fct_rev()
+  geom_col() + 
+  scale_fill_manual(values=tax_color) + 
+  geom_hline(yintercept=0) + 
+#  coord_flip()+
+  theme(panel.background = element_blank(),
+        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
+        axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 8),
+        axis.title = element_text(size = 14, face = "bold"),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 14, face = "bold"),
+        legend.position = "right", legend.box = "vertical")+
+  xlab("log2FoldChange") + 
+  ylab("Species")+
+  guides(fill=guide_legend(title="Phylum"))
+```
+
+***Phyla of the significant MAGs in intervention group***
+```{r sign_features_FMT2_int, comment="", message=FALSE, warning=FALSE}
+ancombc_rand_table_mag%>%
+  filter(lfc_typeTreatment>0)  %>% 
+  count(phylum, name = "sample_count") %>%
+  arrange(desc(sample_count))  
+```
+
+***Phyla of the significant MAGs in cold control***
+```{r sign_features_FMT2_cold_con, comment="", message=FALSE, warning=FALSE}
+ancombc_rand_table_mag%>%
+  filter(lfc_typeTreatment<0)  %>% 
+  count(phylum, name = "sample_count") %>%
+  arrange(desc(sample_count))  
+```
+
+#### Functional differences
+***MCI***
+```{r gitfs_elements_tm5_FMT2_cold, warning=FALSE, comments="", message=FALSE}
+GIFTs_functions_community %>%
+  rowMeans() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point=="FMT2") %>%
+  group_by(type) %>%
+  summarise(MCI = mean(value), sd = sd(value))
+```
+
+```{r gitfs_functional_FMT2_cold, warning=FALSE, comments="", message=FALSE}
+MCI_FMT2 <- GIFTs_functions_community %>%
+  rowMeans() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point == "FMT2")
+
+shapiro.test(MCI_FMT2$value)
+
+res.aov <- aov(value ~ type, data = MCI_FMT2)
+summary(res.aov)
+```
+
+***Functional differences***
+CC and CI
+```{r comunity_elem_FMT2_cold, comment="", message=FALSE, warning=FALSE}
+element_gift %>%
+  filter(type %in% c("Control", "Treatment") & time_point == "FMT2") %>%
+  select(-time_point, -type) %>%
+  filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
+  select(Tube_code, where( ~ is.numeric(.) && sum(.) > 0)) %>%
+  left_join(sample_metadata[c(1, 7)], by = "Tube_code") %>% 
+  pivot_longer(-c(Tube_code, type),
+               names_to = "trait",
+               values_to = "value") %>%
+  group_by(trait) %>%
+  summarise(p_value = wilcox.test(value ~ type)$p.value) %>%
+  mutate(p_adjust = p.adjust(p_value, method = "BH")) %>%
+  filter(p_adjust < 0.05) %>%
+  remove_rownames() %>% 
+  left_join(., uniqueGIFT_db, by=join_by("trait"=="Code_element"))
+```
+
+CI and WC
+```{r comunity_elem_FMT2_warm, comment="", message=FALSE, warning=FALSE}
+element_gift %>%
+  filter(type %in% c("Hot_control", "Treatment") &
+           time_point == "FMT2") %>%
+  select(-time_point, -type) %>%
+  filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
+  select(Tube_code, where(~ is.numeric(.) && sum(.) > 0)) %>%
+  left_join(sample_metadata[c(1, 7)], by = "Tube_code") %>% 
+  pivot_longer(-c(Tube_code,type), names_to = "trait", values_to = "value") %>%
+  group_by(trait) %>%
+  summarise(p_value = wilcox.test(value ~ type)$p.value) %>%
+  mutate(p_adjust=p.adjust(p_value, method="BH")) %>%
+  filter(p_adjust < 0.05)%>%
+  remove_rownames()
+```
+
+CC and WC
+```{r comunity_elem_FMT2_control, comment="", message=FALSE, warning=FALSE}
+element_gift %>%
+  filter(type %in% c("Hot_control", "Control") &
+           time_point == "FMT2") %>%
+  select(-time_point, -type) %>%
+  filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
+  select(Tube_code, where(~ is.numeric(.) && sum(.) > 0)) %>%
+  left_join(sample_metadata[c(1, 7)], by = "Tube_code") %>%
+  pivot_longer(-c(Tube_code,type), names_to = "trait", values_to = "value") %>%
+  group_by(trait) %>%
+  summarise(p_value = wilcox.test(value ~ type)$p.value) %>%
+  mutate(p_adjust=p.adjust(p_value, method="BH")) %>%
+  filter(p_adjust < 0.05)%>%
+  remove_rownames()
+```

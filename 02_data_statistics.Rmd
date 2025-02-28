@@ -1,28 +1,28 @@
 # Data statistics
 
 ```{r load_data_stats}
-load("data/data.Rdata")
+load("data/data_27022025.Rdata")
 ```
 
 ## Sequencing reads statistics
 
 ```{r reads_stats}
-data_stats_nofmt$raw_reads %>% sum()
-data_stats_nofmt$raw_reads %>% mean()
-data_stats_nofmt$raw_reads %>% sd()
+data_stats$raw_reads %>% sum()
+data_stats$raw_reads %>% mean()
+data_stats$raw_reads %>% sd()
 ```
 
 ## DNA fractions
 ```{r data_fractions_stats}
 #Overall
-data_stats_nofmt %>%
+data_stats %>%
     mutate(mapped_perc=mapped_mags/trimmed_reads) %>%
     summarise(mean=mean(mapped_perc),sd=sd(mapped_perc))
 ```
 
 
 ```{r data_fractions_plot, message=FALSE, warning=FALSE, fig.height=5, fig.width=10, fig.fullwidth=TRUE}
-data_stats_nofmt %>%
+data_stats %>%
   mutate(
     low_quality = raw_reads - trimmed_reads,
     unmapped_reads = trimmed_reads - mapped_lizard - mapped_mags
@@ -49,7 +49,7 @@ data_stats_nofmt %>%
 ## Recovered microbial fraction
 
 ```{r data_estimations_plot, message=FALSE, warning=FALSE, fig.height=4, fig.width=10, fig.fullwidth=TRUE}
-data_stats_nofmt %>%
+data_stats %>%
   mutate(
     unmapped_reads = trimmed_reads - mapped_lizard - mapped_mags,
     mag_proportion = mapped_mags / (mapped_mags + unmapped_reads),
@@ -94,16 +94,16 @@ data_stats_nofmt %>%
 ### Domain-adjusted mapping rate (DAMR)
 
 ```{r damr}
-data_stats_nofmt %>%
+data_stats %>%
   mutate(
     unmapped_reads = trimmed_reads - mapped_lizard - mapped_mags,
     mag_proportion = mapped_mags / (mapped_mags + unmapped_reads),
     singlem_read_fraction = singlem_read_fraction
   ) %>%
   mutate(damr=pmin(1, mag_proportion/singlem_read_fraction)) %>%
-  left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
+  left_join(sample_metadata[c(1,7, 10)], by = join_by(sample == Tube_code)) %>%
   filter(!is.na(time_point)) %>%
-  select(sample,damr, time_point, species, type) %>%
+  select(sample,damr, time_point, type) %>%
   #group_by(type) %>%
   #summarise(mean=mean(damr),sd=sd(damr)) %>%
   tt()

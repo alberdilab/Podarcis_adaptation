@@ -1,53 +1,88 @@
 # Community composition
 
 ```{r load_data_community}
-load("data/data.Rdata")
+load("data/data_27022025.Rdata")
 ```
 
 ## Taxonomy overview 
 
 ### Stacked barplot
 
-```{r taxonomy_barplot, fig.height=8, fig.width=18, fig.fullwidth=TRUE, warning=FALSE}
+```{r taxonomy_barplot, warning=FALSE, fig.height=12, fig.width=20, fig.fullwidth=TRUE}
 # Merge data frames based on sample
-transplants_metadata<-sample_metadata%>%
-  mutate(Tube_code=str_remove_all(Tube_code, "_a"))
-transplants_metadata$newID <- paste(transplants_metadata$Tube_code, "_", transplants_metadata$individual)
+# transplants_metadata <- sample_metadata %>%
+#   mutate(Tube_code = str_remove_all(Tube_code, "_a"))
+# transplants_metadata$newID <- paste(transplants_metadata$Tube_code,
+#                                     "_",
+#                                     transplants_metadata$individual)
 
-merged_data<-genome_counts_filt %>%
-  mutate_at(vars(-genome),~./sum(.)) %>% #apply TSS normalisation
+merged_data <- genome_counts_filt %>%
+  mutate_at(vars(-genome),  ~ . / sum(.)) %>% #apply TSS normalisation
   pivot_longer(-genome, names_to = "sample", values_to = "count") %>% #reduce to minimum number of columns
   left_join(., genome_metadata, by = join_by(genome == genome)) %>% #append genome metadata
-  left_join(., transplants_metadata, by = join_by(sample == Tube_code)) %>% #append sample metadata
+  left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>% #append sample metadata
   filter(count > 0) #filter 0 counts
 
-ggplot(merged_data, aes(x=newID,y=count, fill=phylum, group=phylum)) + #grouping enables keeping the same sorting of taxonomic units
-    geom_bar(stat="identity", colour="white", linewidth=0.1) + #plot stacked bars with white borders
-    scale_fill_manual(values=phylum_colors) +
-    facet_nested(. ~ time_point + type ,  scales="free") + #facet per day and treatment
-    guides(fill = guide_legend(ncol = 1)) +
-    labs(fill="Phylum",y = "Relative abundance",x="Sample")+
-    theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, size=0))
+ggplot(merged_data, aes(
+  x = sample,
+  y = count,
+  fill = phylum,
+  group = phylum
+)) + #grouping enables keeping the same sorting of taxonomic units
+  geom_bar(stat = "identity",
+           colour = "white",
+           linewidth = 0.1) + #plot stacked bars with white borders
+  scale_fill_manual(values = phylum_colors) +
+  facet_nested(. ~ time_point + type , scales = "free") + #facet per day and treatment
+  guides(fill = guide_legend(ncol = 1)) +
+  labs(fill = "Phylum", y = "Relative abundance", x = "Sample") +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1,
+      size = 0
+    ),
+    strip.text.x = element_text(
+      size = 14,
+      colour = "black",
+      face = "bold"
+    ),
+    strip.background = element_rect(fill ="lightgrey"),
+    axis.title = element_text(size = 18, face = "bold"),
+    panel.background = element_blank(),
+    legend.title = element_text(size = 20, face = "bold"),
+    legend.text = element_text(size = 16)
+  )
 ```
 
 #### Wild samples
-
 ```{r taxonomy_barplot_wild, fig.height=8, fig.width=18, fig.fullwidth=TRUE, warning=FALSE}
 merged_data  %>%
-  filter(time_point=="0_Wild")  %>%
-  ggplot(aes(x=newID,y=count, fill=phylum, group=phylum)) + #grouping enables keeping the same sorting of taxonomic units
+  filter(time_point=="Wild")  %>%
+  ggplot(aes(x=sample,y=count, fill=phylum, group=phylum)) + #grouping enables keeping the same sorting of taxonomic units
     geom_bar(stat="identity", colour="white", linewidth=0.1) + #plot stacked bars with white borders
     scale_fill_manual(values=phylum_colors) +
     facet_nested(. ~ Population,  scales="free") + #facet per day and treatment
     guides(fill = guide_legend(ncol = 1)) +
     labs(fill="Phylum",y = "Relative abundance",x="Sample")+
-    theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, size=0),
-    strip.text.x = element_text(size = 12)
-    )
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1,
+      size = 0
+    ),
+    strip.text.x = element_text(
+      size = 14,
+      colour = "black",
+      face = "bold"
+    ),
+    axis.title = element_text(size = 18, face = "bold"),
+    panel.background = element_blank(),
+    strip.background = element_rect(fill ="lightgrey"),
+    legend.title = element_text(size = 20, face = "bold"),
+    legend.text = element_text(size = 16)
+  )
 ```
-
 
 ### Phylum relative abundances
 ```{r taxonomy_phylum_summary, warning=FALSE, comments="", message=FALSE}
@@ -58,66 +93,38 @@ phylum_summary <- genome_counts_filt %>%
   left_join(genome_metadata, by = join_by(genome == genome)) %>%
   group_by(sample,phylum) %>%
   summarise(relabun=sum(count))
+```
 
+#### Cold and wet population
+```{r taxonomy_phylum_summary_cold, warning=FALSE, comments="", message=FALSE}
 phylum_summary %>%
-    group_by(phylum) %>%
+    left_join(sample_metadata, by = join_by(sample == Tube_code))  %>%
+    group_by(phylum, Population) %>%
+    filter(Population=="Cold_wet" & time_point=="Wild") %>%
     summarise(total_mean=mean(relabun*100, na.rm=T),
               total_sd=sd(relabun*100, na.rm=T))  %>%
+  filter(total_mean!=0) %>% 
     mutate(total=str_c(round(total_mean,2),"±",round(total_sd,2))) %>% 
     arrange(-total_mean) %>% 
     dplyr::select(phylum,total) %>% 
     tt()
-
 ```
 
-#### Wild samples
-
-```{r taxonomy_phylum_summary_wild, warning=FALSE, comments="", message=FALSE}
-#Cold and wet population
+#### Hot and dry population
+```{r taxonomy_phylum_summary_hot, warning=FALSE, comments="", message=FALSE}
 phylum_summary %>%
     left_join(sample_metadata, by = join_by(sample == Tube_code))  %>%
     group_by(phylum, Population) %>%
-    filter(Population=="Cold_wet") %>%
-    filter(time_point=="0_Wild") %>%
+    filter(Population=="Hot_dry" & time_point=="Wild") %>%
     summarise(total_mean=mean(relabun*100, na.rm=T),
               total_sd=sd(relabun*100, na.rm=T))  %>%
+  filter(total_mean!=0) %>% 
     mutate(total=str_c(round(total_mean,2),"±",round(total_sd,2))) %>% 
     arrange(-total_mean) %>% 
-    dplyr::select(phylum,total, Population) %>% 
-    tt()
-
-#Hot and dry population
-phylum_summary %>%
-    left_join(sample_metadata, by = join_by(sample == Tube_code))  %>%
-    group_by(phylum, Population) %>%
-    filter(Population=="Hot_dry")%>%
-    filter(time_point=="0_Wild") %>%
-    summarise(total_mean=mean(relabun*100, na.rm=T),
-              total_sd=sd(relabun*100, na.rm=T))  %>%
-    mutate(total=str_c(round(total_mean,2),"±",round(total_sd,2))) %>% 
-    arrange(-total_mean) %>% 
-    dplyr::select(phylum,total, Population) %>% 
+    dplyr::select(phylum,total) %>% 
     tt()
 ```
 
-```{r taxonomy_boxplot_phylum, warning=FALSE, comments="", message=FALSE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
-phylum_arrange <- phylum_summary %>%
-    group_by(phylum) %>%
-    summarise(mean=mean(relabun)) %>%
-    arrange(-mean) %>%
-    select(phylum) %>%
-    pull()
-
-phylum_summary %>%
-    filter(phylum %in% phylum_arrange) %>%
-    mutate(phylum=factor(phylum,levels=rev(phylum_arrange))) %>%
-    ggplot(aes(x=relabun, y=phylum, group=phylum, color=phylum)) +
-        scale_color_manual(values=phylum_colors[rev(phylum_arrange)]) +
-        geom_jitter(alpha=0.5) + 
-        theme_minimal() + 
-        theme(legend.position="none") +
-        labs(y="Phylum",x="Relative abundance")
-```
 
 ## Taxonomy boxplot
 
@@ -130,12 +137,6 @@ family_summary <- genome_counts_filt %>%
   left_join(., genome_metadata, by = join_by(genome == genome)) %>% #append genome metadata
   group_by(sample,family) %>%
   summarise(relabun=sum(count))
-
-family_summary %>%
-    group_by(family) %>%
-    summarise(mean=mean(relabun, na.rm=TRUE),sd=sd(relabun, na.rm=TRUE)) %>%
-    arrange(-mean) %>%
-    tt()
 ```
 
 
@@ -172,12 +173,6 @@ genus_summary <- genome_counts_filt %>%
   group_by(sample,genus) %>%
   summarise(relabun=sum(count)) %>%
   filter(genus != "g__")
-
-genus_summary %>%
-    group_by(genus) %>%
-    summarise(mean=mean(relabun, na.rm=TRUE),sd=sd(relabun, na.rm=TRUE)) %>%
-    arrange(-mean) %>%
-    tt()
 ```
 
 ```{r taxonomy_jitterplot_genus, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
@@ -202,278 +197,9 @@ genus_summary %>%
         geom_jitter(alpha=0.5) + 
         facet_grid(.~type)+
         theme_minimal() + 
-        labs(y="Family", x="Relative abundance", color="Phylum")
+        labs(y="Genus", x="Relative abundance", color="Phylum")
 
 ```
 
-# Diversity analysis
-
-## Alpha diversity
-
-```{r alpha_div, comment="", message=FALSE, warning=FALSE}
-# Calculate Hill numbers
-richness <- genome_counts_filt %>%
-  column_to_rownames(var = "genome") %>%
-  dplyr::select(where(~ !all(. == 0))) %>%
-  hilldiv(., q = 0) %>%
-  t() %>%
-  as.data.frame() %>%
-  dplyr::rename(richness = 1) %>%
-  rownames_to_column(var = "sample")
-
-neutral <- genome_counts_filt %>%
-  column_to_rownames(var = "genome") %>%
-  dplyr::select(where(~ !all(. == 0))) %>%
-  hilldiv(., q = 1) %>%
-  t() %>%
-  as.data.frame() %>%
-  dplyr::rename(neutral = 1) %>%
-  rownames_to_column(var = "sample")
-
-phylogenetic <- genome_counts_filt %>%
-  column_to_rownames(var = "genome") %>%
-  dplyr::select(where(~ !all(. == 0))) %>%
-  hilldiv(., q = 1, tree = genome_tree) %>%
-  t() %>%
-  as.data.frame() %>%
-  dplyr::rename(phylogenetic = 1) %>%
-  rownames_to_column(var = "sample")
-
-# Aggregate basal GIFT into elements
-dist <- genome_gifts %>%
-  to.elements(., GIFT_db2) %>%
-  traits2dist(., method = "gower")
-
-functional <- genome_counts_filt %>%
-  column_to_rownames(var = "genome") %>%
-  dplyr::select(where(~ !all(. == 0))) %>%
-  hilldiv(., q = 1, dist = dist) %>%
-  t() %>%
-  as.data.frame() %>%
-  dplyr::rename(functional = 1) %>%
-  rownames_to_column(var = "sample") %>%
-  mutate(functional = if_else(is.nan(functional), 1, functional))
-
-# Merge all metrics
-alpha_div <- richness %>%
-  full_join(neutral, by = join_by(sample == sample)) %>%
-  full_join(phylogenetic, by = join_by(sample == sample)) %>%
-  full_join(functional, by = join_by(sample == sample))
-```
-
-### Wild samples
-
-```{r alpha_div_plot_0, comment="", message=FALSE, warning=FALSE, fig.height=6, fig.width=10, fig.fullwidth=TRUE}
-alpha_div %>%
-  pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
-  left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
-  filter(time_point=="0_Wild") %>%
-  mutate(metric=factor(metric,levels=c("richness","neutral","phylogenetic","functional"))) %>%
-      ggplot(aes(y = value, x = Population, group=Population, color=Population, fill=Population)) +
-      geom_boxplot(outlier.shape = NA) +
-      geom_jitter(alpha=0.5) +
-      scale_color_manual(name="Population",
-          breaks=c("Cold_wet","Hot_dry"),
-          labels=c("Cold","Hot"),
-          values=c('#008080', "#d57d2c")) +
-      scale_fill_manual(name="Population",
-          breaks=c("Cold_wet","Hot_dry"),
-          labels=c("Cold","Hot"),
-          values=c('#00808050', "#d57d2c50")) +
-      facet_wrap(. ~ metric,scales = "free") +
-      coord_cartesian(xlim = c(1, NA)) +
-      stat_compare_means(size=3, label.x=.58) +
-      theme_classic() +
-        theme(
-    strip.background = element_blank(),
-    panel.grid.minor.x = element_line(size = .1, color = "grey"),
-    axis.title.x = element_blank(),
-    axis.title.y = element_text(size=10),
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    # Increase plot size
-    plot.title = element_text(size = 10),
-    axis.text = element_text(size = 8),
-    axis.title = element_text(size = 8)
-      ) +
-  ylab("Alpha diversity")
-```
-
-### Acclimation samples
-
-```{r alpha_div_plot_1, comment="", message=FALSE, warning=FALSE, fig.height=6, fig.width=10, fig.fullwidth=TRUE}
-alpha_div %>%
-  pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
-  left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
-  filter(time_point=="1_Acclimation") %>%
-  mutate(metric=factor(metric,levels=c("richness","neutral","phylogenetic","functional"))) %>%
-      ggplot(aes(y = value, x = Population, group=Population, color=Population, fill=Population)) +
-      geom_boxplot(outlier.shape = NA) +
-      geom_jitter(alpha=0.5) +
-      scale_color_manual(name="Population",
-          breaks=c("Cold_wet","Hot_dry"),
-          labels=c("Cold","Hot"),
-          values=c('#008080', "#d57d2c")) +
-      scale_fill_manual(name="Population",
-          breaks=c("Cold_wet","Hot_dry"),
-          labels=c("Cold","Hot"),
-          values=c('#00808050', "#d57d2c50")) +
-      facet_wrap(. ~ metric,scales = "free") +
-      coord_cartesian(xlim = c(1, NA)) +
-      stat_compare_means(size=3, label.x=.58) +
-      theme_classic() +
-        theme(
-    strip.background = element_blank(),
-    panel.grid.minor.x = element_line(size = .1, color = "grey"),
-    axis.title.x = element_blank(),
-    axis.title.y = element_text(size=10),
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    # Increase plot size
-    plot.title = element_text(size = 10),
-    axis.text = element_text(size = 8),
-    axis.title = element_text(size = 8)
-      ) +
-  ylab("Alpha diversity")
-```
- 
-### Post-Transplant_1 samples
-
-```{r alpha_div_plot_5, comment="", message=FALSE, warning=FALSE, fig.height=7, fig.width=10, fig.fullwidth=TRUE}
-bxp1<-alpha_div %>%
-  pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
-  left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
-  filter(time_point=="5_Post-FMT1") %>%
-  mutate(metric=factor(metric,levels=c("richness","neutral","phylogenetic","functional"))) %>%
-      ggplot(aes(y = value, x = type, group=type, color=type, fill=type)) +
-      geom_boxplot(outlier.shape = NA) +
-      geom_jitter(alpha=0.5) +
-      scale_color_manual(name="Type",
-          breaks=c("Control","Hot_control", "Treatment"),
-          labels=c("Cold-Cold","Hot-Hot", "Cold-Hot"),
-          values=c("#4477AA","#d57d2c", "#76b183")) +
-      scale_fill_manual(name="Type",
-          breaks=c("Control","Hot_control", "Treatment"),
-          labels=c("Cold-Cold","Hot-Hot", "Cold-Hot"),
-          values=c("#4477AA50","#d57d2c50","#76b18350")) +
-        scale_x_discrete(labels = c("Control" = "Cold-Cold", "Hot_control" = "Hot-Hot", "Treatment" = "Cold-Hot")) +
-      facet_wrap(. ~ metric,scales = "free") +
-      coord_cartesian(xlim = c(1, NA)) +
-      stat_compare_means(size=3, label.x=.7) +
-      theme_classic() +
-        theme(
-    strip.background = element_blank(),
-    panel.grid.minor.x = element_line(size = .1, color = "grey"),
-    axis.title.x = element_blank(),
-    axis.title.y = element_text(size=10),
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    # Increase plot size
-    plot.title = element_text(size = 10),
-    axis.text = element_text(size = 8),
-    axis.title = element_text(size = 8)
-      ) +
-  ylab("Alpha diversity")
 
 
-# Add significance bars with p-values
-bxp1 + 
-  geom_signif(comparisons = list(c("Control", "Hot_control"), c("Control", "Treatment"), c("Hot_control", "Treatment")),
-              map_signif_level = TRUE)
-```
-
-#### Richness
-
-```{r alpha_div_data, comment="", message=FALSE, warning=FALSE}
-alpha_div_meta <- alpha_div %>%
-  left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
-  filter(time_point =="5_Post-FMT1") 
-
-
-Modelq0GLMMNB <- glmer.nb(richness ~ type+(1|individual), data = alpha_div_meta)
-summary(Modelq0GLMMNB)
-```
-
-#### Neutral
-
-```{r alpha_div_data_1, comment="", message=FALSE, warning=FALSE}
-Model_neutral <- lme(fixed = neutral ~ type, data = alpha_div_meta,
-               random = ~ 1 | individual)
-summary(Model_neutral)
-```
-
-#### Phylogenetic
-
-```{r alpha_div_data_2, comment="", message=FALSE, warning=FALSE}
-Model_phylo <- lme(fixed = phylogenetic ~ Population, data = alpha_div_meta,
-               random = ~ 1 | individual)
-summary(Model_phylo)
-```
-
-#### Functional
-
-```{r alpha_div_data_3, comment="", message=FALSE, warning=FALSE}
-Model_func <- lme(fixed = functional ~ type, data = alpha_div_meta,
-               random = ~ 1 | individual)
-summary(Model_func)
-```
-
-### Post-Transplant_2 samples
-
-```{r alpha_div_plot_6, comment="", message=FALSE, warning=FALSE, fig.height=7, fig.width=10, fig.fullwidth=TRUE}
-bxp1<-alpha_div %>%
-  pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
-  left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
-  filter(time_point=="6_Post-FMT2") %>%
-  mutate(metric=factor(metric,levels=c("richness","neutral","phylogenetic","functional"))) %>%
-      ggplot(aes(y = value, x = type, group=type, color=type, fill=type)) +
-      geom_boxplot(outlier.shape = NA) +
-      geom_jitter(alpha=0.5) +
-      scale_color_manual(name="Type",
-          breaks=c("Control","Hot_control", "Treatment"),
-          labels=c("Cold-control","Warm-control", "Cold-intervention"),
-          values=c("#4477AA","#d57d2c", "#76b183")) +
-      scale_fill_manual(name="Type",
-          breaks=c("Control","Hot_control", "Treatment"),
-          labels=c("Cold-control","Warm-control", "Cold-intervention"),
-          values=c("#4477AA50","#d57d2c50","#76b18350")) +
-          scale_x_discrete(labels = c("Control" = "Cold-Cold", "Hot_control" = "Hot-Hot", "Treatment" = "Cold-Hot")) +
-      facet_wrap(. ~ metric,scales = "free") +
-      coord_cartesian(xlim = c(1, NA)) +
-      stat_compare_means(size=3, label.x=.7) +
-      theme_classic() +
-        theme(
-    strip.background = element_blank(),
-    panel.grid.minor.x = element_line(size = .1, color = "grey"),
-    axis.title.x = element_blank(),
-    axis.title.y = element_text(size=10),
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    # Increase plot size
-    plot.title = element_text(size = 10),
-    axis.text = element_text(size = 8),
-    axis.title = element_text(size = 8)
-      ) +
-  ylab("Alpha diversity")
-
-# Add significance bars with p-values
-bxp1 + 
-  geom_signif(comparisons = list(c("Control", "Hot_control"), c("Control", "Treatment"), c("Hot_control", "Treatment")),
-              map_signif_level = TRUE)
-```
-
-## Beta diversity
-
-```{r beta_div, comment="", message=FALSE, warning=FALSE, eval=FALSE}
-beta_q0n <- genome_counts_filt %>%
-  column_to_rownames(., "genome") %>%
-  hillpair(., q = 0)
-
-beta_q1n <- genome_counts_filt %>%
-  column_to_rownames(., "genome") %>%
-  hillpair(., q = 1)
-
-beta_q1p <- genome_counts_filt %>%
-  column_to_rownames(., "genome") %>%
-  hillpair(., q = 1, tree = genome_tree)
-
-beta_q1f <- genome_counts_filt %>%
-  column_to_rownames(., "genome") %>%
-  hillpair(., q = 1, dist = dist)
-```

@@ -1,0 +1,133 @@
+# Calculations
+```{r load_data_calcu, eval=FALSE}
+load("data/data_27022025.Rdata")
+load("data/beta_27022025.Rdata")
+```
+
+## Alpha diversity
+
+```{r alpha_div, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+# Calculate Hill numbers
+richness <- genome_counts_filt %>%
+  column_to_rownames(var = "genome") %>%
+  dplyr::select(where(~ !all(. == 0))) %>%
+  hilldiv(., q = 0) %>%
+  t() %>%
+  as.data.frame() %>%
+  dplyr::rename(richness = 1) %>%
+  rownames_to_column(var = "sample")
+
+neutral <- genome_counts_filt %>%
+  column_to_rownames(var = "genome") %>%
+  dplyr::select(where(~ !all(. == 0))) %>%
+  hilldiv(., q = 1) %>%
+  t() %>%
+  as.data.frame() %>%
+  dplyr::rename(neutral = 1) %>%
+  rownames_to_column(var = "sample")
+
+phylogenetic <- genome_counts_filt %>%
+  column_to_rownames(var = "genome") %>%
+  dplyr::select(where(~ !all(. == 0))) %>%
+  hilldiv(., q = 1, tree = genome_tree) %>%
+  t() %>%
+  as.data.frame() %>%
+  dplyr::rename(phylogenetic = 1) %>%
+  rownames_to_column(var = "sample")
+
+# Merge all metrics
+alpha_div <- richness %>%
+  full_join(neutral, by = join_by(sample == sample)) %>%
+  full_join(phylogenetic, by = join_by(sample == sample))
+```
+
+## Beta diversity
+```{r beta_div, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+beta_q0n <- genome_counts_filt %>%
+  column_to_rownames(., "genome") %>%
+  hillpair(., q = 0)
+
+beta_q1n <- genome_counts_filt %>%
+  column_to_rownames(., "genome") %>%
+  hillpair(., q = 1)
+
+beta_q1p <- genome_counts_filt %>%
+  column_to_rownames(., "genome") %>%
+  hillpair(., q = 1, tree = genome_tree)
+```
+
+## Phyloseq object
+```{r phyloseq, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+#Phyloseq object
+count_phy <- genome_counts_filt %>%
+  column_to_rownames(var="genome")%>%
+  otu_table(., taxa_are_rows=T)
+
+sample_info_tab_phy <- sample_metadata%>%
+  column_to_rownames(var="Tube_code")%>%
+  sample_data()
+
+TAX <- genome_metadata%>%
+  column_to_rownames(var="genome")%>%
+  select(1:7)%>%
+  as.matrix()%>%
+  tax_table()
+tree <- phy_tree(genome_tree)
+
+physeq_all = phyloseq(count_phy, TAX, sample_info_tab_phy, tree)
+```
+
+## Functional data
+
+```{r gift_analyses, warning=FALSE, eval=FALSE}
+# Aggregate bundle-level GIFTs into the compound level
+GIFTs_elements <- to.elements(genome_gifts, GIFT_db2)
+GIFTs_elements_filtered <- GIFTs_elements[rownames(GIFTs_elements) %in% genome_counts_filt$genome, ]
+GIFTs_elements_filtered <- as.data.frame(GIFTs_elements_filtered) %>%
+  select_if(~ !is.numeric(.) || sum(.) != 0)
+
+elements <- GIFTs_elements_filtered %>%
+  as.data.frame()
+
+# Aggregate element-level GIFTs into the function level
+GIFTs_functions <- to.functions(GIFTs_elements_filtered, GIFT_db2)
+functions <- GIFTs_functions %>%
+  as.data.frame()
+
+# Aggregate function-level GIFTs into overall Biosynthesis, Degradation and Structural GIFTs
+GIFTs_domains <- to.domains(GIFTs_functions, GIFT_db2)
+domains <- GIFTs_domains %>%
+  as.data.frame()
+
+# Get community-weighed average GIFTs per sample
+GIFTs_elements_community <- to.community(GIFTs_elements_filtered, genome_counts_filt %>% column_to_rownames(., "genome") %>% tss(), GIFT_db2)
+GIFTs_functions_community <- to.community(GIFTs_functions, genome_counts_filt %>% column_to_rownames(., "genome") %>% tss(), GIFT_db2)
+GIFTs_domains_community <- to.community(GIFTs_domains, genome_counts_filt %>% column_to_rownames(., "genome") %>% tss(), GIFT_db2)
+
+uniqueGIFT_db <- unique(GIFT_db2[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
+```
+
+```{r element_gift, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+element_gift <- GIFTs_elements_community %>%
+  as.data.frame() %>%
+  rownames_to_column(., "Tube_code") %>%
+  left_join(sample_metadata[c(1, 7, 10)], by = "Tube_code") 
+```
+
+```{r save_beta, comment="", message=FALSE,warning=FALSE, eval=FALSE}
+save(richness,
+     neutral,
+     phylogenetic,
+     alpha_div,
+     physeq_all,
+     beta_q0n, 
+     beta_q1n, 
+     beta_q1p,
+     GIFTs_elements_filtered,
+     GIFTs_elements_community,
+     GIFTs_functions_community,
+     GIFTs_domains_community,
+     element_gift,
+     uniqueGIFT_db,
+     file = "data/calculations_28022025.Rdata")
+```

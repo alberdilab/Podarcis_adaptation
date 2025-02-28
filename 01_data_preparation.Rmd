@@ -6,13 +6,17 @@ Load the original data files outputted by the bioinformatic pipeline.
 
 ### Sample metadata
 
-```{r load_sample_metadata, warning=FALSE, comments="", message=FALSE}
-sample_metadata <- read_tsv("data/metadata.tsv")
+```{r load_sample_metadata, warning=FALSE, comments="", message=FALSE, eval=FALSE}
+sample_metadata <- read_tsv("data/metadata.tsv") %>%
+  mutate(time_point = sub("^\\d+_", "", time_point)) %>% 
+  filter(!time_point %in% c("Antibiotics","Transplant1", "Transplant2")) %>% 
+  filter(individual!="LI1_2nd_6") %>% 
+  mutate(time_point=str_remove_all(time_point, "Post-"))
 ```
 
 ### Read counts
 
-```{r load_read_counts, warning=FALSE, comments="", message=FALSE}
+```{r load_read_counts, warning=FALSE, comments="", message=FALSE, eval=FALSE}
 read_counts_raw <- read_tsv("data/genome.count.tsv") %>%
     rename(genome=1)
 
@@ -30,12 +34,13 @@ merge_and_rename <- function(read_counts_raw) {
     pivot_wider(names_from = prefix, values_from = value)
 }
 
-read_counts <- merge_and_rename(read_counts_raw)
+read_counts <- merge_and_rename(read_counts_raw) %>% 
+    select(c("genome",sample_metadata$Tube_code))
 ```
 
 ### Genome base hits
 
-```{r load_genome_hits, warning=FALSE, comments="", message=FALSE}
+```{r load_genome_hits, warning=FALSE, comments="", message=FALSE, eval=FALSE}
 genome_hits_raw <- read_tsv("data/genome.covered_bases.tsv") %>%
     rename(genome=1)
 
@@ -53,12 +58,13 @@ merge_and_rename <- function(genome_hits_raw) {
     pivot_wider(names_from = prefix, values_from = value)
 }
 
-genome_hits <- merge_and_rename(genome_hits_raw)
+genome_hits <- merge_and_rename(genome_hits_raw)%>% 
+    select(c("genome",sample_metadata$Tube_code))
 ```
 
 ### Genome taxonomy
 
-```{r load_genome_taxonomy, warning=FALSE, comments="", message=FALSE}
+```{r load_genome_taxonomy, warning=FALSE, comments="", message=FALSE, eval=FALSE}
 genome_taxonomy <- read_tsv("data/gtdbtk.summary.tsv") %>%
   select(mag_id = user_genome, classification) %>%
   separate(
@@ -70,7 +76,7 @@ genome_taxonomy <- read_tsv("data/gtdbtk.summary.tsv") %>%
 
 ### Genome quality
 
-```{r load_genome_quality, warning=FALSE, comments="", message=FALSE}
+```{r load_genome_quality, warning=FALSE, comments="", message=FALSE, eval=FALSE}
 genome_quality <- read_tsv("data/quality_report.tsv") %>%
   select(
     genome = Name, 
@@ -89,7 +95,7 @@ genome_quality <- genome_quality %>%
 
 ### Genome tree
 
-```{r load_genome_tree, warning=FALSE, comments="", message=FALSE}
+```{r load_genome_tree, warning=FALSE, comments="", message=FALSE, eval=FALSE}
 genome_tree <- read_tree("data/gtdbtk.backbone.bac120.classify.tree")
 genome_tree$tip.label <- str_replace_all(genome_tree$tip.label,"'", "") #remove single quotes in MAG names
 
@@ -101,7 +107,7 @@ genome_tree <- keep.tip(genome_tree, tip=genome_taxonomy$genome) # keep only MAG
 
 ### Genome annotations
 
-```{r load_genome_annotations, warning=FALSE, comments="", message=FALSE}
+```{r load_genome_annotations, warning=FALSE, comments="", message=FALSE, eval=FALSE}
 genome_annotations <- read_tsv("data/annotations.tsv.xz") %>%
     rename(gene=1, genome=2, contig=3)
 
@@ -123,7 +129,7 @@ genome_metadata <- genome_taxonomy %>%
 
 ### Calculate genome coverage
 
-```{r calculate_genome_coverage, warning=FALSE, comments="", message=FALSE}
+```{r calculate_genome_coverage, warning=FALSE, comments="", message=FALSE, eval=FALSE}
 #Filter genome_hits for the MAGs with over 70% completeness and less than 10% contamination
 genome_hits <- genome_hits %>%
   semi_join(genome_quality, by = "genome")
@@ -134,53 +140,26 @@ genome_coverage <- genome_hits %>%
 
 ## Filtering
 
-4 samples are removed from the analysis due to their low sequencing depth.
+Two samples are removed from the analysis due to their low sequencing depth.
 
-```{r filterging, echo=TRUE, warning=FALSE}
+```{r filterging, echo=TRUE, warning=FALSE, eval=FALSE}
 #Counts_raw
-columns_to_exclude <- c("AD16","AD23", "AD25", "AD91", "AC85") # Columns to exclude
+columns_to_exclude <- c("AD91", "AC85") # Columns to exclude ("AD16","AD23", "AD25", )
 read_counts <- read_counts %>%
+  select(-columns_to_exclude)
+
+#Coverage_table
+genome_coverage <- genome_coverage %>%
   select(-columns_to_exclude)
 
 #Metadata
 sample_metadata <- sample_metadata %>%
-  filter(Tube_code != "AD16") %>%
-  filter(Tube_code != "AD23") %>%
-  filter(Tube_code != "AD25") %>%
-  filter(Tube_code != "AD91") %>%
-  filter(Tube_code != "AC85")
-
-#Coverage_table
-columns_to_exclude <- c("AD16", "AD23", "AD25", "AD91","AC85")  # Columns to exclude
-genome_coverage <- genome_coverage %>%
-  select(-columns_to_exclude)
+  filter(Tube_code %in% colnames(read_counts))
 ```
-
-```{r filterging_1, echo=TRUE, warning=FALSE}
-##Removal of samples of individual LI1_2nd_6
-#Counts_raw
-columns_to_exclude <- c("AFV13","AD06", "AD31", "AE03", "AF12") # Columns to exclude
-read_counts <- read_counts %>%
-  select(-columns_to_exclude)
-
-#Metadata
-sample_metadata <- sample_metadata %>%
-  filter(Tube_code != "AFV13") %>%
-  filter(Tube_code != "AD06") %>%
-  filter(Tube_code != "AD31") %>%
-  filter(Tube_code != "AE03") %>%
-  filter(Tube_code != "AF12") 
-
-#Coverage_table
-columns_to_exclude <- c("AFV13","AD06", "AD31", "AE03", "AF12")  # Columns to exclude
-genome_coverage <- genome_coverage %>%
-  select(-columns_to_exclude)
-```
-
 
 ### Filter reads by coverage
 
-```{r filter_coverage, warning=FALSE, comments="", message=FALSE}
+```{r filter_coverage, warning=FALSE, comments="", message=FALSE, eval=FALSE}
 #Filter read_counts for the MAGs with over 70% completeness and less than 10% contamination
 read_counts <- read_counts %>%
   semi_join(genome_quality, by = "genome")
@@ -193,13 +172,13 @@ read_counts_filt <- genome_coverage %>%
 
 ### Transform reads into genome counts
 
-```{r calculate_genome_counts_unfiltered, warning=FALSE, comments="", message=FALSE}
+```{r calculate_genome_counts_unfiltered, warning=FALSE, comments="", message=FALSE, eval=FALSE}
 readlength=150
 genome_counts <- read_counts %>%
   mutate(across(where(is.numeric), ~ . / (genome_metadata$length / readlength) ))
 ```
 
-```{r calculate_genome_counts_filtered, warning=FALSE, comments="", message=FALSE}
+```{r calculate_genome_counts_filtered, warning=FALSE, comments="", message=FALSE, eval=FALSE}
 readlength=150
 genome_counts_filt <- read_counts_filt %>%
   mutate(across(where(is.numeric), ~ . / (genome_metadata$length / readlength) ))
@@ -207,15 +186,15 @@ genome_counts_filt <- read_counts_filt %>%
 
 ### Distill annotations into GIFTs 
 
-```{r distill_annotations, comment="", message=FALSE, warning=FALSE, eval=FALSE}
-genome_gifts <- distill(genome_annotations,GIFT_db2,genomecol=2,annotcol=c(9,10,19))
+```{r distill_annotations, comment="", message=FALSE, eval=FALSE, warning=FALSE, eval=FALSE}
+genome_gifts <- distill(genome_annotations,GIFT_db2,genomecol=2,annotcol=c(9,10,19), verbosity=F)
 ```
 
 ## Load data statistics
 
 ### Raw reads
 
-```{r raw_reads, warning=FALSE, comments="", message=FALSE}
+```{r raw_reads, warning=FALSE, comments="", message=FALSE, eval=FALSE}
 raw_reads <-
   "data/multiqc_general_stats_2.txt" %>%
   read_tsv() %>%
@@ -227,12 +206,14 @@ raw_reads <-
   group_by(sample_prefix) %>%
   summarize(raw_reads = sum(raw_reads, na.rm = TRUE)) %>%
   rename(sample = sample_prefix)  %>%
-  mutate(sample = str_remove(sample, "^fastp \\|\\s*"))
+  mutate(sample = str_remove(sample, "^fastp \\|\\s*")) %>% 
+  filter(sample %in% sample_metadata$Tube_code)
 ```
+
 
 ### Quality-filtered reads
 
-```{r filtered_reads, warning=FALSE, comments="", message=FALSE}
+```{r filtered_reads, warning=FALSE, comments="", message=FALSE, eval=FALSE}
 fastp_reads <-
   "data/multiqc_general_stats.txt" %>%
   read_tsv() %>%
@@ -247,12 +228,13 @@ fastp_reads <-
   filter(!str_detect(sample, "nonlizard \\|")) %>%
   filter(!str_detect(sample, "lizard \\|")) %>%
   filter(!str_detect(sample, "refseq500 \\|"))  %>%
-  mutate(sample = str_remove(sample, "^fastp \\|\\s*"))
+  mutate(sample = str_remove(sample, "^fastp \\|\\s*")) %>% 
+  filter(sample %in% sample_metadata$Tube_code)
 ```
 
 ### Host-mapped reads
 
-```{r host_mapped, warning=FALSE, comments="", message=FALSE}
+```{r host_mapped, warning=FALSE, comments="", message=FALSE, eval=FALSE}
 host_mapped <-
   "data/multiqc_general_stats.txt" %>%
   read_tsv() %>%
@@ -284,12 +266,13 @@ host_mapped <-
   summarize(
     mapped_lizard = sum(mapped_lizard),
     unmapped_lizard = sum(unmapped_lizard)
-  ) 
+  ) %>% 
+  filter(sample %in% sample_metadata$Tube_code)
 ```
 
 ### Prokaryotic fraction
 
-```{r singlem, warning=FALSE, comments="", message=FALSE}
+```{r singlem, warning=FALSE, comments="", message=FALSE, eval=FALSE}
 singlem <-
   "data/singleM.tsv" %>%
   read_tsv() %>%
@@ -312,12 +295,13 @@ mutate(sample_prefix = str_extract(sample, "^[^_]+")) %>%
     singlem_metagenome_size = sum(singlem_metagenome_size),
     singlem_read_fraction = mean(singlem_read_fraction)
   ) %>%
-  rename(sample = sample_prefix)
+  rename(sample = sample_prefix)%>% 
+  filter(sample %in% sample_metadata$Tube_code)
 ```
 
 ### MAG-mapped reads
 
-```{r mag_mapping, warning=FALSE, comments="", message=FALSE}
+```{r mag_mapping, warning=FALSE, comments="", message=FALSE, eval=FALSE}
 mag_mapping <-
   read_tsv("data/contig.count.tsv.xz") %>%
   pivot_longer(-sequence_id) %>%
@@ -328,19 +312,20 @@ mag_mapping <-
     summarize(
       mapped_mags = sum(mapped_mags)
     ) %>%
-    rename(sample = sample_prefix)
+    rename(sample = sample_prefix)%>% 
+  filter(sample %in% sample_metadata$Tube_code)
 ```
 
 ### Wrap data statistics
 
-```{r wrap_statistics, warning=FALSE, comments="", message=FALSE}
+```{r wrap_statistics, warning=FALSE, comments="", message=FALSE, eval=FALSE}
 data_stats <- raw_reads %>%
   left_join(fastp_reads) %>%
   left_join(host_mapped) %>%
   left_join(singlem) %>%
   left_join(mag_mapping)
 
-data_stats<- data_stats %>%
+data_stats <- data_stats %>%
   filter(!str_detect(sample, "nonlizard \\|")) %>%
   filter(!str_detect(sample, "lizard \\|")) %>%
   filter(!str_detect(sample, "refseq500 \\|"))
@@ -350,7 +335,7 @@ data_stats<- data_stats %>%
 
 [AlberdiLab](www.alberdilab.dk) projects use unified color schemes developed for the [Earth Hologenome Initiative](www.earthhologenome.org), to facilitate figure interpretation.
 
-```{r get_ehi_colors, warning=FALSE, comments="", message=FALSE}
+```{r get_ehi_colors, warning=FALSE, comments="", message=FALSE, eval=FALSE}
 phylum_colors <- read_tsv("https://raw.githubusercontent.com/earthhologenome/EHI_taxonomy_colour/main/ehi_phylum_colors.tsv") %>%
     right_join(genome_metadata, by=join_by(phylum == phylum)) %>%
     arrange(match(genome, genome_tree$tip.label)) %>%
@@ -364,7 +349,7 @@ phylum_colors <- read_tsv("https://raw.githubusercontent.com/earthhologenome/EHI
 
 All working objects are wrapped into a single Rdata object to facilitate downstream usage.
 
-```{r wrap_working_objects, warning=FALSE, comments="", message=FALSE}
+```{r wrap_working_objects, warning=FALSE, comments="", message=FALSE, eval=FALSE}
 save(sample_metadata, 
      genome_metadata, 
      read_counts, 
@@ -374,5 +359,5 @@ save(sample_metadata,
      genome_gifts, 
      phylum_colors,
      data_stats,
-     file = "data/data.Rdata")
+     file = "data/data_27022025.Rdata")
 ```

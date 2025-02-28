@@ -64,7 +64,7 @@ circular_tree %>% open_tree(30) %>% rotate_tree(90)
 
 ## Genome quality
 
-```{r genome_quality}
+```{r genome_quality, message=FALSE, warning=FALSE}
 genome_metadata$completeness %>% mean()
 genome_metadata$completeness %>% sd()
 genome_metadata$contamination %>% mean()

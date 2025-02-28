@@ -70,7 +70,7 @@ library(ggtreeExtra)
 library(ggtree)
 library(ggh4x)
 library(rstatix)
-library(ggpmisc)
+#library(ggpmisc)
 
 # For statistics
 library(spaa)
@@ -84,4 +84,5 @@ library(corrplot)
 library(nlme)
 library(pairwiseAdonis)
 library(lme4)
+library(emmeans)
 ```
