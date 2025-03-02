@@ -251,6 +251,7 @@ summary(res.aov)
 ```
 
 ***Functional differences***
+
 CC and CI
 ```{r comunity_elem_7_1, comment="", message=FALSE, warning=FALSE}
 element_gift %>%
@@ -759,6 +760,7 @@ summary(res.aov)
 ```
 
 ***Functional differences***
+
 CC and CI
 ```{r comunity_elem_FMT2_cold, comment="", message=FALSE, warning=FALSE}
 element_gift %>%
