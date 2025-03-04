@@ -540,7 +540,7 @@ ggarrange(beta_richness_nmds_FMT2, beta_neutral_nmds_FMT2, beta_phylogenetic_nmd
 physeq_FMT2 <- subset_samples(physeq_all, type %in% c("Hot_control", "Treatment") & time_point == "FMT2")
 physeq_FMT2 <- prune_taxa(taxa_sums(physeq_FMT2)>0, physeq_FMT2)
 ```
-```{r ancom_rand_pond_FMT2, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+```{r ancom_rand_pond_FMT2, comment="", message=FALSE, warning=FALSE}
 ancom_rand_output = ancombc2(data = physeq_FMT2, 
                   assay_name = "counts", 
                   tax_level = NULL,
@@ -571,7 +571,7 @@ ancom_rand_output$res %>%
   dplyr::select(taxon, lfc_PopulationHot_dry, p_PopulationHot_dry) %>%
   filter(p_PopulationHot_dry < 0.05)
 ```
-```{r ancom_rand_FMT2, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+```{r ancom_rand_FMT2, comment="", message=FALSE, warning=FALSE}
 taxonomy <- data.frame(physeq_FMT2@tax_table) %>%
   rownames_to_column(., "taxon") %>%
   mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
@@ -602,7 +602,7 @@ tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
 	dplyr::select(colors) %>%
 	pull()
 ```
-```{r ancombc_rand_plot_phy_FMT2, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
+```{r ancombc_rand_plot_phy_FMT2, comment="", message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
 ancombc_rand_table_mag%>%
       mutate(genome=factor(taxon,levels=ancombc_rand_table_mag$taxon)) %>%
 ggplot(., aes(x=lfc_PopulationHot_dry, y=forcats::fct_reorder(genome,lfc_PopulationHot_dry), fill=phylum)) + #forcats::fct_rev()
@@ -644,7 +644,7 @@ ancombc_rand_table_mag%>%
 physeq_FMT2 <- subset_samples(physeq_all, type %in% c("Control", "Treatment") & time_point == "FMT2")
 physeq_FMT2 <- prune_taxa(taxa_sums(physeq_FMT2)>0, physeq_FMT2)
 ```
-```{r ancom_rand_pond_FMT2_cold, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+```{r ancom_rand_pond_FMT2_cold, comment="", message=FALSE, warning=FALSE}
 ancom_rand_output_cold = ancombc2(data = physeq_FMT2, 
                   assay_name = "counts", 
                   tax_level = NULL,
@@ -676,7 +676,7 @@ ancom_rand_output_cold$res %>%
   filter(p_typeTreatment < 0.05)
 ```
 
-```{r ancom_rand_FMT2_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+```{r ancom_rand_FMT2_cold, comment="", message=FALSE, warning=FALSE}
 taxonomy <- data.frame(physeq_FMT2@tax_table) %>%
   rownames_to_column(., "taxon") %>%
   mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
@@ -705,7 +705,7 @@ tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
 	dplyr::select(colors) %>%
 	pull()
 ```
-```{r ancombc_rand_plot_phy_FMT2_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
+```{r ancombc_rand_plot_phy_FMT2_cold, comment="", message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
 ancombc_rand_table_mag%>%
       mutate(genome=factor(taxon,levels=ancombc_rand_table_mag$taxon)) %>%
 ggplot(., aes(x=lfc_typeTreatment, y=forcats::fct_reorder(genome,lfc_typeTreatment), fill=phylum)) + #forcats::fct_rev()

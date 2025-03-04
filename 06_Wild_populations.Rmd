@@ -8,11 +8,11 @@ set.seed(2802)
 ```{r load_data_wild}
 load("data/data_27022025.Rdata")
 load("data/calculations_28022025.Rdata")
-load("data/ancombc_04032025.Rdata")
+#load("data/ancombc_04032025.Rdata")
 ```
 
 ## Shared and unique MAGs
-```{r chart1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+```{r chart1, comment="", message=FALSE, warning=FALSE}
 locationcolors=c('#c4d7d1','#e08683')
 subset_meta <- sample_metadata %>%
   filter(time_point=="Wild")
@@ -287,7 +287,7 @@ physeq_wild <- prune_taxa(taxa_sums(physeq_wild)>0, physeq_wild)
 ```
 
 ### Phylum
-```{r ancom_rand_pond_phylum, comment="", echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+```{r ancom_rand_pond_phylum, comment="", message=FALSE, warning=FALSE}
 ancom_rand_output_wild_phylum = ancombc2(data = physeq_wild, 
                   assay_name = "counts", 
                   tax_level = "phylum",
@@ -320,7 +320,7 @@ ancom_rand_output_wild_phylum$res %>%
 ```
 
 ### MAG level
-```{r ancom_rand_pond_mag_wild, comment="", echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+```{r ancom_rand_pond_mag_wild, comment="", message=FALSE, warning=FALSE}
 ancom_rand_output = ancombc2(data = physeq_wild, 
                   assay_name = "counts", 
                   tax_level = NULL,
@@ -362,7 +362,7 @@ length(structural_zero_taxa)
 ```
 
 ***Differentially abundant MAGs***
-```{r ancom_rand, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+```{r ancom_rand, comment="", message=FALSE, warning=FALSE}
 taxonomy <- data.frame(physeq_wild@tax_table) %>%
   rownames_to_column(., "taxon") %>%
   mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
@@ -393,7 +393,7 @@ tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
 	dplyr::select(colors) %>%
 	pull()
 ```
-```{r ancombc_rand_plot_phy, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
+```{r ancombc_rand_plot_phy, comment="", message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
 ancombc_rand_table_mag%>%
       mutate(genome=factor(taxon,levels=ancombc_rand_table_mag$taxon)) %>%
 ggplot(., aes(x=lfc_PopulationHot_dry, y=forcats::fct_reorder(genome,lfc_PopulationHot_dry), fill=phylum)) + #forcats::fct_rev()
@@ -490,7 +490,7 @@ difference_table_wild <- element_gift_sig_wild %>%
   as.data.frame() %>%
   mutate_if(is.character, as.numeric) %>%
   rownames_to_column(., "Elements") %>%
-  left_join(.,uniqueGIFT_dbBai b[c(1,3,4)],by = join_by(Elements == Code_element)) %>% 
+  left_join(.,uniqueGIFT_db[c(1,3,4)],by = join_by(Elements == Code_element)) %>% 
   arrange(Function) %>% 
   mutate(Difference=Cold_wet-Hot_dry)%>% 
   mutate(group_color = ifelse(Difference <0, "Hot","Cold")) 
