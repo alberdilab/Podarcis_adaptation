@@ -1,4 +1,4 @@
-# FMT-2
+# Changes after FMT compared to acclimation
 ```{r knitr_options_FMT2, include=FALSE}
 knitr::opts_chunk$set(fig.width=10, fig.height=7, fig.fullwidth=TRUE,
 fig.path='Figures/', warning=FALSE,
@@ -7,54 +7,55 @@ set.seed(2802)
 ```
 ```{r load_data_FMT2}
 load("data/data_27022025.Rdata")
-load("data/beta_27022025.Rdata")
 load("data/calculations_28022025.Rdata")
 ```
 
-## From acclimation to FMT1
-### What is the effect of FMT and temperature on the GM after 1 week?
+## What is the effect of FMT and temperature on the GM after 1 week compared to acclimation?
 
-CI vs CC
+### CI vs CC
 
 #### Alpha
 
-```{r alpha_div_plot_6, comment="", message=FALSE, warning=FALSE, fig.height=10, fig.width=10, fig.fullwidth=TRUE}
-bxp1<-alpha_div %>%
+```{r alpha_div_plot_6, comment="", message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
+label_map <- c(
+  "Control" = "Cold-control", 
+  "Treatment" = "Cold-intervention",
+  "richness" = "Species Richness",
+  "neutral" = "Neutral Diversity",
+  "phylogenetic" = "Phylogenetic Diversity",
+  "functional" = "Functional Diversity"
+)
+bxp1 <- alpha_div %>%
   pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
   left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
-  filter(time_point=="FMT1"|time_point=="Acclimation") %>%
-  filter(type!="Hot_control") %>%
+  filter(type %in% c("Control","Treatment") & time_point %in% c("FMT1","Acclimation")) %>%
   mutate(metric = factor(metric, levels = c("richness", "neutral", "phylogenetic", "functional"))) %>%
-  ggplot(aes(y = value, x = interaction(time_point, type), group = interaction(time_point, type), color = type, fill = type)) +
-  geom_boxplot(outlier.shape = NA) +
-  geom_point(position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.8), alpha = 0.5) +
+  ggplot(aes(y = value, x = time_point, color = type, fill = type)) +
+  geom_boxplot(outlier.shape = NA, show.legend = FALSE) +
+  geom_point(position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.8), alpha = 0.5, show.legend = FALSE) +
+  facet_grid(metric ~ type, scales = "free_y", labeller = labeller(metric = label_map, type = label_map))+
+#  facet_nested(.~metric+type, labeller = labeller(metric = label_map, type = label_map))+
   scale_color_manual(name="Type",
           breaks=c("Control", "Treatment"),
-          labels=c("Cold-control", "Cold-intervention"),
           values=c("#4477AA", "#76b183")) +
       scale_fill_manual(name="Type",
           breaks=c("Control", "Treatment"),
-          labels=c("Cold-control", "Cold-intervention"),
           values=c("#4477AA50","#76b18350")) +
-        scale_x_discrete(labels = c("Control" = "Cold-Cold", "Treatment" = "Cold-Hot")) +
+  stat_compare_means(size=3, show.legend = FALSE) +
   theme_minimal() +
-  facet_wrap(. ~ metric,scales = "free") +
-  stat_compare_means(size=3) +
-  scale_x_discrete(labels = c("Acclimation.Control" = "Acclimation-CC",
-                              "FMT.Treatment" = "FMT1-CI",
-                              "Acclimation.Treatment" = "Acclimation-CI",
-                              "FMT1.Control" = "FMT1-CC")) +
-  theme(axis.text.x=element_text(size=8, angle=45))+
-  labs(x = "Time Point", y = "value", color = "Type", fill = "Type")
+  theme(axis.text.x=element_text(size=10))+
+  labs(x = "Time Point", y = "value")
+
+
 
 # Add significance bars with p-values
-bxp1 + 
-  geom_signif(comparisons = list(c("Acclimation-CC", "FMT1.CC"), c("Acclimation-CI", "FMT1-CI")),
-              map_signif_level = TRUE)
+# bxp1 + 
+#   geom_signif(comparisons = list(c("Acclimation-CC", "FMT1.CC"), c("Acclimation-CI", "FMT1-CI")),
+#               map_signif_level = TRUE)
 
 ```
 
-```{r, comparison}
+```{r}
 alpha_div_meta <- alpha_div %>%
   left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
   filter(time_point=="FMT1"|time_point=="Acclimation") %>%
@@ -62,20 +63,20 @@ alpha_div_meta <- alpha_div %>%
 ```
 
 ***Richness***
-```{r alpha_div_data_post3, comparison, comment="", message=FALSE, warning=FALSE}
+```{r alpha_div_data_post3_comparison, comment="", message=FALSE, warning=FALSE, eval=FALSE}
 Modelq0GLMMNB <- glm.nb(richness ~ type*time_point, data = alpha_div_meta,trace=TRUE)
 summary(Modelq0GLMMNB)
 emmeans(Modelq0GLMMNB, pairwise ~ type)
 ```
 
 ***Neutral***
-```{r alpha_div_data_1_post3, comparison, comment="", message=FALSE, warning=FALSE}
+```{r alpha_div_data_1_post3_comparison, comment="", message=FALSE, warning=FALSE}
 Modelq1n <- lm(formula = neutral ~ type*time_point, data = alpha_div_meta) 
 summary(Modelq1n)
 ```
 
 ***Phylogenetic***
-```{r alpha_div_data_2_post3, comparison, comment="", message=FALSE, warning=FALSE}
+```{r alpha_div_data_2_post3_comparison, comment="", message=FALSE, warning=FALSE}
 Model_phylo <- lm(formula = phylogenetic ~ type*time_point, data = alpha_div_meta) 
 summary(Model_phylo)
 ```
@@ -228,9 +229,9 @@ beta_phylogenetic_nmds_post3 <- phylo_post3 %>%
 ggarrange(beta_richness_nmds_post3, beta_neutral_nmds_post3, beta_phylogenetic_nmds_post3, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 ```
 
-***Functional differences***
+### Functional differences
 
-CC from acclimation to FMT1
+***CC from acclimation to FMT1***
 
 ```{r comunity_elem_FMT3_cold, comment="", message=FALSE, warning=FALSE}
 element_gift %>%
@@ -238,19 +239,19 @@ element_gift %>%
   select(-time_point, -type) %>%
   filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
   select(Tube_code, where( ~ is.numeric(.) && sum(.) > 0)) %>%
-  left_join(sample_metadata[c(1, 7)], by = "Tube_code") %>% 
-  pivot_longer(-c(Tube_code, type),
+  left_join(sample_metadata[c(1, 10)], by = "Tube_code") %>% 
+  pivot_longer(-c(Tube_code, time_point),
                names_to = "trait",
                values_to = "value") %>%
   group_by(trait) %>%
-  summarise(p_value = wilcox.test(value ~ type)$p.value) %>%
+  summarise(p_value = wilcox.test(value ~ time_point)$p.value) %>%
   mutate(p_adjust = p.adjust(p_value, method = "BH")) %>%
   filter(p_adjust < 0.05) %>%
   remove_rownames() %>% 
   left_join(., uniqueGIFT_db, by=join_by("trait"=="Code_element"))
 ```
 
-CI from acclimation to FMT1
+***CI from acclimation to FMT1***
 
 ```{r comunity_elem_FMT3_cold_1, comment="", message=FALSE, warning=FALSE}
 element_gift %>%
@@ -258,19 +259,19 @@ element_gift %>%
   select(-time_point, -type) %>%
   filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
   select(Tube_code, where( ~ is.numeric(.) && sum(.) > 0)) %>%
-  left_join(sample_metadata[c(1, 7)], by = "Tube_code") %>% 
-  pivot_longer(-c(Tube_code, type),
+  left_join(sample_metadata[c(1, 10)], by = "Tube_code") %>% 
+  pivot_longer(-c(Tube_code, time_point),
                names_to = "trait",
                values_to = "value") %>%
   group_by(trait) %>%
-  summarise(p_value = wilcox.test(value ~ type)$p.value) %>%
+  summarise(p_value = wilcox.test(value ~ time_point)$p.value) %>%
   mutate(p_adjust = p.adjust(p_value, method = "BH")) %>%
   filter(p_adjust < 0.05) %>%
   remove_rownames() %>% 
   left_join(., uniqueGIFT_db, by=join_by("trait"=="Code_element"))
 ```
 
-CI vs WC
+### CI vs WC
 
 #### Alpha
 
@@ -310,7 +311,7 @@ bxp1 +
 
 ```
 
-```{r, comparison_1}
+```{r}
 alpha_div_meta <- alpha_div %>%
   left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
   filter(time_point=="FMT1"|time_point=="Acclimation") %>%
@@ -318,20 +319,20 @@ alpha_div_meta <- alpha_div %>%
 ```
 
 ***Richness***
-```{r alpha_div_data_post4, comparison, comment="", message=FALSE, warning=FALSE}
+```{r alpha_div_data_post4_comparison, comment="", message=FALSE, warning=FALSE, eval=FALSE}
 Modelq0GLMMNB <- glm.nb(richness ~ type*time_point, data = alpha_div_meta,trace=TRUE)
 summary(Modelq0GLMMNB)
 emmeans(Modelq0GLMMNB, pairwise ~ type)
 ```
 
 ***Neutral***
-```{r alpha_div_data_1_post4, comparison, comment="", message=FALSE, warning=FALSE}
+```{r alpha_div_data_1_post4_comparison, comment="", message=FALSE, warning=FALSE}
 Modelq1n <- lm(formula = neutral ~ type*time_point, data = alpha_div_meta) 
 summary(Modelq1n)
 ```
 
 ***Phylogenetic***
-```{r alpha_div_data_2_post4, comparison, comment="", message=FALSE, warning=FALSE}
+```{r alpha_div_data_2_post4_comparison, comment="", message=FALSE, warning=FALSE}
 Model_phylo <- lm(formula = phylogenetic ~ type*time_point, data = alpha_div_meta) 
 summary(Model_phylo)
 ```
@@ -484,9 +485,9 @@ beta_phylogenetic_nmds_post4 <- phylo_post4 %>%
 ggarrange(beta_richness_nmds_post4, beta_neutral_nmds_post4, beta_phylogenetic_nmds_post4, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 ```
 
-***Functional differences***
+#### Functional differences
 
-WC from acclimation to FMT1
+***WC from acclimation to FMT1***
 
 ```{r comunity_elem_FMT3_cold_2, comment="", message=FALSE, warning=FALSE}
 element_gift %>%
@@ -494,21 +495,21 @@ element_gift %>%
   select(-time_point, -type) %>%
   filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
   select(Tube_code, where( ~ is.numeric(.) && sum(.) > 0)) %>%
-  left_join(sample_metadata[c(1, 7)], by = "Tube_code") %>% 
-  pivot_longer(-c(Tube_code, type),
+  left_join(sample_metadata[c(1, 10)], by = "Tube_code") %>% 
+  pivot_longer(-c(Tube_code, time_point),
                names_to = "trait",
                values_to = "value") %>%
   group_by(trait) %>%
-  summarise(p_value = wilcox.test(value ~ type)$p.value) %>%
+  summarise(p_value = wilcox.test(value ~ time_point)$p.value) %>%
   mutate(p_adjust = p.adjust(p_value, method = "BH")) %>%
   filter(p_adjust < 0.05) %>%
   remove_rownames() %>% 
   left_join(., uniqueGIFT_db, by=join_by("trait"=="Code_element"))
 ```
 
-### What is the effect of FMT and temperature on the GM after 2 weeks?
+## What is the effect of FMT and temperature on the GM after 2 weeks caompared to acclimation?
 
-CI vs CC
+### CI vs CC
 
 #### Alpha
 
@@ -548,7 +549,7 @@ bxp1 +
 
 ```
 
-```{r, comparison_post3}
+```{r}
 alpha_div_meta <- alpha_div %>%
   left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
   filter(time_point=="FMT2"|time_point=="Acclimation") %>%
@@ -556,20 +557,20 @@ alpha_div_meta <- alpha_div %>%
 ```
 
 ***Richness***
-```{r alpha_div_data, comparison, comment="", message=FALSE, warning=FALSE}
+```{r alpha_div_data_comparison, comment="", message=FALSE, warning=FALSE, eval=FALSE}
 Modelq0GLMMNB <- glm.nb(richness ~ type*time_point, data = alpha_div_meta,trace=TRUE)
 summary(Modelq0GLMMNB)
 emmeans(Modelq0GLMMNB, pairwise ~ type)
 ```
 
 ***Neutral***
-```{r alpha_div_data_1, comparison, comment="", message=FALSE, warning=FALSE}
+```{r alpha_div_data_1_comparison, comment="", message=FALSE, warning=FALSE}
 Modelq1n <- lm(formula = neutral ~ type*time_point, data = alpha_div_meta) 
 summary(Modelq1n)
 ```
 
 ***Phylogenetic***
-```{r alpha_div_data_2, comparison, comment="", message=FALSE, warning=FALSE}
+```{r alpha_div_data_2_comparison, comment="", message=FALSE, warning=FALSE}
 Model_phylo <- lm(formula = phylogenetic ~ type*time_point, data = alpha_div_meta) 
 summary(Model_phylo)
 ```
@@ -722,9 +723,9 @@ beta_phylogenetic_nmds_post5 <- phylo_post5 %>%
 ggarrange(beta_richness_nmds_post5, beta_neutral_nmds_post5, beta_phylogenetic_nmds_post5, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 ```
 
-***Functional differences***
+#### Functional differences
 
-CC from acclimation to FMT2
+***CC from acclimation to FMT2***
 
 ```{r comunity_elem_FMT3_cold_5, comment="", message=FALSE, warning=FALSE}
 element_gift %>%
@@ -732,19 +733,19 @@ element_gift %>%
   select(-time_point, -type) %>%
   filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
   select(Tube_code, where( ~ is.numeric(.) && sum(.) > 0)) %>%
-  left_join(sample_metadata[c(1, 7)], by = "Tube_code") %>% 
-  pivot_longer(-c(Tube_code, type),
+  left_join(sample_metadata[c(1, 10)], by = "Tube_code") %>% 
+  pivot_longer(-c(Tube_code, time_point),
                names_to = "trait",
                values_to = "value") %>%
   group_by(trait) %>%
-  summarise(p_value = wilcox.test(value ~ type)$p.value) %>%
+  summarise(p_value = wilcox.test(value ~ time_point)$p.value) %>%
   mutate(p_adjust = p.adjust(p_value, method = "BH")) %>%
   filter(p_adjust < 0.05) %>%
   remove_rownames() %>% 
   left_join(., uniqueGIFT_db, by=join_by("trait"=="Code_element"))
 ```
 
-CI from acclimation to FMT2
+***CI from acclimation to FMT2***
 
 ```{r comunity_elem_FMT3_cold_6, comment="", message=FALSE, warning=FALSE}
 element_gift %>%
@@ -752,19 +753,19 @@ element_gift %>%
   select(-time_point, -type) %>%
   filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
   select(Tube_code, where( ~ is.numeric(.) && sum(.) > 0)) %>%
-  left_join(sample_metadata[c(1, 7)], by = "Tube_code") %>% 
-  pivot_longer(-c(Tube_code, type),
+  left_join(sample_metadata[c(1, 10)], by = "Tube_code") %>% 
+  pivot_longer(-c(Tube_code, time_point),
                names_to = "trait",
                values_to = "value") %>%
   group_by(trait) %>%
-  summarise(p_value = wilcox.test(value ~ type)$p.value) %>%
+  summarise(p_value = wilcox.test(value ~ time_point)$p.value) %>%
   mutate(p_adjust = p.adjust(p_value, method = "BH")) %>%
   filter(p_adjust < 0.05) %>%
   remove_rownames() %>% 
   left_join(., uniqueGIFT_db, by=join_by("trait"=="Code_element"))
 ```
 
-CI vs WC
+### CI vs WC
 
 #### Alpha
 
@@ -804,7 +805,7 @@ bxp1 +
 
 ```
 
-```{r, comparison_1_post5}
+```{r}
 alpha_div_meta <- alpha_div %>%
   left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
   filter(time_point=="FMT2"|time_point=="Acclimation") %>%
@@ -812,20 +813,20 @@ alpha_div_meta <- alpha_div %>%
 ```
 
 ***Richness***
-```{r alpha_div_data_post6, comparison, comment="", message=FALSE, warning=FALSE}
+```{r alpha_div_data_post6_comparison, comment="", message=FALSE, warning=FALSE, eval=FALSE}
 Modelq0GLMMNB <- glm.nb(richness ~ type*time_point, data = alpha_div_meta,trace=TRUE)
 summary(Modelq0GLMMNB)
 emmeans(Modelq0GLMMNB, pairwise ~ type)
 ```
 
 ***Neutral***
-```{r alpha_div_data_1_post6, comparison, comment="", message=FALSE, warning=FALSE}
+```{r alpha_div_data_1_post6_comparison, comment="", message=FALSE, warning=FALSE}
 Modelq1n <- lm(formula = neutral ~ type*time_point, data = alpha_div_meta) 
 summary(Modelq1n)
 ```
 
 ***Phylogenetic***
-```{r alpha_div_data_2_post6, comparison, comment="", message=FALSE, warning=FALSE}
+```{r alpha_div_data_2_post6_comparison, comment="", message=FALSE, warning=FALSE}
 Model_phylo <- lm(formula = phylogenetic ~ type*time_point, data = alpha_div_meta) 
 summary(Model_phylo)
 ```
@@ -978,9 +979,9 @@ beta_phylogenetic_nmds_post6 <- phylo_post6 %>%
 ggarrange(beta_richness_nmds_post6, beta_neutral_nmds_post6, beta_phylogenetic_nmds_post6, ncol=2, nrow=2, common.legend = TRUE, legend="right")
 ```
 
-***Functional differences***
+#### Functional differences
 
-WC from acclimation to FMT2
+***WC from acclimation to FMT2***
 
 ```{r comunity_elem_FMT3_cold_post6, comment="", message=FALSE, warning=FALSE}
 element_gift %>%
@@ -988,12 +989,12 @@ element_gift %>%
   select(-time_point, -type) %>%
   filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
   select(Tube_code, where( ~ is.numeric(.) && sum(.) > 0)) %>%
-  left_join(sample_metadata[c(1, 7)], by = "Tube_code") %>% 
-  pivot_longer(-c(Tube_code, type),
+  left_join(sample_metadata[c(1, 10)], by = "Tube_code") %>% 
+  pivot_longer(-c(Tube_code, time_point),
                names_to = "trait",
                values_to = "value") %>%
   group_by(trait) %>%
-  summarise(p_value = wilcox.test(value ~ type)$p.value) %>%
+  summarise(p_value = wilcox.test(value ~ time_point)$p.value) %>%
   mutate(p_adjust = p.adjust(p_value, method = "BH")) %>%
   filter(p_adjust < 0.05) %>%
   remove_rownames() %>% 

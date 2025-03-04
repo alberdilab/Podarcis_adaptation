@@ -7,13 +7,13 @@ set.seed(2802)
 ```
 ```{r load_data_FMT}
 load("data/data_27022025.Rdata")
-load("data/beta_27022025.Rdata")
+load("data/calculations_28022025.Rdata")
 ```
 
 ## FMT1
 ### Is the GM of the intervention group more similar to warm population after one week from FMT?
 #### Alpha
-```{r alpha_div_plot_5, comment="", message=FALSE, warning=FALSE, fig.height=10, fig.width=10, fig.fullwidth=TRUE}
+```{r alpha_div_plot_5, comment="", message=FALSE, warning=FALSE, fig.height=4, fig.width=10, fig.fullwidth=TRUE}
 bxp1<-alpha_div %>%
   pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
   left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
@@ -532,7 +532,7 @@ ggarrange(beta_richness_nmds_FMT2, beta_neutral_nmds_FMT2, beta_phylogenetic_nmd
 physeq_FMT2 <- subset_samples(physeq_all, type %in% c("Hot_control", "Treatment") & time_point == "FMT2")
 physeq_FMT2 <- prune_taxa(taxa_sums(physeq_FMT2)>0, physeq_FMT2)
 ```
-```{r ancom_rand_pond_FMT2, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+```{r ancom_rand_pond_FMT2, comment="", message=FALSE, warning=FALSE}
 ancom_rand_output = ancombc2(data = physeq_FMT2, 
                   assay_name = "counts", 
                   tax_level = NULL,
@@ -636,7 +636,7 @@ ancombc_rand_table_mag%>%
 physeq_FMT2 <- subset_samples(physeq_all, type %in% c("Control", "Treatment") & time_point == "FMT2")
 physeq_FMT2 <- prune_taxa(taxa_sums(physeq_FMT2)>0, physeq_FMT2)
 ```
-```{r ancom_rand_pond_FMT2_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+```{r ancom_rand_pond_FMT2_cold, comment="", message=FALSE, warning=FALSE}
 ancom_rand_output_cold = ancombc2(data = physeq_FMT2, 
                   assay_name = "counts", 
                   tax_level = NULL,
@@ -704,7 +704,6 @@ ggplot(., aes(x=lfc_typeTreatment, y=forcats::fct_reorder(genome,lfc_typeTreatme
   geom_col() + 
   scale_fill_manual(values=tax_color) + 
   geom_hline(yintercept=0) + 
-#  coord_flip()+
   theme(panel.background = element_blank(),
         axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
         axis.text.x = element_text(size = 12),
