@@ -12,13 +12,42 @@ load("data/calculations_28022025.Rdata")
 
 ## FMT1
 ### Is the GM of the intervention group more similar to warm population after one week from FMT?
+
+#### Shapiro test
+
+```{r shapiro_fmt1, comment="", message=FALSE, warning=FALSE,}
+alpha_div %>%
+  pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
+  left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point =="FMT1") %>% 
+  filter(metric=="richness") %>% 
+  summarize(shapiro_p_value = shapiro.test(value)$p.value) %>%
+  pull(shapiro_p_value)
+
+alpha_div %>%
+  pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
+  left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point =="FMT1") %>% 
+  filter(metric=="neutral") %>% 
+  summarize(shapiro_p_value = shapiro.test(value)$p.value) %>%
+  pull(shapiro_p_value)
+
+alpha_div %>%
+  pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
+  left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point =="FMT1") %>% 
+  filter(metric=="phylogenetic") %>% 
+  summarize(shapiro_p_value = shapiro.test(value)$p.value) %>%
+  pull(shapiro_p_value)
+```
+
 #### Alpha
 ```{r alpha_div_plot_5, comment="", message=FALSE, warning=FALSE, fig.height=4, fig.width=10, fig.fullwidth=TRUE}
 bxp1<-alpha_div %>%
   pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
   left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
   filter(time_point=="FMT1") %>%
-  mutate(metric=factor(metric,levels=c("richness","neutral","phylogenetic","functional"))) %>%
+  mutate(metric=factor(metric,levels=c("richness","neutral","phylogenetic"))) %>%
       ggplot(aes(y = value, x = type, group=type, color=type, fill=type)) +
       geom_boxplot(outlier.shape = NA) +
       geom_jitter(alpha=0.5) +
@@ -33,7 +62,7 @@ bxp1<-alpha_div %>%
         scale_x_discrete(labels = c("Control" = "Cold-Cold", "Hot_control" = "Hot-Hot", "Treatment" = "Cold-Hot")) +
       facet_wrap(. ~ metric,scales = "free") +
       coord_cartesian(xlim = c(1, NA)) +
-      stat_compare_means(size=3, label.x=.7) +
+      stat_compare_means(method="t.test",size=3, label.x=.7) +
       theme_classic() +
         theme(
     strip.background = element_blank(),
@@ -53,31 +82,6 @@ bxp1<-alpha_div %>%
 bxp1 + 
   geom_signif(comparisons = list(c("Control", "Hot_control"), c("Control", "Treatment"), c("Hot_control", "Treatment")),
               map_signif_level = TRUE)
-```
-
-```{r}
-alpha_div_meta <- alpha_div %>%
-  left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
-  filter(time_point =="FMT1") 
-```
-
-***Richness***
-```{r alpha_div_data, comment="", message=FALSE, warning=FALSE, eval=FALSE}
-Modelq0GLMMNB <- glm.nb(richness ~ type, data = alpha_div_meta,trace=TRUE)
-summary(Modelq0GLMMNB)
-emmeans(Modelq0GLMMNB, pairwise ~ type)
-```
-
-***Neutral***
-```{r alpha_div_data_1, comment="", message=FALSE, warning=FALSE}
-Modelq1n <- lm(formula = neutral ~ type, data = alpha_div_meta) 
-summary(Modelq1n)
-```
-
-***Phylogenetic***
-```{r alpha_div_data_2, comment="", message=FALSE, warning=FALSE}
-Model_phylo <- lm(formula = phylogenetic ~ type, data = alpha_div_meta) 
-summary(Model_phylo)
 ```
 
 #### Beta diversity
@@ -306,13 +310,42 @@ element_gift %>%
 
 ## FMT2
 ### Is the GM of the intervention group still more similar to warm population after one week from FMT?
+
+#### Shapiro test
+
+```{r shapiro_fmt2, comment="", message=FALSE, warning=FALSE,}
+alpha_div %>%
+  pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
+  left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point =="FMT2") %>% 
+  filter(metric=="richness") %>% 
+  summarize(shapiro_p_value = shapiro.test(value)$p.value) %>%
+  pull(shapiro_p_value)
+
+alpha_div %>%
+  pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
+  left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point =="FMT2") %>% 
+  filter(metric=="neutral") %>% 
+  summarize(shapiro_p_value = shapiro.test(value)$p.value) %>%
+  pull(shapiro_p_value)
+
+alpha_div %>%
+  pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
+  left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point =="FMT2") %>% 
+  filter(metric=="phylogenetic") %>% 
+  summarize(shapiro_p_value = shapiro.test(value)$p.value) %>%
+  pull(shapiro_p_value)
+```
+
 #### Alpha
 ```{r alpha_div_plot_FMT2, comment="", message=FALSE, warning=FALSE, fig.height=4, fig.width=10, fig.fullwidth=TRUE}
 bxp1<-alpha_div %>%
   pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
   left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
   filter(time_point=="FMT2") %>%
-  mutate(metric=factor(metric,levels=c("richness","neutral","phylogenetic","functional"))) %>%
+  mutate(metric=factor(metric,levels=c("richness","neutral","phylogenetic"))) %>%
       ggplot(aes(y = value, x = type, group=type, color=type, fill=type)) +
       geom_boxplot(outlier.shape = NA) +
       geom_jitter(alpha=0.5) +
@@ -327,7 +360,7 @@ bxp1<-alpha_div %>%
         scale_x_discrete(labels = c("Control" = "Cold-Cold", "Hot_control" = "Hot-Hot", "Treatment" = "Cold-Hot")) +
       facet_wrap(. ~ metric,scales = "free") +
       coord_cartesian(xlim = c(1, NA)) +
-      stat_compare_means(size=3, label.x=.7) +
+      stat_compare_means(method="t.test",size=3, label.x=.7) +
       theme_classic() +
         theme(
     strip.background = element_blank(),
@@ -347,31 +380,6 @@ bxp1<-alpha_div %>%
 bxp1 + 
   geom_signif(comparisons = list(c("Control", "Hot_control"), c("Control", "Treatment"), c("Hot_control", "Treatment")),
               map_signif_level = TRUE)
-```
-
-```{r}
-alpha_div_meta <- alpha_div %>%
-  left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
-  filter(time_point =="FMT2") 
-```
-
-***Richness***
-```{r alpha_div_data_FMT2, comment="", message=FALSE, warning=FALSE, eval=FALSE}
-Modelq0GLMMNB <- glm.nb(richness ~ type, data = alpha_div_meta,trace=TRUE)
-summary(Modelq0GLMMNB)
-emmeans(Modelq0GLMMNB, pairwise ~ type)
-```
-
-***Neutral***
-```{r alpha_div_data_1_FMT2, comment="", message=FALSE, warning=FALSE}
-Modelq1n <- lm(formula = neutral ~ type, data = alpha_div_meta) 
-summary(Modelq1n)
-```
-
-***Phylogenetic***
-```{r alpha_div_data_2_FMT2, comment="", message=FALSE, warning=FALSE}
-Model_phylo <- lm(formula = phylogenetic ~ type, data = alpha_div_meta) 
-summary(Model_phylo)
 ```
 
 #### Beta diversity
@@ -532,7 +540,7 @@ ggarrange(beta_richness_nmds_FMT2, beta_neutral_nmds_FMT2, beta_phylogenetic_nmd
 physeq_FMT2 <- subset_samples(physeq_all, type %in% c("Hot_control", "Treatment") & time_point == "FMT2")
 physeq_FMT2 <- prune_taxa(taxa_sums(physeq_FMT2)>0, physeq_FMT2)
 ```
-```{r ancom_rand_pond_FMT2, comment="", message=FALSE, warning=FALSE}
+```{r ancom_rand_pond_FMT2, comment="", message=FALSE, warning=FALSE, eval=FALSE}
 ancom_rand_output = ancombc2(data = physeq_FMT2, 
                   assay_name = "counts", 
                   tax_level = NULL,
@@ -636,7 +644,7 @@ ancombc_rand_table_mag%>%
 physeq_FMT2 <- subset_samples(physeq_all, type %in% c("Control", "Treatment") & time_point == "FMT2")
 physeq_FMT2 <- prune_taxa(taxa_sums(physeq_FMT2)>0, physeq_FMT2)
 ```
-```{r ancom_rand_pond_FMT2_cold, comment="", message=FALSE, warning=FALSE}
+```{r ancom_rand_pond_FMT2_cold, comment="", message=FALSE, warning=FALSE, eval=FALSE}
 ancom_rand_output_cold = ancombc2(data = physeq_FMT2, 
                   assay_name = "counts", 
                   tax_level = NULL,

@@ -19,7 +19,7 @@ alpha_div %>%
   left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
   filter(Population == "Cold_wet" & time_point %in% c("Acclimation", "Wild")) %>%
   mutate(time_point = factor(time_point, levels = c("Wild", "Acclimation"))) %>%
-  mutate(metric = factor(metric, levels = c("richness", "neutral", "phylogenetic", "functional"))) %>%
+  mutate(metric = factor(metric, levels = c("richness", "neutral", "phylogenetic"))) %>%
   ggplot(aes(
     y = value,
     x = time_point,
@@ -43,7 +43,6 @@ alpha_div %>%
   ) +
   facet_wrap(. ~ metric, scales = "free") +
   coord_cartesian(xlim = c(1, NA)) +
-  stat_compare_means(size = 3, label.x = .58) +
   theme_classic() +
   theme(
     strip.background = element_blank(),
@@ -57,6 +56,32 @@ alpha_div %>%
     axis.title = element_text(size = 8)
   ) +
   ylab("Alpha diversity")
+```
+
+```{r, wild_accli}
+alpha_div_meta <- alpha_div %>%
+  left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(Population=="Cold_wet") %>%
+  filter(time_point =="Acclimation"| time_point == "Wild") 
+```
+
+***Richness***
+```{r alpha_div_data_wild_accli, comment="", message=FALSE, warning=FALSE}
+Modelq0GLMMNB <- MASS::glm.nb(richness ~ time_point, data = alpha_div_meta,trace=TRUE)
+summary(Modelq0GLMMNB)
+emmeans::emmeans(Modelq0GLMMNB, pairwise ~ time_point)
+```
+
+***Neutral***
+```{r alpha_div_data_1_wild_accli, comment="", message=FALSE, warning=FALSE}
+Modelq1n <- lm(formula = neutral ~ time_point, data = alpha_div_meta) 
+summary(Modelq1n)
+```
+
+***Phylogenetic***
+```{r alpha_div_data_2_wild_accli, comment="", message=FALSE, warning=FALSE}
+Model_phylo <- lm(formula = phylogenetic ~ time_point, data = alpha_div_meta) 
+summary(Model_phylo)
 ```
 
 ##### Beta diversity
@@ -160,7 +185,7 @@ alpha_div %>%
   left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
   filter(type=="Hot_control" & time_point %in% c("Acclimation", "Wild")) %>%
   mutate(time_point = factor(time_point, levels = c("Wild", "Acclimation"))) %>%
-  mutate(metric = factor(metric, levels = c("richness", "neutral", "phylogenetic", "functional"))) %>%
+  mutate(metric = factor(metric, levels = c("richness", "neutral", "phylogenetic"))) %>%
   ggplot(aes(
     y = value,
     x = time_point,
@@ -184,7 +209,6 @@ alpha_div %>%
   ) +
   facet_wrap(. ~ metric, scales = "free") +
   coord_cartesian(xlim = c(1, NA)) +
-  stat_compare_means(size = 3, label.x = .58) +
   theme_classic() +
   theme(
     strip.background = element_blank(),
@@ -198,6 +222,32 @@ alpha_div %>%
     axis.title = element_text(size = 8)
   ) +
   ylab("Alpha diversity")
+```
+
+```{r, warm_wild_accli}
+alpha_div_meta <- alpha_div %>%
+  left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(Population=="Hot_dry") %>%
+  filter(time_point =="Acclimation"| time_point == "Wild") 
+```
+
+***Richness***
+```{r alpha_div_data_warm_wild_accli, comment="", message=FALSE, warning=FALSE}
+Modelq0GLMMNB <- MASS::glm.nb(richness ~ time_point, data = alpha_div_meta,trace=TRUE)
+summary(Modelq0GLMMNB)
+emmeans::emmeans(Modelq0GLMMNB, pairwise ~ time_point)
+```
+
+***Neutral***
+```{r alpha_div_data_1_warm_wild_accli, comment="", message=FALSE, warning=FALSE}
+Modelq1n <- lm(formula = neutral ~ time_point, data = alpha_div_meta) 
+summary(Modelq1n)
+```
+
+***Phylogenetic***
+```{r alpha_div_data_2_warm_wild_accli, comment="", message=FALSE, warning=FALSE}
+Model_phylo <- lm(formula = phylogenetic ~ time_point, data = alpha_div_meta) 
+summary(Model_phylo)
 ```
 
 ##### Beta diversity
@@ -312,13 +362,43 @@ difference_table_warm %>%
 ```
 
 ### Do populations mantain a different GM after acclimation?
+
+#### Shaprio test
+
+```{r shapiro_wild_accli, comment="", message=FALSE, warning=FALSE,}
+alpha_div %>%
+  pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
+  left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point =="Acclimation") %>% 
+  filter(metric=="richness") %>% 
+  summarize(shapiro_p_value = shapiro.test(value)$p.value) %>%
+  pull(shapiro_p_value)
+
+alpha_div %>%
+  pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
+  left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point =="Acclimation") %>% 
+  filter(metric=="neutral") %>% 
+  summarize(shapiro_p_value = shapiro.test(value)$p.value) %>%
+  pull(shapiro_p_value)
+
+alpha_div %>%
+  pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
+  left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point =="Acclimation") %>% 
+  filter(metric=="phylogenetic") %>% 
+  summarize(shapiro_p_value = shapiro.test(value)$p.value) %>%
+  pull(shapiro_p_value)
+```
+
+
 #### Alpha diversity
 ```{r alpha_div_plot_accli, comment="", message=FALSE, warning=FALSE, fig.height=4, fig.width=8, fig.fullwidth=TRUE}
 alpha_div %>%
   pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
   left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
   filter(time_point=="Acclimation") %>%
-  mutate(metric=factor(metric,levels=c("richness","neutral","phylogenetic","functional"))) %>%
+  mutate(metric=factor(metric,levels=c("richness","neutral","phylogenetic"))) %>%
       ggplot(aes(y = value, x = Population, group=Population, color=Population, fill=Population)) +
       geom_boxplot(outlier.shape = NA) +
       geom_jitter(alpha=0.5) +
@@ -332,7 +412,7 @@ alpha_div %>%
           values=c('#00808050', "#d57d2c50")) +
       facet_wrap(. ~ metric,scales = "free") +
       coord_cartesian(xlim = c(1, NA)) +
-      stat_compare_means(size=3, label.x=.58) +
+      stat_compare_means(method="t.test",size=3, label.x=.58) +
       theme_classic() +
         theme(
     strip.background = element_blank(),

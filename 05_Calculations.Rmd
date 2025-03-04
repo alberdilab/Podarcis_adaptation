@@ -81,7 +81,7 @@ physeq_all = phyloseq(count_phy, TAX, sample_info_tab_phy, tree)
 
 ```{r gift_analyses, warning=FALSE, eval=FALSE}
 # Aggregate bundle-level GIFTs into the compound level
-GIFTs_elements <- to.elements(genome_gifts, GIFT_db2)
+GIFTs_elements <- to.elements(genome_gifts, GIFT_db)
 GIFTs_elements_filtered <- GIFTs_elements[rownames(GIFTs_elements) %in% genome_counts_filt$genome, ]
 GIFTs_elements_filtered <- as.data.frame(GIFTs_elements_filtered) %>%
   select_if(~ !is.numeric(.) || sum(.) != 0)
@@ -90,21 +90,21 @@ elements <- GIFTs_elements_filtered %>%
   as.data.frame()
 
 # Aggregate element-level GIFTs into the function level
-GIFTs_functions <- to.functions(GIFTs_elements_filtered, GIFT_db2)
+GIFTs_functions <- to.functions(GIFTs_elements_filtered, GIFT_db)
 functions <- GIFTs_functions %>%
   as.data.frame()
 
 # Aggregate function-level GIFTs into overall Biosynthesis, Degradation and Structural GIFTs
-GIFTs_domains <- to.domains(GIFTs_functions, GIFT_db2)
+GIFTs_domains <- to.domains(GIFTs_functions, GIFT_db)
 domains <- GIFTs_domains %>%
   as.data.frame()
 
 # Get community-weighed average GIFTs per sample
-GIFTs_elements_community <- to.community(GIFTs_elements_filtered, genome_counts_filt %>% column_to_rownames(., "genome") %>% tss(), GIFT_db2)
-GIFTs_functions_community <- to.community(GIFTs_functions, genome_counts_filt %>% column_to_rownames(., "genome") %>% tss(), GIFT_db2)
-GIFTs_domains_community <- to.community(GIFTs_domains, genome_counts_filt %>% column_to_rownames(., "genome") %>% tss(), GIFT_db2)
+GIFTs_elements_community <- to.community(GIFTs_elements_filtered, genome_counts_filt %>% column_to_rownames(., "genome") %>% tss(), GIFT_db)
+GIFTs_functions_community <- to.community(GIFTs_functions, genome_counts_filt %>% column_to_rownames(., "genome") %>% tss(), GIFT_db)
+GIFTs_domains_community <- to.community(GIFTs_domains, genome_counts_filt %>% column_to_rownames(., "genome") %>% tss(), GIFT_db)
 
-uniqueGIFT_db <- unique(GIFT_db2[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
+uniqueGIFT_db <- unique(GIFT_db[c(2,4,5,6)]) %>% unite("Function",Function:Element, sep= "_", remove=FALSE)
 ```
 
 ```{r element_gift, comment="", message=FALSE, warning=FALSE, eval=FALSE}

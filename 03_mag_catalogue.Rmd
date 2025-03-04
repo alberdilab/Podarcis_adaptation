@@ -139,7 +139,7 @@ grid.arrange(grobs = list(genome_completeness,genome_biplot,genome_contamination
 
 # Aggregate basal GIFT into elements
 function_table <- genome_gifts %>%
-    to.elements(., GIFT_db2)
+    to.elements(., GIFT_db)
 
 # Generate  basal tree
 function_tree <- force.ultrametric(genome_tree, method="extend") %>%
