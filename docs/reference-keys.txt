@@ -68,6 +68,18 @@ do-populations-mantain-a-different-gm-after-acclimation
 shaprio-test
 alpha-diversity-2
 beta-diversity-2
+<<<<<<< HEAD
+=======
+functional-differences
+warm
+alpha-diversity-3
+beta-diversity-3
+functional-differences-1
+do-populations-mantain-a-different-gm-after-acclimation
+shaprio-test
+alpha-diversity-4
+beta-diversity-4
+>>>>>>> d08d3ecaca65f0411fd9dfdf7dedf41ce523b6b2
 functional-capacity-1
 metabolic-capacity-index-at-functional-level-1
 differences-in-functional-pathways-1
@@ -93,6 +105,7 @@ alpha-diversity-3
 beta-diversity-5
 what-is-the-effect-of-fmt-and-temperature-on-the-gm-after-1-week-compared-to-acclimation
 ci-vs-cc
+<<<<<<< HEAD
 alpha-diversity-4
 beta-diversity-6
 functional-differences-2
@@ -109,3 +122,21 @@ ci-vs-wc-1
 alpha-4
 beta-diversity-9
 functional-differences-5
+=======
+alpha-diversity-5
+beta-diversity-7
+functional-differences-4
+ci-vs-wc
+alpha-2
+beta-diversity-8
+functional-differences-5
+what-is-the-effect-of-fmt-and-temperature-on-the-gm-after-2-weeks-caompared-to-acclimation
+ci-vs-cc-1
+alpha-3
+beta-diversity-9
+functional-differences-6
+ci-vs-wc-1
+alpha-4
+beta-diversity-10
+functional-differences-7
+>>>>>>> d08d3ecaca65f0411fd9dfdf7dedf41ce523b6b2

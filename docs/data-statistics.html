@@ -2312,8 +2312,13 @@ color: #a52929;
 
     <script>
 
+<<<<<<< HEAD
       function styleCell_wy264s3t8xqi14jdggb4(i, j, css_id) {
           var table = document.getElementById("tinytable_wy264s3t8xqi14jdggb4");
+=======
+      function styleCell_0bw6qnjqp4akit94rjvh(i, j, css_id) {
+          var table = document.getElementById("tinytable_0bw6qnjqp4akit94rjvh");
+>>>>>>> d08d3ecaca65f0411fd9dfdf7dedf41ce523b6b2
           var cell = table.rows[i]?.cells[j];  // Safe navigation to avoid errors
           if (cell) {
               console.log(`Styling cell at (${i}, ${j}) with class ${css_id}`);
@@ -2323,7 +2328,11 @@ color: #a52929;
           }
       }
       function insertSpanRow(i, colspan, content) {
+<<<<<<< HEAD
         var table = document.getElementById('tinytable_wy264s3t8xqi14jdggb4');
+=======
+        var table = document.getElementById('tinytable_0bw6qnjqp4akit94rjvh');
+>>>>>>> d08d3ecaca65f0411fd9dfdf7dedf41ce523b6b2
         var newRow = table.insertRow(i);
         var newCell = newRow.insertCell(0);
         newCell.setAttribute("colspan", colspan);
@@ -2331,8 +2340,13 @@ color: #a52929;
         // this may be unsafe, but innerText does not interpret <br>
         newCell.innerHTML = content;
       }
+<<<<<<< HEAD
       function spanCell_wy264s3t8xqi14jdggb4(i, j, rowspan, colspan) {
         var table = document.getElementById("tinytable_wy264s3t8xqi14jdggb4");
+=======
+      function spanCell_0bw6qnjqp4akit94rjvh(i, j, rowspan, colspan) {
+        var table = document.getElementById("tinytable_0bw6qnjqp4akit94rjvh");
+>>>>>>> d08d3ecaca65f0411fd9dfdf7dedf41ce523b6b2
         const targetRow = table.rows[i];
         const targetCell = targetRow.cells[j];
         for (let r = 0; r < rowspan; r++) {
@@ -2362,14 +2376,23 @@ color: #a52929;
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
+<<<<<<< HEAD
           { positions: [ { i: 106, j: 0 }, { i: 106, j: 1 }, { i: 106, j: 2 }, { i: 106, j: 3 },  ], css_id: 'tinytable_css_u62mtp08pbz9ho76owsk',}, 
           { positions: [ { i: 0, j: 0 }, { i: 0, j: 1 }, { i: 0, j: 2 }, { i: 0, j: 3 },  ], css_id: 'tinytable_css_eob8tddhzp1zjvfjv5wd',}, 
+=======
+          { positions: [ { i: 106, j: 0 }, { i: 106, j: 1 }, { i: 106, j: 2 }, { i: 106, j: 3 },  ], css_id: 'tinytable_css_lp7hr1zn65knu3467xnd',}, 
+          { positions: [ { i: 0, j: 0 }, { i: 0, j: 1 }, { i: 0, j: 2 }, { i: 0, j: 3 },  ], css_id: 'tinytable_css_0t67s12x0az4vwgurib0',}, 
+>>>>>>> d08d3ecaca65f0411fd9dfdf7dedf41ce523b6b2
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
+<<<<<<< HEAD
                   styleCell_wy264s3t8xqi14jdggb4(cell.i, cell.j, group.css_id);
+=======
+                  styleCell_0bw6qnjqp4akit94rjvh(cell.i, cell.j, group.css_id);
+>>>>>>> d08d3ecaca65f0411fd9dfdf7dedf41ce523b6b2
               });
           });
       });
@@ -2377,11 +2400,19 @@ color: #a52929;
 
     <style>
 
+<<<<<<< HEAD
 .table td.tinytable_css_u62mtp08pbz9ho76owsk, .table th.tinytable_css_u62mtp08pbz9ho76owsk { border-bottom: solid #d3d8dc 0.1em; }
 .table td.tinytable_css_eob8tddhzp1zjvfjv5wd, .table th.tinytable_css_eob8tddhzp1zjvfjv5wd { border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
 </style>
     <div class="container">
       <table class="table table-borderless" id="tinytable_wy264s3t8xqi14jdggb4" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+=======
+.table td.tinytable_css_lp7hr1zn65knu3467xnd, .table th.tinytable_css_lp7hr1zn65knu3467xnd { border-bottom: solid #d3d8dc 0.1em; }
+.table td.tinytable_css_0t67s12x0az4vwgurib0, .table th.tinytable_css_0t67s12x0az4vwgurib0 { border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
+</style>
+    <div class="container">
+      <table class="table table-borderless" id="tinytable_0bw6qnjqp4akit94rjvh" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+>>>>>>> d08d3ecaca65f0411fd9dfdf7dedf41ce523b6b2
         <thead>
         
               <tr>
