@@ -77,7 +77,7 @@ alpha_div %>%
       ) +
   ylab("Alpha diversity")
 ```
-***p<0.05 when comparin neutral beta diversity between Cold-control and Warm-control
+***p<0.05 when comparing neutral beta diversity between Cold-control and Warm-control
 
 
 #### Beta diversity
