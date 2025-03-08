@@ -43,7 +43,7 @@ alpha_div %>%
 
 #### Alpha
 ```{r alpha_div_plot_5, comment="", message=FALSE, warning=FALSE, fig.height=4, fig.width=10, fig.fullwidth=TRUE}
-bxp1<-alpha_div %>%
+alpha_div %>%
   pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
   left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
   filter(time_point=="FMT1") %>%
@@ -76,13 +76,9 @@ bxp1<-alpha_div %>%
     axis.title = element_text(size = 8)
       ) +
   ylab("Alpha diversity")
-
-
-# Add significance bars with p-values
-bxp1 + 
-  geom_signif(comparisons = list(c("Control", "Hot_control"), c("Control", "Treatment"), c("Hot_control", "Treatment")),
-              map_signif_level = TRUE)
 ```
+***p<0.05 when comparin neutral beta diversity between Cold-control and Warm-control
+
 
 #### Beta diversity
 
@@ -566,12 +562,12 @@ ancom_rand_output = ancombc2(data = physeq_FMT2,
                   trend_control = NULL)
 
 ```
-```{r}
+```{r, eval=FALSE}
 ancom_rand_output$res %>%
   dplyr::select(taxon, lfc_PopulationHot_dry, p_PopulationHot_dry) %>%
   filter(p_PopulationHot_dry < 0.05)
 ```
-```{r ancom_rand_FMT2, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+```{r ancom_rand_FMT2, comment="", echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
 taxonomy <- data.frame(physeq_FMT2@tax_table) %>%
   rownames_to_column(., "taxon") %>%
   mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
@@ -602,7 +598,7 @@ tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
 	dplyr::select(colors) %>%
 	pull()
 ```
-```{r ancombc_rand_plot_phy_FMT2, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
+```{r ancombc_rand_plot_phy_FMT2, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE, eval=FALSE}
 ancombc_rand_table_mag%>%
       mutate(genome=factor(taxon,levels=ancombc_rand_table_mag$taxon)) %>%
 ggplot(., aes(x=lfc_PopulationHot_dry, y=forcats::fct_reorder(genome,lfc_PopulationHot_dry), fill=phylum)) + #forcats::fct_rev()
@@ -624,7 +620,7 @@ ggplot(., aes(x=lfc_PopulationHot_dry, y=forcats::fct_reorder(genome,lfc_Populat
 ```
 
 ***Phyla of the significant MAGs in warm control***
-```{r sign_features_FMT2_warm, comment="", message=FALSE, warning=FALSE}
+```{r sign_features_FMT2_warm, comment="", message=FALSE, warning=FALSE, eval=FALSE}
 ancombc_rand_table_mag%>%
   filter(lfc_PopulationHot_dry>0)  %>% 
   count(phylum, name = "sample_count") %>%
@@ -632,7 +628,7 @@ ancombc_rand_table_mag%>%
 ```
 
 ***Phyla of the significant MAGs in intervention group***
-```{r sign_features_FMT2_cold, comment="", message=FALSE, warning=FALSE}
+```{r sign_features_FMT2_cold, comment="", message=FALSE, warning=FALSE, eval=FALSE}
 ancombc_rand_table_mag%>%
   filter(lfc_PopulationHot_dry<0)  %>% 
   count(phylum, name = "sample_count") %>%
@@ -670,13 +666,13 @@ ancom_rand_output_cold = ancombc2(data = physeq_FMT2,
                   trend_control = NULL)
 
 ```
-```{r}
+```{r, eval=FALSE}
 ancom_rand_output_cold$res %>%
   dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
   filter(p_typeTreatment < 0.05)
 ```
 
-```{r ancom_rand_FMT2_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+```{r ancom_rand_FMT2_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
 taxonomy <- data.frame(physeq_FMT2@tax_table) %>%
   rownames_to_column(., "taxon") %>%
   mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
@@ -705,7 +701,7 @@ tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
 	dplyr::select(colors) %>%
 	pull()
 ```
-```{r ancombc_rand_plot_phy_FMT2_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
+```{r ancombc_rand_plot_phy_FMT2_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE, eval=FALSE}
 ancombc_rand_table_mag%>%
       mutate(genome=factor(taxon,levels=ancombc_rand_table_mag$taxon)) %>%
 ggplot(., aes(x=lfc_typeTreatment, y=forcats::fct_reorder(genome,lfc_typeTreatment), fill=phylum)) + #forcats::fct_rev()
@@ -726,7 +722,7 @@ ggplot(., aes(x=lfc_typeTreatment, y=forcats::fct_reorder(genome,lfc_typeTreatme
 ```
 
 ***Phyla of the significant MAGs in intervention group***
-```{r sign_features_FMT2_int, comment="", message=FALSE, warning=FALSE}
+```{r sign_features_FMT2_int, comment="", message=FALSE, warning=FALSE, eval=FALSE}
 ancombc_rand_table_mag%>%
   filter(lfc_typeTreatment>0)  %>% 
   count(phylum, name = "sample_count") %>%
@@ -734,7 +730,7 @@ ancombc_rand_table_mag%>%
 ```
 
 ***Phyla of the significant MAGs in cold control***
-```{r sign_features_FMT2_cold_con, comment="", message=FALSE, warning=FALSE}
+```{r sign_features_FMT2_cold_con, comment="", message=FALSE, warning=FALSE, eval=FALSE}
 ancombc_rand_table_mag%>%
   filter(lfc_typeTreatment<0)  %>% 
   count(phylum, name = "sample_count") %>%
