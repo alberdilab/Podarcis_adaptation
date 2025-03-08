@@ -362,11 +362,7 @@ length(structural_zero_taxa)
 ```
 
 ***Differentially abundant MAGs***
-<<<<<<< HEAD
 ```{r ancom_rand, comment="", echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
-=======
-```{r ancom_rand, comment="", message=FALSE, warning=FALSE}
->>>>>>> d08d3ecaca65f0411fd9dfdf7dedf41ce523b6b2
 taxonomy <- data.frame(physeq_wild@tax_table) %>%
   rownames_to_column(., "taxon") %>%
   mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
@@ -397,11 +393,8 @@ tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
 	dplyr::select(colors) %>%
 	pull()
 ```
-<<<<<<< HEAD
+
 ```{r ancombc_rand_plot_phy, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE, eval=FALSE}
-=======
-```{r ancombc_rand_plot_phy, comment="", message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
->>>>>>> d08d3ecaca65f0411fd9dfdf7dedf41ce523b6b2
 ancombc_rand_table_mag%>%
       mutate(genome=factor(taxon,levels=ancombc_rand_table_mag$taxon)) %>%
 ggplot(., aes(x=lfc_PopulationHot_dry, y=forcats::fct_reorder(genome,lfc_PopulationHot_dry), fill=phylum)) + #forcats::fct_rev()

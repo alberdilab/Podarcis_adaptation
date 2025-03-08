@@ -330,7 +330,9 @@ beta_phylogenetic_nmds_post7 <- CAP_df %>%
 ```{r beta_neutral_nmds_plot_post7_final, fig.height=8, fig.width=12, fig.fullwidth=TRUE}
 ggarrange(beta_richness_nmds_post7, beta_neutral_nmds_post7, beta_phylogenetic_nmds_post7, ncol=3, nrow=1, common.legend = TRUE, legend="right")
 ```
-
+```{r beta_neutral_nmds_plot_post7_final_1, fig.height=8, fig.width=12, fig.fullwidth=TRUE}
+beta_neutral_nmds_post7
+```
 
 ## What is the effect of FMT and temperature on the GM after 1 week compared to acclimation?
 
