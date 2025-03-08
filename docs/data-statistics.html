@@ -2182,6 +2182,23 @@ color: #a52929;
 <li class="chapter" data-level="10.3.2" data-path="changes-after-fmt-compared-to-acclimation.html"><a href="changes-after-fmt-compared-to-acclimation.html#ci-vs-wc-1"><i class="fa fa-check"></i><b>10.3.2</b> CI vs WC</a></li>
 </ul></li>
 </ul></li>
+<li class="chapter" data-level="11" data-path="physiological-measurements.html"><a href="physiological-measurements.html"><i class="fa fa-check"></i><b>11</b> Physiological measurements</a>
+<ul>
+<li class="chapter" data-level="11.1" data-path="physiological-measurements.html"><a href="physiological-measurements.html#respirometry"><i class="fa fa-check"></i><b>11.1</b> Respirometry</a>
+<ul>
+<li class="chapter" data-level="11.1.1" data-path="physiological-measurements.html"><a href="physiological-measurements.html#acclimation-oxygen-consumption"><i class="fa fa-check"></i><b>11.1.1</b> Acclimation oxygen consumption</a></li>
+<li class="chapter" data-level="11.1.2" data-path="physiological-measurements.html"><a href="physiological-measurements.html#time-point-oxygen-consumption"><i class="fa fa-check"></i><b>11.1.2</b> Time-point oxygen consumption</a></li>
+<li class="chapter" data-level="11.1.3" data-path="physiological-measurements.html"><a href="physiological-measurements.html#data-modelling"><i class="fa fa-check"></i><b>11.1.3</b> Data modelling</a></li>
+</ul></li>
+<li class="chapter" data-level="11.2" data-path="physiological-measurements.html"><a href="physiological-measurements.html#pha-test"><i class="fa fa-check"></i><b>11.2</b> PHA test</a>
+<ul>
+<li class="chapter" data-level="11.2.1" data-path="physiological-measurements.html"><a href="physiological-measurements.html#pha-measurements"><i class="fa fa-check"></i><b>11.2.1</b> PHA measurements</a></li>
+<li class="chapter" data-level="11.2.2" data-path="physiological-measurements.html"><a href="physiological-measurements.html#time-point-measurements"><i class="fa fa-check"></i><b>11.2.2</b> Time-point measurements</a></li>
+<li class="chapter" data-level="11.2.3" data-path="physiological-measurements.html"><a href="physiological-measurements.html#time-point-measurements-linking-individuals"><i class="fa fa-check"></i><b>11.2.3</b> Time-point measurements, linking individuals</a></li>
+<li class="chapter" data-level="11.2.4" data-path="physiological-measurements.html"><a href="physiological-measurements.html#data-modelling-1"><i class="fa fa-check"></i><b>11.2.4</b> Data modelling</a></li>
+<li class="chapter" data-level="11.2.5" data-path="physiological-measurements.html"><a href="physiological-measurements.html#data-modeling-without-wc"><i class="fa fa-check"></i><b>11.2.5</b> Data modeling without WC</a></li>
+</ul></li>
+</ul></li>
 <li class="divider"></li>
 <li><a href="https://www.alberdilab.dk" target="blank"><b>www.alberdilab.dk</b></a></li>
 <li><a href="https://www.earthhologenome.org" target="blank"><b>www.earthhologenome.org</b></a></li>
@@ -2312,8 +2329,8 @@ color: #a52929;
 
     <script>
 
-      function styleCell_sjhvrp0vlvsdkwgybart(i, j, css_id) {
-          var table = document.getElementById("tinytable_sjhvrp0vlvsdkwgybart");
+      function styleCell_rp0vlvsdkwgybartm94j(i, j, css_id) {
+          var table = document.getElementById("tinytable_rp0vlvsdkwgybartm94j");
           var cell = table.rows[i]?.cells[j];  // Safe navigation to avoid errors
           if (cell) {
               console.log(`Styling cell at (${i}, ${j}) with class ${css_id}`);
@@ -2323,7 +2340,7 @@ color: #a52929;
           }
       }
       function insertSpanRow(i, colspan, content) {
-        var table = document.getElementById('tinytable_sjhvrp0vlvsdkwgybart');
+        var table = document.getElementById('tinytable_rp0vlvsdkwgybartm94j');
         var newRow = table.insertRow(i);
         var newCell = newRow.insertCell(0);
         newCell.setAttribute("colspan", colspan);
@@ -2331,8 +2348,8 @@ color: #a52929;
         // this may be unsafe, but innerText does not interpret <br>
         newCell.innerHTML = content;
       }
-      function spanCell_sjhvrp0vlvsdkwgybart(i, j, rowspan, colspan) {
-        var table = document.getElementById("tinytable_sjhvrp0vlvsdkwgybart");
+      function spanCell_rp0vlvsdkwgybartm94j(i, j, rowspan, colspan) {
+        var table = document.getElementById("tinytable_rp0vlvsdkwgybartm94j");
         const targetRow = table.rows[i];
         const targetCell = targetRow.cells[j];
         for (let r = 0; r < rowspan; r++) {
@@ -2362,14 +2379,14 @@ color: #a52929;
       window.addEventListener('load', function () {
           var cellsToStyle = [
             // tinytable style arrays after
-          { positions: [ { i: 0, j: 0 }, { i: 0, j: 1 }, { i: 0, j: 2 }, { i: 0, j: 3 },  ], css_id: 'tinytable_css_m94jhedgijhz22aowc5t',}, 
-          { positions: [ { i: 106, j: 0 }, { i: 106, j: 1 }, { i: 106, j: 2 }, { i: 106, j: 3 },  ], css_id: 'tinytable_css_1spkbfd9muvu6xu2v43h',}, 
+          { positions: [ { i: 0, j: 0 }, { i: 0, j: 1 }, { i: 0, j: 2 }, { i: 0, j: 3 },  ], css_id: 'tinytable_css_hedgijhz22aowc5t1spk',}, 
+          { positions: [ { i: 106, j: 0 }, { i: 106, j: 1 }, { i: 106, j: 2 }, { i: 106, j: 3 },  ], css_id: 'tinytable_css_bfd9muvu6xu2v43h9n2s',}, 
           ];
 
           // Loop over the arrays to style the cells
           cellsToStyle.forEach(function (group) {
               group.positions.forEach(function (cell) {
-                  styleCell_sjhvrp0vlvsdkwgybart(cell.i, cell.j, group.css_id);
+                  styleCell_rp0vlvsdkwgybartm94j(cell.i, cell.j, group.css_id);
               });
           });
       });
@@ -2377,11 +2394,11 @@ color: #a52929;
 
     <style>
 
-.table td.tinytable_css_m94jhedgijhz22aowc5t, .table th.tinytable_css_m94jhedgijhz22aowc5t { border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
-.table td.tinytable_css_1spkbfd9muvu6xu2v43h, .table th.tinytable_css_1spkbfd9muvu6xu2v43h { border-bottom: solid #d3d8dc 0.1em; }
+.table td.tinytable_css_hedgijhz22aowc5t1spk, .table th.tinytable_css_hedgijhz22aowc5t1spk { border-top: solid #d3d8dc 0.1em; border-bottom: solid #d3d8dc 0.05em; }
+.table td.tinytable_css_bfd9muvu6xu2v43h9n2s, .table th.tinytable_css_bfd9muvu6xu2v43h9n2s { border-bottom: solid #d3d8dc 0.1em; }
 </style>
     <div class="container">
-      <table class="table table-borderless" id="tinytable_sjhvrp0vlvsdkwgybart" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
+      <table class="table table-borderless" id="tinytable_rp0vlvsdkwgybartm94j" style="width: auto; margin-left: auto; margin-right: auto;" data-quarto-disable-processing="true">
         <thead>
         
               <tr>
