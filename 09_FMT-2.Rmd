@@ -458,7 +458,7 @@ betadisper(neutral_post3, subset_meta_post3$type) %>% permutest(., pairwise = TR
 ```
 
 ```{r beta_neutral_permanova_post3_1_comparison, warning=FALSE, comments="", message=FALSE}
-adonis2(neutral_post3 ~ type,
+adonis2(neutral_post3 ~ type*time_point,
         data = subset_meta_post3 %>% arrange(match(Tube_code,labels(neutral_post3))),
         permutations = 999,
         strata = subset_meta_post3 %>% arrange(match(Tube_code,labels(neutral_post3))) %>% pull(individual),
@@ -487,7 +487,7 @@ betadisper(phylo_post3, subset_meta_post3$type) %>% permutest(., pairwise = TRUE
 ```
 
 ```{r beta_phylo_permanova_post3_1_comparison, warning=FALSE, comments="", message=FALSE}
-adonis2(phylo_post3 ~ type,
+adonis2(phylo_post3 ~ type*time_point,
         data = subset_meta_post3 %>% arrange(match(Tube_code,labels(phylo_post3))),
         permutations = 999,
         strata = subset_meta_post3 %>% arrange(match(Tube_code,labels(phylo_post3))) %>% pull(individual),
@@ -782,7 +782,7 @@ betadisper(neutral_post4, subset_meta_post4$type) %>% permutest(., pairwise = TR
 ```
 
 ```{r beta_neutral_permanova_post4_1_comparison, warning=FALSE, comments="", message=FALSE}
-adonis2(neutral_post4 ~ type,
+adonis2(neutral_post4 ~ type*time_point,
         data = subset_meta_post4 %>% arrange(match(Tube_code,labels(neutral_post4))),
         permutations = 999,
         strata = subset_meta_post4 %>% arrange(match(Tube_code,labels(neutral_post4))) %>% pull(individual),
@@ -811,7 +811,7 @@ betadisper(phylo_post4, subset_meta_post4$type) %>% permutest(., pairwise = TRUE
 ```
 
 ```{r beta_phylo_permanova_post4_1_comparison, warning=FALSE, comments="", message=FALSE}
-adonis2(phylo_post4 ~ type,
+adonis2(phylo_post4 ~ type*time_point,
         data = subset_meta_post4 %>% arrange(match(Tube_code,labels(phylo_post4))),
         permutations = 999,
         strata = subset_meta_post4 %>% arrange(match(Tube_code,labels(phylo_post4))) %>% pull(individual),
@@ -1412,7 +1412,7 @@ betadisper(neutral_post6, subset_meta_post6$type) %>% permutest(., pairwise = TR
 ```
 
 ```{r beta_neutral_permanova_post6_1_comparison, warning=FALSE, comments="", message=FALSE}
-adonis2(neutral_post6 ~ type,
+adonis2(neutral_post6 ~ type*time_point,
         data = subset_meta_post6 %>% arrange(match(Tube_code,labels(neutral_post6))),
         permutations = 999,
         strata = subset_meta_post6 %>% arrange(match(Tube_code,labels(neutral_post6))) %>% pull(individual),
@@ -1441,7 +1441,7 @@ betadisper(phylo_post6, subset_meta_post6$type) %>% permutest(., pairwise = TRUE
 ```
 
 ```{r beta_phylo_permanova_post6_1_comparison, warning=FALSE, comments="", message=FALSE}
-adonis2(phylo_post6 ~ type,
+adonis2(phylo_post6 ~ type*time_point,
         data = subset_meta_post6 %>% arrange(match(Tube_code,labels(phylo_post6))),
         permutations = 999,
         strata = subset_meta_post6 %>% arrange(match(Tube_code,labels(phylo_post6))) %>% pull(individual),
