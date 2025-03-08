@@ -287,7 +287,7 @@ physeq_wild <- prune_taxa(taxa_sums(physeq_wild)>0, physeq_wild)
 ```
 
 ### Phylum
-```{r ancom_rand_pond_phylum, comment="", message=FALSE, warning=FALSE}
+```{r ancom_rand_pond_phylum, comment="", message=FALSE, warning=FALSE, eval=FALSE}
 ancom_rand_output_wild_phylum = ancombc2(data = physeq_wild, 
                   assay_name = "counts", 
                   tax_level = "phylum",
@@ -320,7 +320,7 @@ ancom_rand_output_wild_phylum$res %>%
 ```
 
 ### MAG level
-```{r ancom_rand_pond_mag_wild, comment="", message=FALSE, warning=FALSE}
+```{r ancom_rand_pond_mag_wild, comment="", message=FALSE, warning=FALSE, eval=FALSE}
 ancom_rand_output = ancombc2(data = physeq_wild, 
                   assay_name = "counts", 
                   tax_level = NULL,
