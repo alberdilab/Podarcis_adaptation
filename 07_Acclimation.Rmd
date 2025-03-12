@@ -294,7 +294,7 @@ difference_table_acclimation <- element_gift_sig_acclimation %>%
 difference_table_acclimation %>%
   ggplot(aes(x=forcats::fct_reorder(Function,Difference), y=Difference, fill=group_color)) + 
   geom_col() +
-  scale_fill_manual(values=c("#e5bd5b", "#6b7398")) + 
+  scale_fill_manual(values=c('#008080',"#d57d2c")) + 
   geom_hline(yintercept=0) + 
   coord_flip()+
   theme(axis.text = element_text(size = 10),

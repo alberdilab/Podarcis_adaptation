@@ -2,6 +2,7 @@
 ```{r load_data_calcu, eval=FALSE}
 load("data/data_27022025.Rdata")
 load("data/beta_27022025.Rdata")
+load("data/calculations_28022025.Rdata")
 ```
 
 ## Alpha diversity

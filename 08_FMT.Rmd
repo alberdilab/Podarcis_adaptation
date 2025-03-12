@@ -243,13 +243,13 @@ physeq_FMT1 <- prune_taxa(taxa_sums(physeq_FMT1)>0, physeq_FMT1)
 ancom_rand_output = ancombc2(data = physeq_FMT1, 
                   assay_name = "counts", 
                   tax_level = NULL,
-                  fix_formula = "Population", 
+                  fix_formula = "type", 
                   p_adj_method = "holm", 
                   pseudo_sens = TRUE,
                   prv_cut =0, 
                   lib_cut = 0, 
                   s0_perc = 0.05,
-                  group = "Population", 
+                  group = "type", 
                   struc_zero = TRUE, 
                   neg_lb = FALSE,
                   alpha = 0.05, 
@@ -265,24 +265,30 @@ ancom_rand_output = ancombc2(data = physeq_FMT1,
                   trend_control = NULL)
 
 ```
+
 ```{r, eval=FALSE}
-ancom_rand_output$res %>%
-  dplyr::select(taxon, lfc_PopulationHot_dry, p_PopulationHot_dry) %>%
-  filter(p_PopulationHot_dry < 0.05)
+save(ancom_rand_output, file="data/ancom_rand_output.RData")
 ```
 
-```{r ancom_rand_FMT1, comment="", echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+```{r 1, eval=TRUE}
+load("data/ancom_rand_output.RData")
+ancom_rand_output$res %>%
+  dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
+  filter(p_typeTreatment < 0.05)
+```
+
+```{r ancom_rand_FMT1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
 taxonomy <- data.frame(physeq_FMT1@tax_table) %>%
   rownames_to_column(., "taxon") %>%
   mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
 
 ancombc_rand_table_mag <- ancom_rand_output$res %>%
-  dplyr::select(taxon, lfc_PopulationHot_dry, p_PopulationHot_dry) %>%
-  filter(p_PopulationHot_dry < 0.05) %>%
-  dplyr::arrange(p_PopulationHot_dry) %>%
+  dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
+  filter(p_typeTreatment < 0.05) %>%
+  dplyr::arrange(p_typeTreatment) %>%
   merge(., taxonomy, by="taxon") %>%
   mutate_at(vars(phylum, species), ~ str_replace(., "[dpcofgs]__", ""))%>%
-  dplyr::arrange(lfc_PopulationHot_dry)
+  dplyr::arrange(lfc_typeTreatment)
 
 ancombc_rand_table_mag
   
@@ -303,10 +309,10 @@ tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
 	pull()
 ```
 
-```{r ancombc_rand_plot_phy_FMT1, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE, eval=FALSE}
+```{r ancombc_rand_plot_phy_FMT1, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
 ancombc_rand_table_mag%>%
       mutate(genome=factor(taxon,levels=ancombc_rand_table_mag$taxon)) %>%
-ggplot(., aes(x=lfc_PopulationHot_dry, y=forcats::fct_reorder(genome,lfc_PopulationHot_dry), fill=phylum)) + #forcats::fct_rev()
+ggplot(., aes(x=lfc_typeTreatment, y=forcats::fct_reorder(genome,lfc_typeTreatment), fill=phylum)) + #forcats::fct_rev()
   geom_col() + 
   scale_fill_manual(values=tax_color) + 
   geom_hline(yintercept=0) + 
@@ -320,30 +326,30 @@ ggplot(., aes(x=lfc_PopulationHot_dry, y=forcats::fct_reorder(genome,lfc_Populat
         legend.title = element_text(size = 14, face = "bold"),
         legend.position = "right", legend.box = "vertical")+
   xlab("log2FoldChange") + 
-  ylab("Species")+
+  ylab("MAGs")+
   guides(fill=guide_legend(title="Phylum"))
 ```
 
 ***Phyla of the significant MAGs in warm control***
-```{r sign_features_FMT1_warm, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+```{r sign_features_FMT1_warm, comment="", message=FALSE, warning=FALSE}
 ancombc_rand_table_mag%>%
-  filter(lfc_PopulationHot_dry>0)  %>% 
+  filter(lfc_typeTreatment>0)  %>% 
   count(phylum, name = "sample_count") %>%
   arrange(desc(sample_count))  
 ```
 
 ***Phyla of the significant MAGs in intervention group***
-```{r sign_features_FMT1_cold, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+```{r sign_features_FMT1_cold, comment="", message=FALSE, warning=FALSE}
 ancombc_rand_table_mag%>%
-  filter(lfc_PopulationHot_dry<0)  %>% 
+  filter(lfc_typeTreatment<0)  %>% 
   count(phylum, name = "sample_count") %>%
   arrange(desc(sample_count))  
 ```
 
 ##### Intervention vs cold control
 ```{r}
-physeq_FMT1 <- subset_samples(physeq_all, type %in% c("Control", "Treatment") & time_point == "FMT1")
-physeq_FMT1 <- prune_taxa(taxa_sums(physeq_FMT1)>0, physeq_FMT1)
+physeq_FMT1_cold <- subset_samples(physeq_all, type %in% c("Control", "Treatment") & time_point == "FMT1")
+physeq_FMT1_cold <- prune_taxa(taxa_sums(physeq_FMT1)>0, physeq_FMT1)
 ```
 ```{r ancom_rand_pond_FMT1_cold, comment="", message=FALSE, warning=FALSE, eval=FALSE}
 ancom_rand_output_cold = ancombc2(data = physeq_FMT1, 
@@ -371,13 +377,19 @@ ancom_rand_output_cold = ancombc2(data = physeq_FMT1,
                   trend_control = NULL)
 
 ```
-```{r, eval=FALSE}
+
+```{r 10, eval=FALSE}
+save(ancom_rand_output_cold, file="data/ancom_rand_output_cold.RData")
+```
+
+```{r 3, eval=TRUE}
+load("data/ancom_rand_output_cold.RData")
 ancom_rand_output_cold$res %>%
   dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
   filter(p_typeTreatment < 0.05)
 ```
 
-```{r ancom_rand_FMT1_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+```{r ancom_rand_FMT1_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE}
 taxonomy <- data.frame(physeq_FMT1@tax_table) %>%
   rownames_to_column(., "taxon") %>%
   mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
@@ -407,7 +419,7 @@ tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
 	pull()
 ```
 
-```{r ancombc_rand_plot_phy_FMT1_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE, eval=FALSE}
+```{r ancombc_rand_plot_phy_FMT1_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
 ancombc_rand_table_mag%>%
       mutate(genome=factor(taxon,levels=ancombc_rand_table_mag$taxon)) %>%
 ggplot(., aes(x=lfc_typeTreatment, y=forcats::fct_reorder(genome,lfc_typeTreatment), fill=phylum)) + #forcats::fct_rev()
@@ -428,7 +440,7 @@ ggplot(., aes(x=lfc_typeTreatment, y=forcats::fct_reorder(genome,lfc_typeTreatme
 ```
 
 ***Phyla of the significant MAGs in intervention group***
-```{r sign_features_FMT1_int, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+```{r sign_features_FMT1_int, comment="", message=FALSE, warning=FALSE}
 ancombc_rand_table_mag%>%
   filter(lfc_typeTreatment>0)  %>% 
   count(phylum, name = "sample_count") %>%
@@ -436,7 +448,7 @@ ancombc_rand_table_mag%>%
 ```
 
 ***Phyla of the significant MAGs in cold control***
-```{r sign_features_FMT1_cold_con, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+```{r sign_features_FMT1_cold_con, comment="", message=FALSE, warning=FALSE}
 ancombc_rand_table_mag%>%
   filter(lfc_typeTreatment<0)  %>% 
   count(phylum, name = "sample_count") %>%
@@ -752,113 +764,7 @@ physeq_FMT2 <- subset_samples(physeq_all, type %in% c("Hot_control", "Treatment"
 physeq_FMT2 <- prune_taxa(taxa_sums(physeq_FMT2)>0, physeq_FMT2)
 ```
 ```{r ancom_rand_pond_FMT2, comment="", message=FALSE, warning=FALSE}
-ancom_rand_output = ancombc2(data = physeq_FMT2, 
-                  assay_name = "counts", 
-                  tax_level = NULL,
-                  fix_formula = "Population", 
-                  p_adj_method = "holm", 
-                  pseudo_sens = TRUE,
-                  prv_cut =0, 
-                  lib_cut = 0, 
-                  s0_perc = 0.05,
-                  group = "Population", 
-                  struc_zero = TRUE, 
-                  neg_lb = FALSE,
-                  alpha = 0.05, 
-                  n_cl = 2, 
-                  verbose = TRUE,
-                  global = FALSE, 
-                  pairwise = FALSE, 
-                  dunnet = FALSE, 
-                  trend = FALSE,
-                  iter_control = list(tol = 1e-5, max_iter = 20, verbose = FALSE),
-                  em_control = list(tol = 1e-5, max_iter = 100),
-                  mdfdr_control = list(fwer_ctrl_method = "holm", B = 100), 
-                  trend_control = NULL)
-
-```
-```{r, eval=FALSE}
-ancom_rand_output$res %>%
-  dplyr::select(taxon, lfc_PopulationHot_dry, p_PopulationHot_dry) %>%
-  filter(p_PopulationHot_dry < 0.05)
-```
-
-```{r ancom_rand_FMT2, comment="", echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
-taxonomy <- data.frame(physeq_FMT2@tax_table) %>%
-  rownames_to_column(., "taxon") %>%
-  mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
-
-ancombc_rand_table_mag <- ancom_rand_output$res %>%
-  dplyr::select(taxon, lfc_PopulationHot_dry, p_PopulationHot_dry) %>%
-  filter(p_PopulationHot_dry < 0.05) %>%
-  dplyr::arrange(p_PopulationHot_dry) %>%
-  merge(., taxonomy, by="taxon") %>%
-  mutate_at(vars(phylum, species), ~ str_replace(., "[dpcofgs]__", ""))%>%
-  dplyr::arrange(lfc_PopulationHot_dry)
-
-ancombc_rand_table_mag
-  
-colors_alphabetic <- read_tsv("https://raw.githubusercontent.com/earthhologenome/EHI_taxonomy_colour/main/ehi_phylum_colors.tsv") %>%
-  mutate_at(vars(phylum), ~ str_replace(., "[dpcofgs]__", ""))  %>%
-  right_join(taxonomy, by=join_by(phylum == phylum)) %>%
-  dplyr::select(phylum, colors) %>%
-  mutate(colors = str_c(colors, "80"))  %>% #add 80% alpha
-	unique() %>%
-	dplyr::arrange(phylum)
-
-tax_table <- as.data.frame(unique(ancombc_rand_table_mag$phylum))
-  
-colnames(tax_table)[1] <- "phylum"
-tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
-	dplyr::arrange(phylum) %>%
-	dplyr::select(colors) %>%
-	pull()
-```
-
-```{r ancombc_rand_plot_phy_FMT2, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE, eval=FALSE}
-ancombc_rand_table_mag%>%
-      mutate(genome=factor(taxon,levels=ancombc_rand_table_mag$taxon)) %>%
-ggplot(., aes(x=lfc_PopulationHot_dry, y=forcats::fct_reorder(genome,lfc_PopulationHot_dry), fill=phylum)) + #forcats::fct_rev()
-  geom_col() + 
-  scale_fill_manual(values=tax_color) + 
-  geom_hline(yintercept=0) + 
-#  coord_flip()+
-  theme(panel.background = element_blank(),
-        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
-        axis.text.x = element_text(size = 12),
-        axis.text.y = element_text(size = 8),
-        axis.title = element_text(size = 14, face = "bold"),
-        legend.text = element_text(size = 12),
-        legend.title = element_text(size = 14, face = "bold"),
-        legend.position = "right", legend.box = "vertical")+
-  xlab("log2FoldChange") + 
-  ylab("Species")+
-  guides(fill=guide_legend(title="Phylum"))
-```
-
-***Phyla of the significant MAGs in warm control***
-```{r sign_features_FMT2_warm, comment="", message=FALSE, warning=FALSE, eval=FALSE}
-ancombc_rand_table_mag%>%
-  filter(lfc_PopulationHot_dry>0)  %>% 
-  count(phylum, name = "sample_count") %>%
-  arrange(desc(sample_count))  
-```
-
-***Phyla of the significant MAGs in intervention group***
-```{r sign_features_FMT2_cold, comment="", message=FALSE, warning=FALSE, eval=FALSE}
-ancombc_rand_table_mag%>%
-  filter(lfc_PopulationHot_dry<0)  %>% 
-  count(phylum, name = "sample_count") %>%
-  arrange(desc(sample_count))  
-```
-
-##### Intervention vs cold control
-```{r}
-physeq_FMT2 <- subset_samples(physeq_all, type %in% c("Control", "Treatment") & time_point == "FMT2")
-physeq_FMT2 <- prune_taxa(taxa_sums(physeq_FMT2)>0, physeq_FMT2)
-```
-```{r ancom_rand_pond_FMT2_cold, comment="", message=FALSE, warning=FALSE}
-ancom_rand_output_cold = ancombc2(data = physeq_FMT2, 
+ancom_rand_output_fmt2 = ancombc2(data = physeq_FMT2, 
                   assay_name = "counts", 
                   tax_level = NULL,
                   fix_formula = "type", 
@@ -883,18 +789,136 @@ ancom_rand_output_cold = ancombc2(data = physeq_FMT2,
                   trend_control = NULL)
 
 ```
-```{r, eval=FALSE}
-ancom_rand_output_cold$res %>%
+
+```{r 4, eval=FALSE}
+save(ancom_rand_output_fmt2, file="data/ancom_rand_output_fmt2.RData")
+```
+
+```{r 5, eval=TRUE}
+load("data/ancom_rand_output_fmt2.RData")
+ancom_rand_output_fmt2$res %>%
   dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
   filter(p_typeTreatment < 0.05)
 ```
 
-```{r ancom_rand_FMT2_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+```{r ancom_rand_FMT2, comment="", echo=FALSE, message=FALSE, warning=FALSE}
 taxonomy <- data.frame(physeq_FMT2@tax_table) %>%
   rownames_to_column(., "taxon") %>%
   mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
 
-ancombc_rand_table_mag <- ancom_rand_output_cold$res %>%
+ancombc_rand_table_mag <- ancom_rand_output_fmt2$res %>%
+  dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
+  filter(p_typeTreatment < 0.05) %>%
+  dplyr::arrange(p_typeTreatment) %>%
+  merge(., taxonomy, by="taxon") %>%
+  mutate_at(vars(phylum, species), ~ str_replace(., "[dpcofgs]__", ""))%>%
+  dplyr::arrange(lfc_typeTreatment)
+
+ancombc_rand_table_mag
+  
+colors_alphabetic <- read_tsv("https://raw.githubusercontent.com/earthhologenome/EHI_taxonomy_colour/main/ehi_phylum_colors.tsv") %>%
+  mutate_at(vars(phylum), ~ str_replace(., "[dpcofgs]__", ""))  %>%
+  right_join(taxonomy, by=join_by(phylum == phylum)) %>%
+  dplyr::select(phylum, colors) %>%
+  mutate(colors = str_c(colors, "80"))  %>% #add 80% alpha
+	unique() %>%
+	dplyr::arrange(phylum)
+
+tax_table <- as.data.frame(unique(ancombc_rand_table_mag$phylum))
+  
+colnames(tax_table)[1] <- "phylum"
+tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
+	dplyr::arrange(phylum) %>%
+	dplyr::select(colors) %>%
+	pull()
+```
+
+```{r ancombc_rand_plot_phy_FMT2, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
+ancombc_rand_table_mag%>%
+      mutate(genome=factor(taxon,levels=ancombc_rand_table_mag$taxon)) %>%
+ggplot(., aes(x=lfc_typeTreatment, y=forcats::fct_reorder(genome,lfc_typeTreatment), fill=phylum)) + #forcats::fct_rev()
+  geom_col() + 
+  scale_fill_manual(values=tax_color) + 
+  geom_hline(yintercept=0) + 
+#  coord_flip()+
+  theme(panel.background = element_blank(),
+        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
+        axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 8),
+        axis.title = element_text(size = 14, face = "bold"),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 14, face = "bold"),
+        legend.position = "right", legend.box = "vertical")+
+  xlab("log2FoldChange") + 
+  ylab("Species")+
+  guides(fill=guide_legend(title="Phylum"))
+```
+
+***Phyla of the significant MAGs in warm control***
+```{r sign_features_FMT2_warm, comment="", message=FALSE, warning=FALSE}
+ancombc_rand_table_mag%>%
+  filter(lfc_typeTreatment>0)  %>% 
+  count(phylum, name = "sample_count") %>%
+  arrange(desc(sample_count))  
+```
+
+***Phyla of the significant MAGs in intervention group***
+```{r sign_features_FMT2_cold, comment="", message=FALSE, warning=FALSE}
+ancombc_rand_table_mag%>%
+  filter(lfc_typeTreatment<0)  %>% 
+  count(phylum, name = "sample_count") %>%
+  arrange(desc(sample_count))  
+```
+
+##### Intervention vs cold control
+```{r}
+physeq_FMT2 <- subset_samples(physeq_all, type %in% c("Control", "Treatment") & time_point == "FMT2")
+physeq_FMT2 <- prune_taxa(taxa_sums(physeq_FMT2)>0, physeq_FMT2)
+```
+```{r ancom_rand_pond_FMT2_cold, comment="", message=FALSE, warning=FALSE}
+ancom_rand_output_cold_fmt2 = ancombc2(data = physeq_FMT2, 
+                  assay_name = "counts", 
+                  tax_level = NULL,
+                  fix_formula = "type", 
+                  p_adj_method = "holm", 
+                  pseudo_sens = TRUE,
+                  prv_cut =0, 
+                  lib_cut = 0, 
+                  s0_perc = 0.05,
+                  group = "type", 
+                  struc_zero = TRUE, 
+                  neg_lb = FALSE,
+                  alpha = 0.05, 
+                  n_cl = 2, 
+                  verbose = TRUE,
+                  global = FALSE, 
+                  pairwise = FALSE, 
+                  dunnet = FALSE, 
+                  trend = FALSE,
+                  iter_control = list(tol = 1e-5, max_iter = 20, verbose = FALSE),
+                  em_control = list(tol = 1e-5, max_iter = 100),
+                  mdfdr_control = list(fwer_ctrl_method = "holm", B = 100), 
+                  trend_control = NULL)
+
+```
+
+```{r 8, eval=FALSE}
+save(ancom_rand_output_fmt2, file="data/ancom_rand_output_cold_fmt2.RData")
+```
+
+```{r 7, eval=TRUE}
+load("data/ancom_rand_output_cold_fmt2.RData")
+ancom_rand_output_cold_fmt2$res %>%
+  dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
+  filter(p_typeTreatment < 0.05)
+```
+
+```{r ancom_rand_FMT2_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+taxonomy <- data.frame(physeq_FMT2@tax_table) %>%
+  rownames_to_column(., "taxon") %>%
+  mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
+
+ancombc_rand_table_mag <- ancom_rand_output_cold_fmt2$res %>%
   dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
   filter(p_typeTreatment < 0.05) %>%
   dplyr::arrange(p_typeTreatment) %>%
@@ -919,7 +943,7 @@ tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
 	pull()
 ```
 
-```{r ancombc_rand_plot_phy_FMT2_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE, eval=FALSE}
+```{r ancombc_rand_plot_phy_FMT2_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
 ancombc_rand_table_mag%>%
       mutate(genome=factor(taxon,levels=ancombc_rand_table_mag$taxon)) %>%
 ggplot(., aes(x=lfc_typeTreatment, y=forcats::fct_reorder(genome,lfc_typeTreatment), fill=phylum)) + #forcats::fct_rev()
@@ -940,7 +964,7 @@ ggplot(., aes(x=lfc_typeTreatment, y=forcats::fct_reorder(genome,lfc_typeTreatme
 ```
 
 ***Phyla of the significant MAGs in intervention group***
-```{r sign_features_FMT2_int, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+```{r sign_features_FMT2_int, comment="", message=FALSE, warning=FALSE}
 ancombc_rand_table_mag%>%
   filter(lfc_typeTreatment>0)  %>% 
   count(phylum, name = "sample_count") %>%
@@ -948,7 +972,7 @@ ancombc_rand_table_mag%>%
 ```
 
 ***Phyla of the significant MAGs in cold control***
-```{r sign_features_FMT2_cold_con, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+```{r sign_features_FMT2_cold_con, comment="", message=FALSE, warning=FALSE}
 ancombc_rand_table_mag%>%
   filter(lfc_typeTreatment<0)  %>% 
   count(phylum, name = "sample_count") %>%
