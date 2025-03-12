@@ -3,18 +3,18 @@
 ## Respirometry
 
 ```{r load_data_resp}
-load("data/data.Rdata")
+load("data/data_27022025.Rdata")
 respirometry_resp2 <- read_excel("data/respirometry_resp2.xlsx")
 ```
 
 ```{r dataframe_modify, warning=FALSE}
-respirometry_resp2$individual<-as.factor(respirometry_resp2$individual)
-respirometry_resp2$cage<-as.factor(respirometry_resp2$cage)
-respirometry_resp2$time_point<-as.factor(respirometry_resp2$time_point)
-respirometry_resp2$type<-as.factor(respirometry_resp2$type)
-respirometry_resp2$population<-as.factor(respirometry_resp2$population)
-respirometry_resp2$QC_normalized<-as.numeric(respirometry_resp2$QC_normalized)
-respirometry_resp2$r2<-as.numeric(respirometry_resp2$r2)
+respirometry_resp2$individual <- as.factor(respirometry_resp2$individual)
+respirometry_resp2$cage <- as.factor(respirometry_resp2$cage)
+respirometry_resp2$time_point <- as.factor(respirometry_resp2$time_point)
+respirometry_resp2$type <- as.factor(respirometry_resp2$type)
+respirometry_resp2$population <- as.factor(respirometry_resp2$population)
+respirometry_resp2$QC_normalized <- as.numeric(respirometry_resp2$QC_normalized)
+respirometry_resp2$r2 <- as.numeric(respirometry_resp2$r2)
 
 
 #Filter NA values

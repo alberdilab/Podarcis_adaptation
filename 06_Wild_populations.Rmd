@@ -287,7 +287,7 @@ physeq_wild <- prune_taxa(taxa_sums(physeq_wild)>0, physeq_wild)
 ```
 
 ### Phylum
-```{r ancom_rand_pond_phylum, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+```{r ancom_rand_pond_phylum, comment="", message=FALSE, warning=FALSE}
 ancom_rand_output_wild_phylum = ancombc2(data = physeq_wild, 
                   assay_name = "counts", 
                   tax_level = "phylum",
@@ -313,14 +313,14 @@ ancom_rand_output_wild_phylum = ancombc2(data = physeq_wild,
                   trend_control = NULL)
 
 ```
-```{r, eval=FALSE}
+```{r}
 ancom_rand_output_wild_phylum$res %>%
   dplyr::select(taxon, lfc_PopulationHot_dry, p_PopulationHot_dry) %>%
   filter(p_PopulationHot_dry < 0.05)
 ```
 
 ### MAG level
-```{r ancom_rand_pond_mag_wild, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+```{r ancom_rand_pond_mag_wild, comment="", message=FALSE, warning=FALSE}
 ancom_rand_output = ancombc2(data = physeq_wild, 
                   assay_name = "counts", 
                   tax_level = NULL,
@@ -348,7 +348,7 @@ ancom_rand_output = ancombc2(data = physeq_wild,
 ```
 
 ***Structural zeros***
-```{r, eval=FALSE}
+```{r}
 # Extract structural zeros
 structural_zeros <- ancom_rand_output$zero_ind
 
@@ -362,7 +362,7 @@ length(structural_zero_taxa)
 ```
 
 ***Differentially abundant MAGs***
-```{r ancom_rand, comment="", echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
+```{r ancom_rand, comment="", echo=FALSE, message=FALSE, warning=FALSE}
 taxonomy <- data.frame(physeq_wild@tax_table) %>%
   rownames_to_column(., "taxon") %>%
   mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
@@ -394,7 +394,7 @@ tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
 	pull()
 ```
 
-```{r ancombc_rand_plot_phy, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE, eval=FALSE}
+```{r ancombc_rand_plot_phy, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
 ancombc_rand_table_mag%>%
       mutate(genome=factor(taxon,levels=ancombc_rand_table_mag$taxon)) %>%
 ggplot(., aes(x=lfc_PopulationHot_dry, y=forcats::fct_reorder(genome,lfc_PopulationHot_dry), fill=phylum)) + #forcats::fct_rev()
@@ -416,7 +416,7 @@ ggplot(., aes(x=lfc_PopulationHot_dry, y=forcats::fct_reorder(genome,lfc_Populat
 ```
 
 ***Phyla of the significant MAGs in warm***
-```{r wild_sign_features_warm, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+```{r wild_sign_features_warm, comment="", message=FALSE, warning=FALSE}
 ancombc_rand_table_mag%>%
   filter(lfc_PopulationHot_dry>0)  %>% 
   count(phylum, name = "sample_count") %>%
@@ -424,7 +424,7 @@ ancombc_rand_table_mag%>%
 ```
 
 ***Phyla of the significant MAGs in cold***
-```{r wild_sign_features_cold, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+```{r wild_sign_features_cold, comment="", message=FALSE, warning=FALSE}
 ancombc_rand_table_mag%>%
   filter(lfc_PopulationHot_dry<0)  %>% 
   count(phylum, name = "sample_count") %>%

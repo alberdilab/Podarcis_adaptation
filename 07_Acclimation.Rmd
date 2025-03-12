@@ -14,7 +14,7 @@ set.seed(2802)
 
 #### Shaprio test
 
-```{r shapiro_wild_accli, comment="", message=FALSE, warning=FALSE,}
+```{r shapiro_wild_accli, comment="", message=FALSE, warning=FALSE}
 alpha_div %>%
   pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
   left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
