@@ -281,14 +281,74 @@ ggarrange(beta_q0n_nmds_wild, beta_q1n_nmds_wild, beta_q1p_nmds_wild, ncol=2, nr
 
 ## Differential abundance
 
+### Structural zeros
+
+```{r struct_zero_wild_pop, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+cold_samples <- sample_metadata %>% 
+  filter(Population== "Cold_wet") %>% 
+  filter(time_point == "Wild") %>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+warm_samples <- sample_metadata %>% 
+  filter(Population== "Hot_dry") %>% 
+  filter(time_point == "Wild")%>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+structural_zeros <- genome_counts_filt %>% 
+   rowwise() %>% #compute for each row (genome)
+   mutate(all_zeros_cold = all(c_across(all_of(cold_samples)) == 0)) %>% # set true if all samples in cold have zeros
+   mutate(all_zeros_warm = all(c_across(all_of(warm_samples)) == 0)) %>% # set true if all samples in warm have zeros
+   mutate(average_cold = mean(c_across(all_of(cold_samples)), na.rm = TRUE)) %>% # get average genome counts across accli
+   mutate(average_warm = mean(c_across(all_of(warm_samples)), na.rm = TRUE)) %>% # get average genome counts across post2
+   filter(all_zeros_cold == TRUE || all_zeros_warm==TRUE)  %>% # filter only genomes with structural zeros
+   mutate(present = case_when(
+      all_zeros_cold & !all_zeros_warm ~ "cold",
+      !all_zeros_cold & all_zeros_warm ~ "warm",
+      !all_zeros_cold & !all_zeros_warm ~ "None",
+      TRUE ~ NA_character_
+    )) %>%
+   mutate(average = ifelse(present == "cold", average_cold, average_warm)) %>%
+   dplyr::select(genome, present, average) %>%
+   left_join(genome_metadata, by=join_by(genome==genome)) %>%
+   arrange(present,-average)
+structural_zeros
+struct_mag <- structural_zeros %>% 
+  filter(present %in% c("cold","warm")) %>% 
+  select(genome) %>% 
+  pull()
+struct_mag_meta <- structural_zeros %>% 
+  filter(present %in% c("cold","warm"))
+```
+
 ```{r}
-physeq_wild <- subset_samples(physeq_all, time_point == "Wild")
-physeq_wild <- prune_taxa(taxa_sums(physeq_wild)>0, physeq_wild)
+#phyloseq object considering structual zeros
+phylo_samples <- sample_metadata %>% 
+                  filter(time_point == "Wild")%>%
+                    column_to_rownames("Tube_code") %>% 
+                    sample_data() #convert to phyloseq sample_data object
+phylo_genome <- genome_counts_filt %>% 
+                    filter(!genome %in% structural_zeros$genome) %>% # remove structural zeros
+                    column_to_rownames("genome") %>% 
+                    mutate_all(~ replace(., . == 0, 0.00001)) %>% 
+                    otu_table(., taxa_are_rows = TRUE)
+phylo_taxonomy <- genome_metadata %>% 
+                    filter(genome %in% rownames(phylo_genome)) %>% # remove structural zeros
+                    mutate(genome2=genome) %>% #create a pseudo genome name column
+                    column_to_rownames("genome2") %>% 
+                    dplyr::select(domain,phylum,class,order,family,genus,species,genome) %>% #add an additional taxonomic level to ensure genome-level analysis (as no all genomes have species-level taxonomic assignments. Otherwise, ANCOMBC2 aggregates analyses per species)
+                    as.matrix() %>% 
+                    tax_table() #convert to phyloseq tax_table object
+
+physeq_genome_filtered <- phyloseq(phylo_genome, phylo_taxonomy, phylo_samples)
+physeq_sample_wild <- subset_samples(physeq_genome_filtered, time_point %in% c("Wild"))
+physeq_sample_wild<- prune_taxa(taxa_sums(physeq_sample_wild)>0, physeq_sample_wild)
 ```
 
 ### Phylum
 ```{r ancom_rand_pond_phylum, comment="", message=FALSE, warning=FALSE, eval=FALSE}
-ancom_rand_output_wild_phylum = ancombc2(data = physeq_wild, 
+ancom_rand_output_wild_phylum = ancombc2(data = physeq_sample_wild, 
                   assay_name = "counts", 
                   tax_level = "phylum",
                   fix_formula = "Population", 
@@ -313,15 +373,25 @@ ancom_rand_output_wild_phylum = ancombc2(data = physeq_wild,
                   trend_control = NULL)
 
 ```
-```{r, eval=FALSE}
+```{r 11, eval=FALSE}
+save(ancom_rand_output_wild_phylum, file="data/ancom_rand_output_wild_phylum.RData")
+```
+
+```{r 12, eval=TRUE}
+load("data/ancom_rand_output_wild_phylum.RData")
 ancom_rand_output_wild_phylum$res %>%
   dplyr::select(taxon, lfc_PopulationHot_dry, p_PopulationHot_dry) %>%
   filter(p_PopulationHot_dry < 0.05)
 ```
 
 ### MAG level
+```{r ancom_rand_pond_mag_wild_data, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+physeq_wild_mag <- subset_samples(physeq_all, time_point == "Wild")
+physeq_wild_mag <- prune_taxa(taxa_sums(physeq_wild_mag)>0, physeq_wild_mag)
+```
+
 ```{r ancom_rand_pond_mag_wild, comment="", message=FALSE, warning=FALSE, eval=FALSE}
-ancom_rand_output = ancombc2(data = physeq_wild, 
+ancom_rand_output_mag_wild = ancombc2(data = physeq_wild_mag, 
                   assay_name = "counts", 
                   tax_level = NULL,
                   fix_formula = "Population", 
@@ -347,10 +417,16 @@ ancom_rand_output = ancombc2(data = physeq_wild,
 
 ```
 
+```{r 13, eval=FALSE}
+save(ancom_rand_output_mag_wild, file="data/ancom_rand_output_mag_wild.RData")
+```
+
 ***Structural zeros***
 ```{r, eval=FALSE}
+load("data/ancom_rand_output_mag_wild.RData")
+
 # Extract structural zeros
-structural_zeros <- ancom_rand_output$zero_ind
+structural_zeros <- ancom_rand_output_mag_wild$zero_ind
 
 # Convert to a data frame for better readability
 structural_zeros_df <- as.data.frame(structural_zeros) %>% 
@@ -367,7 +443,7 @@ taxonomy <- data.frame(physeq_wild@tax_table) %>%
   rownames_to_column(., "taxon") %>%
   mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
 
-ancombc_rand_table_mag <- ancom_rand_output$res %>%
+ancombc_rand_table_mag <- ancom_rand_output_mag_wild$res %>%
   dplyr::select(taxon, lfc_PopulationHot_dry, p_PopulationHot_dry) %>%
   filter(p_PopulationHot_dry < 0.05) %>%
   dplyr::arrange(p_PopulationHot_dry) %>%

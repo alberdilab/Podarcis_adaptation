@@ -58,6 +58,7 @@ shapiro-test
 alpha-diversity-1
 beta-diversity-1
 differential-abundance
+structural-zeros
 phylum
 mag-level
 functional-capacity

@@ -14,7 +14,7 @@ set.seed(2802)
 
 #### Shaprio test
 
-```{r shapiro_wild_accli, comment="", message=FALSE, warning=FALSE,}
+```{r shapiro_wild_accli, comment="", message=FALSE, warning=FALSE}
 alpha_div %>%
   pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
   left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
@@ -212,7 +212,11 @@ beta_q1p_nmds_accli <- phylo_accli %>%
   theme(legend.position="none") 
 ```
 
-```{r beta_neutral_nmds_plot_final_accli, results=TRUE, fig.height=4, fig.width=10, fig.fullwidth=TRUE}
+```{r beta_neutral_nmds_plot_final_accli, results=TRUE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
+ggarrange(beta_q0n_nmds_accli, beta_q1n_nmds_accli, beta_q1p_nmds_accli, ncol=3, nrow=1, common.legend = TRUE, legend="right")
+```
+
+```{r data_accli, results=TRUE, fig.height=4, fig.width=10, fig.fullwidth=TRUE}
 ggarrange(
   beta_q0n_nmds_accli,
   beta_q1n_nmds_accli,

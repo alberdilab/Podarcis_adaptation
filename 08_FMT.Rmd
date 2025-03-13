@@ -235,12 +235,13 @@ ggarrange(beta_richness_nmds_post1, beta_neutral_nmds_post1, beta_phylogenetic_n
 
 #### Differentially abundant MAGs
 ##### Warm vs Intervention
+
 ```{r FMT1}
 physeq_FMT1 <- subset_samples(physeq_all, type %in% c("Hot_control", "Treatment") & time_point == "FMT1")
 physeq_FMT1 <- prune_taxa(taxa_sums(physeq_FMT1)>0, physeq_FMT1)
 ```
 ```{r ancom_rand_pond_FMT1, comment="", message=FALSE, warning=FALSE, eval=FALSE}
-ancom_rand_output = ancombc2(data = physeq_FMT1, 
+ancom_rand_output_fmt1 = ancombc2(data = physeq_FMT1, 
                   assay_name = "counts", 
                   tax_level = NULL,
                   fix_formula = "type", 
@@ -266,13 +267,31 @@ ancom_rand_output = ancombc2(data = physeq_FMT1,
 
 ```
 
+
 ```{r, eval=FALSE}
-save(ancom_rand_output, file="data/ancom_rand_output.RData")
+save(ancom_rand_output_fmt1, file="data/ancom_rand_output_fmt1.RData")
 ```
 
 ```{r 1, eval=TRUE}
-load("data/ancom_rand_output.RData")
-ancom_rand_output$res %>%
+load("data/ancom_rand_output_fmt1.RData")
+```
+
+***Structural zeros***
+```{r structural_zeros_fmt1}
+# Extract structural zeros
+structural_zeros <- ancom_rand_output_fmt1$zero_ind
+
+# Convert to a data frame for better readability
+structural_zeros_df <- as.data.frame(structural_zeros) %>% 
+  column_to_rownames(., "taxon")
+
+# Find taxa that are structural zeros in at least one group
+structural_zero_taxa <- rownames(structural_zeros_df)[apply(structural_zeros_df, 1, any)]
+length(structural_zero_taxa)
+```
+
+```{r structural_zeros_fmt1_1}
+ancom_rand_output_fmt1$res %>%
   dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
   filter(p_typeTreatment < 0.05)
 ```
@@ -282,7 +301,7 @@ taxonomy <- data.frame(physeq_FMT1@tax_table) %>%
   rownames_to_column(., "taxon") %>%
   mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
 
-ancombc_rand_table_mag <- ancom_rand_output$res %>%
+ancombc_rand_table_mag <- ancom_rand_output_fmt1$res %>%
   dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
   filter(p_typeTreatment < 0.05) %>%
   dplyr::arrange(p_typeTreatment) %>%
@@ -349,10 +368,10 @@ ancombc_rand_table_mag%>%
 ##### Intervention vs cold control
 ```{r}
 physeq_FMT1_cold <- subset_samples(physeq_all, type %in% c("Control", "Treatment") & time_point == "FMT1")
-physeq_FMT1_cold <- prune_taxa(taxa_sums(physeq_FMT1)>0, physeq_FMT1)
+physeq_FMT1_cold <- prune_taxa(taxa_sums(physeq_FMT1_cold)>0, physeq_FMT1_cold)
 ```
 ```{r ancom_rand_pond_FMT1_cold, comment="", message=FALSE, warning=FALSE, eval=FALSE}
-ancom_rand_output_cold = ancombc2(data = physeq_FMT1, 
+ancom_rand_output_cold = ancombc2(data = physeq_FMT1_cold, 
                   assay_name = "counts", 
                   tax_level = NULL,
                   fix_formula = "type", 
@@ -384,13 +403,31 @@ save(ancom_rand_output_cold, file="data/ancom_rand_output_cold.RData")
 
 ```{r 3, eval=TRUE}
 load("data/ancom_rand_output_cold.RData")
+```
+
+***Structural zeros***
+```{r structural_zeros_fmt1_2}
+# Extract structural zeros
+structural_zeros <- ancom_rand_output_cold$zero_ind
+
+# Convert to a data frame for better readability
+structural_zeros_df <- as.data.frame(structural_zeros) %>% 
+  column_to_rownames(., "taxon")
+
+# Find taxa that are structural zeros in at least one group
+structural_zero_taxa <- rownames(structural_zeros_df)[apply(structural_zeros_df, 1, any)]
+length(structural_zero_taxa)
+```
+
+
+```{r 3_1, eval=TRUE}
 ancom_rand_output_cold$res %>%
   dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
   filter(p_typeTreatment < 0.05)
 ```
 
 ```{r ancom_rand_FMT1_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE}
-taxonomy <- data.frame(physeq_FMT1@tax_table) %>%
+taxonomy <- data.frame(physeq_FMT1_cold@tax_table) %>%
   rownames_to_column(., "taxon") %>%
   mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
 
@@ -763,7 +800,7 @@ ggarrange(beta_richness_nmds_FMT2, beta_neutral_nmds_FMT2, beta_phylogenetic_nmd
 physeq_FMT2 <- subset_samples(physeq_all, type %in% c("Hot_control", "Treatment") & time_point == "FMT2")
 physeq_FMT2 <- prune_taxa(taxa_sums(physeq_FMT2)>0, physeq_FMT2)
 ```
-```{r ancom_rand_pond_FMT2, comment="", message=FALSE, warning=FALSE}
+```{r ancom_rand_pond_FMT2, comment="", message=FALSE, warning=FALSE, eval=FALSE}
 ancom_rand_output_fmt2 = ancombc2(data = physeq_FMT2, 
                   assay_name = "counts", 
                   tax_level = NULL,
@@ -797,6 +834,12 @@ save(ancom_rand_output_fmt2, file="data/ancom_rand_output_fmt2.RData")
 ```{r 5, eval=TRUE}
 load("data/ancom_rand_output_fmt2.RData")
 ancom_rand_output_fmt2$res %>%
+  dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
+  filter(p_typeTreatment < 0.05)
+```
+
+```{r}
+ancom_rand_output$res %>%
   dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
   filter(p_typeTreatment < 0.05)
 ```
@@ -875,7 +918,7 @@ ancombc_rand_table_mag%>%
 physeq_FMT2 <- subset_samples(physeq_all, type %in% c("Control", "Treatment") & time_point == "FMT2")
 physeq_FMT2 <- prune_taxa(taxa_sums(physeq_FMT2)>0, physeq_FMT2)
 ```
-```{r ancom_rand_pond_FMT2_cold, comment="", message=FALSE, warning=FALSE}
+```{r ancom_rand_pond_FMT2_cold, comment="", message=FALSE, warning=FALSE, eval=FALSE}
 ancom_rand_output_cold_fmt2 = ancombc2(data = physeq_FMT2, 
                   assay_name = "counts", 
                   tax_level = NULL,
@@ -1008,7 +1051,7 @@ summary(res.aov)
 
 CC and CI
 ```{r comunity_elem_FMT2_cold, comment="", message=FALSE, warning=FALSE}
-element_gift %>%
+significant_elements<-element_gift %>%
   filter(type %in% c("Control", "Treatment") & time_point == "FMT2") %>%
   select(-time_point, -type) %>%
   filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
@@ -1023,6 +1066,48 @@ element_gift %>%
   filter(p_adjust < 0.05) %>%
   remove_rownames() %>% 
   left_join(., uniqueGIFT_db, by=join_by("trait"=="Code_element"))
+```
+
+```{r comunity_elem_fm2_1, comment="", message=FALSE, warning=FALSE}
+element_gift_sig <- element_gift %>%
+  select(Tube_code, all_of(intersect(
+    significant_elements$trait,
+    colnames(element_gift)
+  ))) %>%
+  left_join(., sample_metadata[c(1, 7)], by = join_by(Tube_code == Tube_code)) %>%
+  filter(type!="Hot_control")
+
+difference_table <- element_gift_sig %>%
+  select(-Tube_code) %>%
+  group_by(type) %>%
+  summarise(across(everything(), mean)) %>%
+  t() %>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric) %>%
+  rownames_to_column(., "Elements") %>%
+  left_join(.,uniqueGIFT_db[c(1,3,4)],by = join_by(Elements == Code_element)) %>% 
+  arrange(Function) %>% 
+  mutate(Difference=Control-Treatment)%>% 
+  mutate(group_color = ifelse(Difference <0, "Control","Treatment")) 
+```
+
+```{r commun_wilcox_elem_plot_fmt2, comment="", message=FALSE, warning=FALSE, fig.height=6, fig.width=12, fig.fullwidth=TRUE}
+difference_table %>%
+  ggplot(aes(x=forcats::fct_reorder(Function,Difference), y=Difference, fill=group_color)) + 
+  geom_col() +
+  scale_fill_manual(values=c("#4477AA","#76b183")) + 
+  geom_hline(yintercept=0) + 
+  coord_flip()+
+  theme(axis.text = element_text(size = 10),
+        axis.title = element_text(size = 12),
+        legend.position = "right", 
+        legend.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major = element_line(size = 0.15, linetype = 'solid',
+                                        colour = "grey"))+
+  xlab("Function") + 
+  ylab("Mean difference")
 ```
 
 CI and WC
