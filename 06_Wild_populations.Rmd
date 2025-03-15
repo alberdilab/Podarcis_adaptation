@@ -276,7 +276,7 @@ beta_q1p_nmds_wild <- phylo %>%
 ```
 
 ```{r beta_neutral_nmds_plot_final, results=TRUE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
-ggarrange(beta_q0n_nmds_wild, beta_q1n_nmds_wild, beta_q1p_nmds_wild, ncol=2, nrow=2, common.legend = TRUE, legend="right")
+ggarrange(beta_q0n_nmds_wild, beta_q1n_nmds_wild, beta_q1p_nmds_wild, ncol=3, nrow=1, common.legend = TRUE, legend="right")
 ```
 
 ## Differential abundance
@@ -419,22 +419,6 @@ ancom_rand_output_mag_wild = ancombc2(data = physeq_wild_mag,
 
 ```{r 13, eval=FALSE}
 save(ancom_rand_output_mag_wild, file="data/ancom_rand_output_mag_wild.RData")
-```
-
-***Structural zeros***
-```{r, eval=FALSE}
-load("data/ancom_rand_output_mag_wild.RData")
-
-# Extract structural zeros
-structural_zeros <- ancom_rand_output_mag_wild$zero_ind
-
-# Convert to a data frame for better readability
-structural_zeros_df <- as.data.frame(structural_zeros) %>% 
-  column_to_rownames(., "taxon")
-
-# Find taxa that are structural zeros in at least one group
-structural_zero_taxa <- rownames(structural_zeros_df)[apply(structural_zeros_df, 1, any)]
-length(structural_zero_taxa)
 ```
 
 ***Differentially abundant MAGs***

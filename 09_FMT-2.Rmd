@@ -115,18 +115,6 @@ adonis2(richness_post7 ~ type*time_point,
         tt()
 ```
 
-```{r beta_richness_permanova_post7_3_comparison, warning=FALSE, comments="", message=FALSE}
-subset_meta_post7_arrange <- column_to_rownames(subset_meta_post7, "Tube_code")
-subset_meta_post7_arrange<-subset_meta_post7_arrange[labels(richness_post7),]
-
-pairwise <- pairwise.adonis(richness_post7, subset_meta_post7_arrange$type, perm=999)
-pairwise%>%
-  tt()
-pairwise <- pairwise.adonis(richness_post7, subset_meta_post7_arrange$time_point, perm=999)
-pairwise%>%
-  tt()
-```
-
 ***Neutral***
 ```{r beta_neutral_permanova_post7_2_comparison, warning=FALSE, comments="", message=FALSE}
 neutral_post7 <- as.matrix(beta_q1n$S)
@@ -145,17 +133,6 @@ adonis2(neutral_post7 ~ type*time_point,
         tt()
 ```
 
-```{r beta_neutral_permanova_post7_3_comparison, warning=FALSE, comments="", message=FALSE}
-subset_meta_post7_arrange <- column_to_rownames(subset_meta_post7, "Tube_code")
-subset_meta_post7_arrange<-subset_meta_post7_arrange[labels(neutral_post7),]
-pairwise <- pairwise.adonis(neutral_post7, subset_meta_post7$type, perm=999)
-pairwise%>%
-  tt()
-pairwise <- pairwise.adonis(neutral_post7, subset_meta_post7_arrange$time_point, perm=999)
-pairwise%>%
-  tt()
-```
-
 ***Phylogenetic***
 ```{r beta_phylo_permanova_post7_2_comparison, warning=FALSE, comments="", message=FALSE}
 phylo_post7 <- as.matrix(beta_q1p$S)
@@ -172,17 +149,6 @@ adonis2(phylo_post7 ~ type*time_point,
           by="terms") %>%        
         broom::tidy() %>%
         tt()
-```
-
-```{r beta_phylo_permanova_post7_3_comparison, warning=FALSE, comments="", message=FALSE}
-subset_meta_post7_arrange <- column_to_rownames(subset_meta_post7, "Tube_code")
-subset_meta_post7_arrange<-subset_meta_post7_arrange[labels(phylo_post7),]
-pairwise <- pairwise.adonis(phylo_post7, subset_meta_post7_arrange$type, perm=999)
-pairwise%>%
-  tt()
-pairwise <- pairwise.adonis(phylo_post7, subset_meta_post7_arrange$time_point, perm=999)
-pairwise%>%
-  tt()
 ```
 
 ***dbRDA***
@@ -380,8 +346,6 @@ alpha_div_meta <- alpha_div %>%
 ```{r alpha_div_data_post3_comparison, comment="", message=FALSE, warning=FALSE}
 Modelq0GLMMNB <- glmer.nb(richness ~ type*time_point+(1|individual), data = alpha_div_meta)
 summary(Modelq0GLMMNB)
-emmeans::emmeans(Modelq0GLMMNB, pairwise ~ type)
-emmeans::emmeans(Modelq0GLMMNB, pairwise ~ time_point)
 ```
 
 ***Neutral***
@@ -389,8 +353,6 @@ emmeans::emmeans(Modelq0GLMMNB, pairwise ~ time_point)
 Modelq1n <- lme(neutral ~ type*time_point, data = alpha_div_meta,
                random = ~ 1 | individual)
 summary(Modelq1n)
-emmeans::emmeans(Modelq1n, pairwise ~ type)
-emmeans::emmeans(Modelq1n, pairwise ~ time_point)
 ```
 
 ***Phylogenetic***
@@ -398,8 +360,6 @@ emmeans::emmeans(Modelq1n, pairwise ~ time_point)
 Model_phylo <- lme(phylogenetic ~ type*time_point, data = alpha_div_meta,
                random = ~ 1 | individual)
 summary(Model_phylo)
-emmeans::emmeans(Model_phylo, pairwise ~ type)
-emmeans::emmeans(Model_phylo, pairwise ~ time_point)
 ```
 
 #### Beta diversity
@@ -437,18 +397,6 @@ adonis2(richness_post3 ~ type*time_point,
         tt()
 ```
 
-```{r beta_richness_permanova_post3_3_comparison, warning=FALSE, comments="", message=FALSE}
-subset_meta_post3_arrange <- column_to_rownames(subset_meta_post3, "Tube_code")
-subset_meta_post3_arrange<-subset_meta_post3_arrange[labels(richness_post3),]
-
-pairwise <- pairwise.adonis(richness_post3, subset_meta_post3_arrange$type, perm=999)
-pairwise%>%
-  tt()
-pairwise <- pairwise.adonis(richness_post3, subset_meta_post3_arrange$time_point, perm=999)
-pairwise%>%
-  tt()
-```
-
 ***Neutral***
 ```{r beta_neutral_permanova_post3_2_comparison, warning=FALSE, comments="", message=FALSE}
 neutral_post3 <- as.matrix(beta_q1n$S)
@@ -467,17 +415,6 @@ adonis2(neutral_post3 ~ type*time_point,
         tt()
 ```
 
-```{r beta_neutral_permanova_post3_3_comparison, warning=FALSE, comments="", message=FALSE}
-subset_meta_post3_arrange <- column_to_rownames(subset_meta_post3, "Tube_code")
-subset_meta_post3_arrange<-subset_meta_post3_arrange[labels(neutral_post3),]
-pairwise <- pairwise.adonis(neutral_post3, subset_meta_post3_arrange$type, perm=999)
-pairwise%>%
-  tt()
-pairwise <- pairwise.adonis(neutral_post3, subset_meta_post3_arrange$time_point, perm=999)
-pairwise%>%
-  tt()
-```
-
 ***Phylogenetic***
 ```{r beta_phylo_permanova_post3_2_comparison, warning=FALSE, comments="", message=FALSE}
 phylo_post3 <- as.matrix(beta_q1p$S)
@@ -494,17 +431,6 @@ adonis2(phylo_post3 ~ type*time_point,
         by="terms") %>%        
         broom::tidy() %>%
         tt()
-```
-
-```{r beta_phylo_permanova_post3_3_comparison, warning=FALSE, comments="", message=FALSE}
-subset_meta_post3_arrange <- column_to_rownames(subset_meta_post3, "Tube_code")
-subset_meta_post3_arrange<-subset_meta_post3_arrange[labels(phylo_post3),]
-pairwise <- pairwise.adonis(phylo_post3, subset_meta_post3_arrange$type, perm=999)
-pairwise%>%
-  tt()
-pairwise <- pairwise.adonis(phylo_post3, subset_meta_post3_arrange$time_point, perm=999)
-pairwise%>%
-  tt()
 ```
 
 ***dbRDA***
@@ -788,8 +714,6 @@ alpha_div_meta <- alpha_div %>%
 ```{r alpha_div_data_post4_comparison, comment="", message=FALSE, warning=FALSE}
 Modelq0GLMMNB <- glmer.nb(richness ~ type*time_point+(1|individual), data = alpha_div_meta)
 summary(Modelq0GLMMNB)
-emmeans::emmeans(Modelq0GLMMNB, pairwise ~ type)
-emmeans::emmeans(Modelq0GLMMNB, pairwise ~ time_point)
 ```
 
 ***Neutral***
@@ -798,8 +722,6 @@ Modelq1n <- lme(neutral ~ type*time_point,
                random = ~ 1 | individual,
                data = alpha_div_meta,) 
 summary(Modelq1n)
-emmeans::emmeans(Modelq1n, pairwise ~ type)
-emmeans::emmeans(Modelq1n, pairwise ~ time_point)
 ```
 
 ***Phylogenetic***
@@ -808,8 +730,6 @@ Model_phylo <- lme(phylogenetic ~ type*time_point,
                random = ~ 1 | individual,
                data = alpha_div_meta) 
 summary(Model_phylo)
-emmeans::emmeans(Model_phylo, pairwise ~ type)
-emmeans::emmeans(Model_phylo, pairwise ~ time_point)
 ```
 
 #### Beta diversity
@@ -847,18 +767,6 @@ adonis2(richness_post4 ~ type*time_point,
         tt()
 ```
 
-```{r beta_richness_permanova_post4_3_comparison, warning=FALSE, comments="", message=FALSE}
-subset_meta_post4_arrange <- column_to_rownames(subset_meta_post4, "Tube_code")
-subset_meta_post4_arrange<-subset_meta_post4_arrange[labels(richness_post4),]
-
-pairwise <- pairwise.adonis(richness_post4, subset_meta_post4_arrange$type, perm=999)
-pairwise%>%
-  tt()
-pairwise <- pairwise.adonis(richness_post4, subset_meta_post4_arrange$time_point, perm=999)
-pairwise%>%
-  tt()
-```
-
 ***Neutral***
 ```{r beta_neutral_permanova_post4_2_comparison, warning=FALSE, comments="", message=FALSE}
 neutral_post4 <- as.matrix(beta_q1n$S)
@@ -877,17 +785,6 @@ adonis2(neutral_post4 ~ type*time_point,
         tt()
 ```
 
-```{r beta_neutral_permanova_post4_3_comparison, warning=FALSE, comments="", message=FALSE}
-subset_meta_post4_arrange <- column_to_rownames(subset_meta_post4, "Tube_code")
-subset_meta_post4_arrange<-subset_meta_post4_arrange[labels(neutral_post4),]
-pairwise <- pairwise.adonis(neutral_post4, subset_meta_post4_arrange$type, perm=999)
-pairwise%>%
-  tt()
-pairwise <- pairwise.adonis(neutral_post4, subset_meta_post4_arrange$time_point, perm=999)
-pairwise%>%
-  tt()
-```
-
 ***Phylogenetic***
 ```{r beta_phylo_permanova_post4_2_comparison, warning=FALSE, comments="", message=FALSE}
 phylo_post4 <- as.matrix(beta_q1p$S)
@@ -904,17 +801,6 @@ adonis2(phylo_post4 ~ type*time_point,
         by="terms") %>%
         broom::tidy() %>%
         tt()
-```
-
-```{r beta_phylo_permanova_post4_3_comparison, warning=FALSE, comments="", message=FALSE}
-subset_meta_post4_arrange <- column_to_rownames(subset_meta_post4, "Tube_code")
-subset_meta_post4_arrange<-subset_meta_post4_arrange[labels(phylo_post4),]
-pairwise <- pairwise.adonis(phylo_post4, subset_meta_post4_arrange$type, perm=999)
-pairwise%>%
-  tt()
-pairwise <- pairwise.adonis(phylo_post4, subset_meta_post4_arrange$time_point, perm=999)
-pairwise%>%
-  tt()
 ```
 
 ***RDA***
@@ -1094,8 +980,6 @@ alpha_div_meta <- alpha_div %>%
 ```{r alpha_div_data_comparison, comment="", message=FALSE, warning=FALSE}
 Modelq0GLMMNB <- glmer.nb(richness ~ type*time_point+(1|individual), data = alpha_div_meta)
 summary(Modelq0GLMMNB)
-emmeans::emmeans(Modelq0GLMMNB, pairwise ~ type)
-emmeans::emmeans(Modelq0GLMMNB, pairwise ~ time_point)
 ```
 
 ***Neutral***
@@ -1104,8 +988,6 @@ Modelq1n <- lme(neutral ~ type*time_point,
                random = ~ 1 | individual,
                data = alpha_div_meta)  
 summary(Modelq1n)
-emmeans::emmeans(Modelq1n, pairwise ~ type)
-emmeans::emmeans(Modelq1n, pairwise ~ time_point)
 ```
 
 ***Phylogenetic***
@@ -1114,8 +996,6 @@ Model_phylo <- lme(phylogenetic ~ type*time_point,
                random = ~ 1 | individual,
                data = alpha_div_meta)  
 summary(Model_phylo)
-emmeans::emmeans(Model_phylo, pairwise ~ type)
-emmeans::emmeans(Model_phylo, pairwise ~ time_point)
 ```
 
 #### Beta diversity
@@ -1153,18 +1033,6 @@ adonis2(richness_post5 ~ type*time_point,
         tt()
 ```
 
-```{r beta_richness_permanova_post5_3_comparison, warning=FALSE, comments="", message=FALSE}
-subset_meta_post5_arrange <- column_to_rownames(subset_meta_post5, "Tube_code")
-subset_meta_post5_arrange<-subset_meta_post5_arrange[labels(richness_post5),]
-
-pairwise <- pairwise.adonis(richness_post5, subset_meta_post5_arrange$type, perm=999)
-pairwise%>%
-  tt()
-pairwise <- pairwise.adonis(richness_post5, subset_meta_post5_arrange$time_point, perm=999)
-pairwise%>%
-  tt()
-```
-
 ***Neutral***
 ```{r beta_neutral_permanova_post5_2_comparison, warning=FALSE, comments="", message=FALSE}
 neutral_post5 <- as.matrix(beta_q1n$S)
@@ -1183,17 +1051,6 @@ adonis2(neutral_post5 ~ type*time_point,
         tt()
 ```
 
-```{r beta_neutral_permanova_post5_3_comparison, warning=FALSE, comments="", message=FALSE}
-subset_meta_post5_arrange <- column_to_rownames(subset_meta_post5, "Tube_code")
-subset_meta_post5_arrange<-subset_meta_post5_arrange[labels(neutral_post5),]
-pairwise <- pairwise.adonis(neutral_post5, subset_meta_post5_arrange$type, perm=999)
-pairwise%>%
-  tt()
-pairwise <- pairwise.adonis(neutral_post5, subset_meta_post5_arrange$time_point, perm=999)
-pairwise%>%
-  tt()
-```
-
 ***Phylogenetic***
 ```{r beta_phylo_permanova_post5_2_comparison, warning=FALSE, comments="", message=FALSE}
 phylo_post5 <- as.matrix(beta_q1p$S)
@@ -1210,17 +1067,6 @@ adonis2(phylo_post5 ~ type*time_point,
         by="terms") %>%
         broom::tidy() %>%
         tt()
-```
-
-```{r beta_phylo_permanova_post5_3_comparison, warning=FALSE, comments="", message=FALSE}
-subset_meta_post5_arrange <- column_to_rownames(subset_meta_post5, "Tube_code")
-subset_meta_post5_arrange<-subset_meta_post5_arrange[labels(phylo_post5),]
-pairwise <- pairwise.adonis(phylo_post5, subset_meta_post5_arrange$type, perm=999)
-pairwise%>%
-  tt()
-pairwise <- pairwise.adonis(phylo_post5, subset_meta_post5_arrange$time_point, perm=999)
-pairwise%>%
-  tt()
 ```
 
 ***dbRDA***
@@ -1461,8 +1307,6 @@ alpha_div_meta <- alpha_div %>%
 ```{r alpha_div_data_post6_comparison, comment="", message=FALSE, warning=FALSE, eval=TRUE}
 Modelq0GLMMNB <- glmer.nb(richness ~ type*time_point+(1|individual), data = alpha_div_meta)
 summary(Modelq0GLMMNB)
-emmeans(Modelq0GLMMNB, pairwise ~ type)
-emmeans(Modelq0GLMMNB, pairwise ~ time_point)
 ```
 
 ***Neutral***
@@ -1471,8 +1315,6 @@ Modelq1n <- lme(neutral ~ type*time_point,
                random = ~ 1 | individual,
                data = alpha_div_meta)   
 summary(Modelq1n)
-emmeans(Modelq1n, pairwise ~ type)
-emmeans(Modelq1n, pairwise ~ time_point)
 ```
 
 ***Phylogenetic***
@@ -1481,8 +1323,6 @@ Model_phylo <- lme(phylogenetic ~ type*time_point,
                random = ~ 1 | individual,
                data = alpha_div_meta)   
 summary(Model_phylo)
-emmeans(Model_phylo, pairwise ~ type)
-emmeans(Model_phylo, pairwise ~ time_point)
 ```
 
 #### Beta diversity
@@ -1520,18 +1360,6 @@ adonis2(richness_post6 ~ type*time_point,
         tt()
 ```
 
-```{r beta_richness_permanova_post6_3_comparison, warning=FALSE, comments="", message=FALSE}
-subset_meta_post6_arrange <- column_to_rownames(subset_meta_post6, "Tube_code")
-subset_meta_post6_arrange<-subset_meta_post6_arrange[labels(richness_post6),]
-
-pairwise <- pairwise.adonis(richness_post6, subset_meta_post6_arrange$type, perm=999)
-pairwise%>%
-  tt()
-pairwise <- pairwise.adonis(richness_post6, subset_meta_post6_arrange$time_point, perm=999)
-pairwise%>%
-  tt()
-```
-
 ***Neutral***
 ```{r beta_neutral_permanova_post6_2_comparison, warning=FALSE, comments="", message=FALSE}
 neutral_post6 <- as.matrix(beta_q1n$S)
@@ -1550,17 +1378,6 @@ adonis2(neutral_post6 ~ type*time_point,
         tt()
 ```
 
-```{r beta_neutral_permanova_post6_3_comparison, warning=FALSE, comments="", message=FALSE}
-subset_meta_post6_arrange <- column_to_rownames(subset_meta_post6, "Tube_code")
-subset_meta_post6_arrange<-subset_meta_post6_arrange[labels(neutral_post6),]
-pairwise <- pairwise.adonis(neutral_post6, subset_meta_post6_arrange$type, perm=999)
-pairwise%>%
-  tt()
-pairwise <- pairwise.adonis(neutral_post6, subset_meta_post6_arrange$time_point, perm=999)
-pairwise%>%
-  tt()
-```
-
 ***Phylogenetic***
 ```{r beta_phylo_permanova_post6_2_comparison, warning=FALSE, comments="", message=FALSE}
 phylo_post6 <- as.matrix(beta_q1p$S)
@@ -1577,17 +1394,6 @@ adonis2(phylo_post6 ~ type*time_point,
         by="terms") %>%
         broom::tidy() %>%
         tt()
-```
-
-```{r beta_phylo_permanova_post6_3_comparison, warning=FALSE, comments="", message=FALSE}
-subset_meta_post6_arrange <- column_to_rownames(subset_meta_post6, "Tube_code")
-subset_meta_post6_arrange<-subset_meta_post6_arrange[labels(phylo_post6),]
-pairwise <- pairwise.adonis(phylo_post6, subset_meta_post6_arrange$type, perm=999)
-pairwise%>%
-  tt()
-pairwise <- pairwise.adonis(phylo_post6, subset_meta_post6_arrange$time_point, perm=999)
-pairwise%>%
-  tt()
 ```
 
 ***dbRDA***

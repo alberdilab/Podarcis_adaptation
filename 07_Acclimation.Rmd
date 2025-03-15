@@ -216,18 +216,6 @@ beta_q1p_nmds_accli <- phylo_accli %>%
 ggarrange(beta_q0n_nmds_accli, beta_q1n_nmds_accli, beta_q1p_nmds_accli, ncol=3, nrow=1, common.legend = TRUE, legend="right")
 ```
 
-```{r data_accli, results=TRUE, fig.height=4, fig.width=10, fig.fullwidth=TRUE}
-ggarrange(
-  beta_q0n_nmds_accli,
-  beta_q1n_nmds_accli,
-  beta_q1p_nmds_accli,
-  ncol = 2,
-  nrow = 2,
-  common.legend = TRUE,
-  legend = "right"
-)
-```
-
 ## Functional capacity
 ### Metabolic capacity index at functional level
 

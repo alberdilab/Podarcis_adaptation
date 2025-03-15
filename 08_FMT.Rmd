@@ -59,7 +59,6 @@ alpha_div %>%
           breaks=c("Control","Hot_control", "Treatment"),
           labels=c("Cold-control","Warm-control", "Cold-intervention"),
           values=c("#4477AA50","#d57d2c50","#76b18350")) +
-        scale_x_discrete(labels = c("Control" = "Cold-Cold", "Hot_control" = "Hot-Hot", "Treatment" = "Cold-Hot")) +
       facet_wrap(. ~ metric,scales = "free") +
       coord_cartesian(xlim = c(1, NA)) +
       stat_compare_means(method="t.test",size=3, label.x=.7) +
