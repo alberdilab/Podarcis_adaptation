@@ -1,4 +1,4 @@
-# What is the effect of acclimation?
+# Do populations mantain a different GM after acclimation?
 ```{r load_data_acclimation}
 load("data/data_27022025.Rdata")
 load("data/calculations_28022025.Rdata")
@@ -10,9 +10,7 @@ message=FALSE)
 set.seed(2802)
 ```
 
-### Do populations mantain a different GM after acclimation?
-
-#### Shaprio test
+## Shapiro test
 
 ```{r shapiro_wild_accli, comment="", message=FALSE, warning=FALSE}
 alpha_div %>%
@@ -40,7 +38,7 @@ alpha_div %>%
   pull(shapiro_p_value)
 ```
 
-#### Alpha diversity
+## Alpha diversity
 ```{r alpha_div_plot_accli, comment="", message=FALSE, warning=FALSE, fig.height=4, fig.width=8, fig.fullwidth=TRUE}
 alpha_div %>%
   pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
@@ -76,7 +74,8 @@ alpha_div %>%
   ylab("Alpha diversity")
 ```
 
-#### Beta diversity
+## Beta diversity
+
 Number of samples used
 ```{r beta_div_neutral_accli_samples, message=FALSE, warning=FALSE, comments=FALSE}
 samples_to_keep_accli <- sample_metadata %>%
@@ -139,7 +138,7 @@ adonis2(phylo_accli ~ Population,
 
 ***NMDS***
 ```{r beta_neutral_nmds_accli, warning=FALSE, comments="", message=FALSE, results="hide"}
-beta_q0n_nmds_accli <- richness_accli %>%
+richness_accli %>%
   metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace=FALSE) %>%
   vegan::scores() %>%
   as_tibble(., rownames = "sample") %>%
@@ -163,7 +162,7 @@ beta_q0n_nmds_accli <- richness_accli %>%
   theme_classic() +
   theme(legend.position="none")
 
-beta_q1n_nmds_accli <- neutral_accli %>%
+neutral_accli %>%
   metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace=FALSE) %>%
   vegan::scores() %>%
   as_tibble(., rownames = "sample") %>%
@@ -187,7 +186,7 @@ beta_q1n_nmds_accli <- neutral_accli %>%
   theme_classic() +
   theme(legend.position="none")
 
-beta_q1p_nmds_accli <- phylo_accli %>%
+phylo_accli %>%
   metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace=FALSE) %>%
   vegan::scores() %>%
   as_tibble(., rownames = "sample") %>%
@@ -212,9 +211,6 @@ beta_q1p_nmds_accli <- phylo_accli %>%
   theme(legend.position="none") 
 ```
 
-```{r beta_neutral_nmds_plot_final_accli, results=TRUE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
-ggarrange(beta_q0n_nmds_accli, beta_q1n_nmds_accli, beta_q1p_nmds_accli, ncol=3, nrow=1, common.legend = TRUE, legend="right")
-```
 
 ## Functional capacity
 ### Metabolic capacity index at functional level

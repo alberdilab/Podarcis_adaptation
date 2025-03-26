@@ -202,7 +202,7 @@ adonis2(phylo ~ Population,
 
 ***NMDS***
 ```{r beta_neutral_nmds, comments="", warning=FALSE, message=FALSE, results="hide"}
-beta_q0n_nmds_wild <- richness %>%
+richness %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace=FALSE) %>%
 				vegan::scores() %>%
 				as_tibble(., rownames = "sample") %>%
@@ -226,7 +226,7 @@ beta_q0n_nmds_wild <- richness %>%
 				theme_classic() +
 				theme(legend.position="none")
 
-beta_q1n_nmds_wild <- neutral %>%
+neutral %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace=FALSE) %>%
 				vegan::scores() %>%
 				as_tibble(., rownames = "sample") %>%
@@ -250,40 +250,37 @@ beta_q1n_nmds_wild <- neutral %>%
 				theme_classic() +
 				theme(legend.position="none")
 
-beta_q1p_nmds_wild <- phylo %>%
-				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace=FALSE) %>%
-				vegan::scores() %>%
-				as_tibble(., rownames = "sample") %>%
-				left_join(subset_meta, by = join_by(sample == Tube_code))%>%
-			group_by(Population) %>%
-			mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
-			mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
-			ungroup() %>%
-			ggplot(., aes(x=NMDS1,y=NMDS2, color=Population, shape=type)) +
-				scale_color_manual(name="Population",
+phylo %>%
+  metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace=FALSE) %>%
+  vegan::scores() %>%
+  as_tibble(., rownames = "sample") %>%
+  left_join(subset_meta, by = join_by(sample == Tube_code)) %>%
+  group_by(Population) %>% 
+  mutate(x_cen = mean(NMDS1, na.rm = TRUE)) %>%
+  mutate(y_cen = mean(NMDS2, na.rm = TRUE)) %>%
+  ungroup() %>%
+  ggplot(., aes(x=NMDS1,y=NMDS2, color=Population, shape=type)) +
+  scale_color_manual(name="Population",
                     breaks=c("Cold_wet","Hot_dry"),
                     labels=c("Cold","Hot"),
                     values=c('#008080',"#d57d2c")) +
-        scale_shape_manual(name="Type",
+  scale_shape_manual(name="Type",
                            breaks=c("Control", "Hot_control", "Treatment"),
                            labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
                          values=c("circle","square","triangle")) +
-				geom_point(size=2) +
-				geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
-        labs(y= element_blank (),x="NMDS1 \n Phylogenetic beta diversity") +
-				theme_classic() +
-				theme(legend.position="none") 
+  geom_point(size=2) +
+  geom_segment(aes(x=x_cen, y=y_cen, xend=NMDS1, yend=NMDS2), alpha=0.2) +
+  labs(y = element_blank (), x = "NMDS1 \n Phylogenetic beta diversity") +
+  theme_classic() +
+  theme(legend.position = "none") 
 ```
 
-```{r beta_neutral_nmds_plot_final, results=TRUE, fig.height=8, fig.width=10, fig.fullwidth=TRUE}
-ggarrange(beta_q0n_nmds_wild, beta_q1n_nmds_wild, beta_q1p_nmds_wild, ncol=3, nrow=1, common.legend = TRUE, legend="right")
-```
 
 ## Differential abundance
 
 ### Structural zeros
 
-```{r struct_zero_wild_pop, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+```{r struct_zero_wild_pop1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
 cold_samples <- sample_metadata %>% 
   filter(Population== "Cold_wet") %>% 
   filter(time_point == "Wild") %>%
@@ -295,82 +292,101 @@ warm_samples <- sample_metadata %>%
   filter(time_point == "Wild")%>%
   dplyr::select("Tube_code") %>%
   pull()
+meta_wild <-sample_metadata%>% 
+  filter(time_point == "Wild")
 
-structural_zeros <- genome_counts_filt %>% 
-   rowwise() %>% #compute for each row (genome)
-   mutate(all_zeros_cold = all(c_across(all_of(cold_samples)) == 0)) %>% # set true if all samples in cold have zeros
-   mutate(all_zeros_warm = all(c_across(all_of(warm_samples)) == 0)) %>% # set true if all samples in warm have zeros
-   mutate(average_cold = mean(c_across(all_of(cold_samples)), na.rm = TRUE)) %>% # get average genome counts across accli
-   mutate(average_warm = mean(c_across(all_of(warm_samples)), na.rm = TRUE)) %>% # get average genome counts across post2
-   filter(all_zeros_cold == TRUE || all_zeros_warm==TRUE)  %>% # filter only genomes with structural zeros
-   mutate(present = case_when(
-      all_zeros_cold & !all_zeros_warm ~ "cold",
-      !all_zeros_cold & all_zeros_warm ~ "warm",
-      !all_zeros_cold & !all_zeros_warm ~ "None",
-      TRUE ~ NA_character_
-    )) %>%
-   mutate(average = ifelse(present == "cold", average_cold, average_warm)) %>%
-   dplyr::select(genome, present, average) %>%
-   left_join(genome_metadata, by=join_by(genome==genome)) %>%
-   arrange(present,-average)
-structural_zeros
-struct_mag <- structural_zeros %>% 
-  filter(present %in% c("cold","warm")) %>% 
-  select(genome) %>% 
-  pull()
-struct_mag_meta <- structural_zeros %>% 
-  filter(present %in% c("cold","warm"))
+structural_zeros <- genome_counts_filt %>%
+  select(c("genome", meta_wild$Tube_code)) %>%
+  filter(rowSums(across(where(is.numeric)))!=0) %>% 
+  rowwise() %>%
+  mutate(all_zeros_cold = all(c_across(all_of(cold_samples)) == 0)) %>% # set true if all samples in cold have zeros
+  mutate(all_zeros_warm = all(c_across(all_of(warm_samples)) == 0)) %>% # set true if all samples in warm have zeros
+  mutate(average_cold = mean(c_across(all_of(cold_samples)), na.rm = TRUE)) %>% # get average genome counts across accli
+  mutate(average_warm = mean(c_across(all_of(warm_samples)), na.rm = TRUE)) %>% # get average genome counts across post2
+  filter(all_zeros_cold == TRUE | all_zeros_warm == TRUE)  %>% # filter only genomes with structural zeros
+  mutate(present = case_when(all_zeros_cold & !all_zeros_warm ~ "Hot_dry",!all_zeros_cold & all_zeros_warm ~ "Cold_wet",!all_zeros_cold & !all_zeros_warm ~ "None",TRUE ~ NA_character_)) %>%
+  mutate(average = ifelse(present == "Cold_wet", average_cold, average_warm)) %>%
+  dplyr::select(genome, present, average) %>%
+  left_join(genome_metadata, by = join_by(genome == genome)) %>%
+  arrange(present, -average)
+
+
+# struct_mag <- structural_zeros %>% 
+#   filter(present %in% c("cold","warm")) %>% 
+#   select(genome) %>% 
+#   pull()
+# struct_mag_meta <- structural_zeros %>% 
+#   filter(present %in% c("cold","warm"))
 ```
 
 ```{r}
-#phyloseq object considering structual zeros
-phylo_samples <- sample_metadata %>% 
-                  filter(time_point == "Wild")%>%
-                    column_to_rownames("Tube_code") %>% 
-                    sample_data() #convert to phyloseq sample_data object
-phylo_genome <- genome_counts_filt %>% 
-                    filter(!genome %in% structural_zeros$genome) %>% # remove structural zeros
-                    column_to_rownames("genome") %>% 
-                    mutate_all(~ replace(., . == 0, 0.00001)) %>% 
-                    otu_table(., taxa_are_rows = TRUE)
-phylo_taxonomy <- genome_metadata %>% 
-                    filter(genome %in% rownames(phylo_genome)) %>% # remove structural zeros
-                    mutate(genome2=genome) %>% #create a pseudo genome name column
-                    column_to_rownames("genome2") %>% 
-                    dplyr::select(domain,phylum,class,order,family,genus,species,genome) %>% #add an additional taxonomic level to ensure genome-level analysis (as no all genomes have species-level taxonomic assignments. Otherwise, ANCOMBC2 aggregates analyses per species)
-                    as.matrix() %>% 
-                    tax_table() #convert to phyloseq tax_table object
+wild_struc <- structural_zeros %>% 
+  filter(present=="Cold_wet")%>% 
+  count(phylum, name = "Cold_wet") %>%
+  arrange(desc(Cold_wet))
+structural_zeros %>% 
+  filter(present=="Hot_dry")%>% 
+  count(phylum, name = "Hot_dry") %>%
+  arrange(desc(Hot_dry)) %>% 
+  full_join(., wild_struc, by="phylum") %>%
+  mutate(across(everything(), ~ ifelse(is.na(.), 0, .))) %>% 
+  tt()
+```
 
-physeq_genome_filtered <- phyloseq(phylo_genome, phylo_taxonomy, phylo_samples)
-physeq_sample_wild <- subset_samples(physeq_genome_filtered, time_point %in% c("Wild"))
-physeq_sample_wild<- prune_taxa(taxa_sums(physeq_sample_wild)>0, physeq_sample_wild)
+```{r}
+phylo_samples <- sample_metadata %>%
+  filter(time_point == "Wild") %>%
+  column_to_rownames("Tube_code") %>%
+  sample_data() 
+phylo_genome <- genome_counts_filt %>%
+  select(one_of(c("genome",rownames(phylo_samples)))) %>% 
+  filter(!genome %in% structural_zeros$genome) %>%
+  column_to_rownames("genome") %>%
+  mutate_all( ~ replace(., . == 0, 0.00001)) %>%
+  otu_table(., taxa_are_rows = TRUE)
+phylo_taxonomy <- genome_metadata %>%
+  filter(genome %in% rownames(phylo_genome)) %>%
+  mutate(genome2 = genome) %>%
+  column_to_rownames("genome2") %>%
+  dplyr::select(domain, phylum, class, order, family, genus, species, genome) %>%
+  as.matrix() %>%
+  tax_table() 
+
+physeq_sample_wild <- phyloseq(phylo_genome, phylo_taxonomy, phylo_samples)
+physeq_sample_wild <- prune_taxa(taxa_sums(physeq_sample_wild)>0, physeq_sample_wild)
 ```
 
 ### Phylum
-```{r ancom_rand_pond_phylum, comment="", message=FALSE, warning=FALSE, eval=FALSE}
-ancom_rand_output_wild_phylum = ancombc2(data = physeq_sample_wild, 
-                  assay_name = "counts", 
-                  tax_level = "phylum",
-                  fix_formula = "Population", 
-                  p_adj_method = "holm", 
-                  pseudo_sens = TRUE,
-                  prv_cut =0, 
-                  lib_cut = 0, 
-                  s0_perc = 0.05,
-                  group = "Population", 
-                  struc_zero = TRUE, 
-                  neg_lb = FALSE,
-                  alpha = 0.05, 
-                  n_cl = 2, 
-                  verbose = TRUE,
-                  global = FALSE, 
-                  pairwise = FALSE, 
-                  dunnet = FALSE, 
-                  trend = FALSE,
-                  iter_control = list(tol = 1e-5, max_iter = 20, verbose = FALSE),
-                  em_control = list(tol = 1e-5, max_iter = 100),
-                  mdfdr_control = list(fwer_ctrl_method = "holm", B = 100), 
-                  trend_control = NULL)
+```{r ancom_rand_pond_phylum, comment="", message=FALSE, warning=FALSE}
+ancom_rand_output_wild_phylum = ancombc2(
+  data = physeq_sample_wild,
+  assay_name = "counts",
+  tax_level = "phylum",
+  fix_formula = "Population",
+  p_adj_method = "holm",
+  pseudo_sens = TRUE,
+  prv_cut = 0,
+  lib_cut = 0,
+  s0_perc = 0.05,
+  group = NULL,
+  struc_zero = FALSE,
+  neg_lb = FALSE,
+  alpha = 0.05,
+  n_cl = 2,
+  verbose = TRUE,
+  global = FALSE,
+  pairwise = FALSE,
+  dunnet = FALSE,
+  trend = FALSE,
+  iter_control = list(
+    tol = 1e-5,
+    max_iter = 20,
+    verbose = FALSE
+  ),
+  em_control = list(tol = 1e-5, max_iter = 100),
+  mdfdr_control = list(fwer_ctrl_method = "holm", B = 100),
+  trend_control = NULL
+)
 
 ```
 ```{r 11, eval=FALSE}
@@ -385,36 +401,41 @@ ancom_rand_output_wild_phylum$res %>%
 ```
 
 ### MAG level
-```{r ancom_rand_pond_mag_wild_data, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+```{r ancom_rand_pond_mag_wild_data, comment="", message=FALSE, warning=FALSE}
 physeq_wild_mag <- subset_samples(physeq_all, time_point == "Wild")
 physeq_wild_mag <- prune_taxa(taxa_sums(physeq_wild_mag)>0, physeq_wild_mag)
 ```
 
-```{r ancom_rand_pond_mag_wild, comment="", message=FALSE, warning=FALSE, eval=FALSE}
-ancom_rand_output_mag_wild = ancombc2(data = physeq_wild_mag, 
-                  assay_name = "counts", 
-                  tax_level = NULL,
-                  fix_formula = "Population", 
-                  p_adj_method = "holm", 
-                  pseudo_sens = TRUE,
-                  prv_cut =0, 
-                  lib_cut = 0, 
-                  s0_perc = 0.05,
-                  group = "Population", 
-                  struc_zero = TRUE, 
-                  neg_lb = FALSE,
-                  alpha = 0.05, 
-                  n_cl = 2, 
-                  verbose = TRUE,
-                  global = FALSE, 
-                  pairwise = FALSE, 
-                  dunnet = FALSE, 
-                  trend = FALSE,
-                  iter_control = list(tol = 1e-5, max_iter = 20, verbose = FALSE),
-                  em_control = list(tol = 1e-5, max_iter = 100),
-                  mdfdr_control = list(fwer_ctrl_method = "holm", B = 100), 
-                  trend_control = NULL)
-
+```{r ancom_rand_pond_mag_wild, comment="", message=FALSE, warning=FALSE}
+ancom_rand_output_mag_wild = ancombc2(
+  data = physeq_wild_mag,
+  assay_name = "counts",
+  tax_level = NULL,
+  fix_formula = "Population",
+  p_adj_method = "holm",
+  pseudo_sens = TRUE,
+  prv_cut = 0,
+  lib_cut = 0,
+  s0_perc = 0.05,
+  group = NULL,
+  struc_zero = FALSE,
+  neg_lb = FALSE,
+  alpha = 0.05,
+  n_cl = 2,
+  verbose = TRUE,
+  global = FALSE,
+  pairwise = FALSE,
+  dunnet = FALSE,
+  trend = FALSE,
+  iter_control = list(
+    tol = 1e-5,
+    max_iter = 20,
+    verbose = FALSE
+  ),
+  em_control = list(tol = 1e-5, max_iter = 100),
+  mdfdr_control = list(fwer_ctrl_method = "holm", B = 100),
+  trend_control = NULL
+)
 ```
 
 ```{r 13, eval=FALSE}
@@ -422,8 +443,8 @@ save(ancom_rand_output_mag_wild, file="data/ancom_rand_output_mag_wild.RData")
 ```
 
 ***Differentially abundant MAGs***
-```{r ancom_rand, comment="", echo=FALSE, message=FALSE, warning=FALSE, eval=FALSE}
-taxonomy <- data.frame(physeq_wild@tax_table) %>%
+```{r ancom_rand, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+taxonomy <- data.frame(physeq_wild_mag@tax_table) %>%
   rownames_to_column(., "taxon") %>%
   mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
 
@@ -454,39 +475,45 @@ tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
 	pull()
 ```
 
-```{r ancombc_rand_plot_phy, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE, eval=FALSE}
-ancombc_rand_table_mag%>%
-      mutate(genome=factor(taxon,levels=ancombc_rand_table_mag$taxon)) %>%
-ggplot(., aes(x=lfc_PopulationHot_dry, y=forcats::fct_reorder(genome,lfc_PopulationHot_dry), fill=phylum)) + #forcats::fct_rev()
-  geom_col() + 
-  scale_fill_manual(values=tax_color) + 
-  geom_hline(yintercept=0) + 
-#  coord_flip()+
-  theme(panel.background = element_blank(),
-        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
-        axis.text.x = element_text(size = 12),
-        axis.text.y = element_text(size = 8),
-        axis.title = element_text(size = 14, face = "bold"),
-        legend.text = element_text(size = 12),
-        legend.title = element_text(size = 14, face = "bold"),
-        legend.position = "right", legend.box = "vertical")+
-  xlab("log2FoldChange") + 
-  ylab("Species")+
-  guides(fill=guide_legend(title="Phylum"))
+```{r ancombc_rand_plot_phy, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
+ancombc_rand_table_mag %>%
+  mutate(genome = factor(taxon, levels = ancombc_rand_table_mag$taxon)) %>%
+  ggplot(.,aes(x = lfc_PopulationHot_dry,y = forcats::fct_reorder(genome, lfc_PopulationHot_dry),fill = phylum)) + 
+  geom_col() +
+  scale_fill_manual(values = tax_color) +
+  geom_hline(yintercept = 0) +
+  theme(
+    panel.background = element_blank(),
+    axis.line = element_line(
+      size = 0.5,
+      linetype = "solid",
+      colour = "black"
+    ),
+    axis.text.x = element_text(size = 12),
+    axis.text.y = element_text(size = 8),
+    axis.title = element_text(size = 14, face = "bold"),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 14, face = "bold"),
+    legend.position = "right",
+    legend.box = "vertical"
+  ) +
+  xlab("log2FoldChange") +
+  ylab("Species") +
+  guides(fill = guide_legend(title = "Phylum"))
 ```
 
 ***Phyla of the significant MAGs in warm***
-```{r wild_sign_features_warm, comment="", message=FALSE, warning=FALSE, eval=FALSE}
-ancombc_rand_table_mag%>%
-  filter(lfc_PopulationHot_dry>0)  %>% 
+```{r wild_sign_features_warm, comment="", message=FALSE, warning=FALSE}
+ancombc_rand_table_mag %>%
+  filter(lfc_PopulationHot_dry > 0)  %>%
   count(phylum, name = "sample_count") %>%
   arrange(desc(sample_count))  
 ```
 
 ***Phyla of the significant MAGs in cold***
-```{r wild_sign_features_cold, comment="", message=FALSE, warning=FALSE, eval=FALSE}
-ancombc_rand_table_mag%>%
-  filter(lfc_PopulationHot_dry<0)  %>% 
+```{r wild_sign_features_cold, comment="", message=FALSE, warning=FALSE}
+ancombc_rand_table_mag %>%
+  filter(lfc_PopulationHot_dry < 0)  %>%
   count(phylum, name = "sample_count") %>%
   arrange(desc(sample_count))  
 ```
@@ -499,7 +526,7 @@ GIFTs_functions_community %>%
   rowMeans() %>%
   as_tibble(., rownames = "sample") %>%
   left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
-  filter(time_point=="Wild") %>%
+  filter(time_point == "Wild") %>%
   group_by(Population) %>%
   summarise(MCI = mean(value), sd = sd(value))
 ```
@@ -508,31 +535,33 @@ MCI_element_wild <- GIFTs_functions_community %>%
   rowMeans() %>%
   as_tibble(., rownames = "sample") %>%
   left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
-  filter(time_point=="Wild")
+  filter(time_point == "Wild")
 
 shapiro.test(MCI_element_wild$value) #normality test
 var.test(value ~ Population, data = MCI_element_wild)
-t.test(value ~ Population, data=MCI_element_wild, var.equal = TRUE)
+t.test(value ~ Population, data = MCI_element_wild, var.equal = TRUE)
 ```
 
 ### Differences in functional pathways
 ```{r comunity_elem, comment="", message=FALSE, warning=FALSE}
-element_gift_wild <- element_gift %>% 
-  filter(time_point=="Wild") %>% 
-  select(-time_point,-type) %>%
+element_gift_wild <- element_gift %>%
+  filter(time_point == "Wild") %>%
+  select(-time_point, -type) %>%
   filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
-  select(Tube_code, where(~ is.numeric(.) && sum(.) > 0)) %>%
+  select(Tube_code, where( ~ is.numeric(.) && sum(.) > 0)) %>%
   left_join(sample_metadata[c(1, 4)], by = "Tube_code")
 ```
 
 ```{r commun_wilcox_elem_wild, comment="", message=FALSE, warning=FALSE}
 significant_elements_wild <- element_gift_wild %>%
-  pivot_longer(-c(Tube_code,Population), names_to = "trait", values_to = "value") %>%
+  pivot_longer(-c(Tube_code, Population),
+               names_to = "trait",
+               values_to = "value") %>%
   group_by(trait) %>%
   summarise(p_value = wilcox.test(value ~ Population)$p.value) %>%
-  mutate(p_adjust=p.adjust(p_value, method="BH")) %>%
-  filter(p_adjust < 0.05)%>%
-  rownames_to_column(., "Elements")  %>% 
+  mutate(p_adjust = p.adjust(p_value, method = "BH")) %>%
+  filter(p_adjust < 0.05) %>%
+  rownames_to_column(., "Elements")  %>%
   select(-Elements)
 
 element_gift_sig_wild <- element_gift_wild %>%
@@ -551,26 +580,31 @@ difference_table_wild <- element_gift_sig_wild %>%
   as.data.frame() %>%
   mutate_if(is.character, as.numeric) %>%
   rownames_to_column(., "Elements") %>%
-  left_join(.,uniqueGIFT_db[c(1,3,4)],by = join_by(Elements == Code_element)) %>% 
-  arrange(Function) %>% 
-  mutate(Difference=Cold_wet-Hot_dry)%>% 
-  mutate(group_color = ifelse(Difference <0, "Hot","Cold")) 
+  left_join(., uniqueGIFT_db[c(1, 3, 4)], by = join_by(Elements == Code_element)) %>%
+  arrange(Function) %>%
+  mutate(Difference = Cold_wet - Hot_dry) %>%
+  mutate(group_color = ifelse(Difference < 0, "Hot", "Cold")) 
 ```
 
 ```{r commun_wilcox_elem_plot_wild, comment="", message=FALSE, warning=FALSE, fig.height=6, fig.width=12, fig.fullwidth=TRUE}
 difference_table_wild %>%
-  ggplot(aes(x=forcats::fct_reorder(Function,Difference), y=Difference, fill=group_color)) + 
+  ggplot(aes(x = forcats::fct_reorder(Function, Difference),y = Difference,fill = group_color)) +
   geom_col() +
-  scale_fill_manual(values=c('#008080',"#d57d2c")) + 
-  geom_hline(yintercept=0) + 
-  coord_flip()+
-  theme(axis.text = element_text(size = 10),
-        axis.title = element_text(size = 12),
-        legend.position = "right", 
-        legend.title = element_blank(),
-        panel.background = element_blank(),
-        panel.grid.major = element_line(size = 0.15, linetype = 'solid',
-                                        colour = "grey"))+
-  xlab("Function") + 
+  scale_fill_manual(values = c('#008080', "#d57d2c")) +
+  geom_hline(yintercept = 0) +
+  coord_flip() +
+  theme(
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 12),
+    legend.position = "right",
+    legend.title = element_blank(),
+    panel.background = element_blank(),
+    panel.grid.major = element_line(
+      size = 0.15,
+      linetype = 'solid',
+      colour = "grey"
+    )
+  ) +
+  xlab("Function") +
   ylab("Mean difference")
 ```

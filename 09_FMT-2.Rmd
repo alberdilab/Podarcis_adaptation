@@ -821,7 +821,7 @@ biplot_scores$Variable <- recode(biplot_scores$Variable,
                                  "subset_meta_post4$typeTreatment" = "Cold-intervention",
                                  "subset_meta_post4$time_pointFMT1:subset_meta_post4$typeTreatment" = "Interaction in Cold-intervention")
 
-beta_richness_nmds_post4 <-CAP_df %>%
+CAP_df %>%
   group_by(type, time_point) %>%
   mutate(x_cen = mean(CAP1, na.rm = TRUE)) %>%
   mutate(y_cen = mean(CAP2, na.rm = TRUE)) %>%
@@ -857,7 +857,7 @@ biplot_scores$Variable <- recode(biplot_scores$Variable,
                                  "subset_meta_post4$typeTreatment" = "Cold-intervention",
                                  "subset_meta_post4$time_pointFMT1:subset_meta_post4$typeTreatment" = "Interaction in Cold-intervention")
 
-beta_neutral_nmds_post4 <- CAP_df %>%
+CAP_df %>%
   group_by(type, time_point) %>%
   mutate(x_cen = mean(CAP1, na.rm = TRUE)) %>%
   mutate(y_cen = mean(CAP2, na.rm = TRUE)) %>%
@@ -894,7 +894,7 @@ biplot_scores$Variable <- recode(biplot_scores$Variable,
                                  "subset_meta_post4$typeTreatment" = "Cold-intervention",
                                  "subset_meta_post4$time_pointFMT1:subset_meta_post4$typeTreatment" = "Interaction in Cold-intervention")
 
-beta_phylogenetic_nmds_post4 <- CAP_df %>%
+ CAP_df %>%
   group_by(type, time_point) %>%
   mutate(x_cen = mean(CAP1, na.rm = TRUE)) %>%
   mutate(y_cen = mean(CAP2, na.rm = TRUE)) %>%
@@ -915,9 +915,7 @@ beta_phylogenetic_nmds_post4 <- CAP_df %>%
   theme_classic()
 ```
 
-```{r beta_neutral_nmds_plot_post4_final, fig.height=7}
-ggarrange(beta_richness_nmds_post4, beta_neutral_nmds_post4, beta_phylogenetic_nmds_post4, ncol=3, nrow=1, common.legend = TRUE, legend="right")
-```
+
 
 #### Functional differences
 
@@ -1414,7 +1412,7 @@ biplot_scores$Variable <- recode(biplot_scores$Variable,
                                  "subset_meta_post6$typeTreatment" = "Cold-intervention",
                                  "subset_meta_post6$time_pointFMT2:subset_meta_post6$typeTreatment" = "Interaction in Cold-intervention")
 
-beta_richness_nmds_post6 <-CAP_df %>%
+CAP_df %>%
   group_by(type, time_point) %>%
   mutate(x_cen = mean(CAP1, na.rm = TRUE)) %>%
   mutate(y_cen = mean(CAP2, na.rm = TRUE)) %>%
@@ -1450,7 +1448,7 @@ biplot_scores$Variable <- recode(biplot_scores$Variable,
                                  "subset_meta_post6$typeTreatment" = "Cold-intervention",
                                  "subset_meta_post6$time_pointFMT2:subset_meta_post6$typeTreatment" = "Interaction in Cold-intervention")
 
-beta_neutral_nmds_post6 <- CAP_df %>%
+CAP_df %>%
   group_by(type, time_point) %>%
   mutate(x_cen = mean(CAP1, na.rm = TRUE)) %>%
   mutate(y_cen = mean(CAP2, na.rm = TRUE)) %>%
@@ -1487,7 +1485,7 @@ biplot_scores$Variable <- recode(biplot_scores$Variable,
                                  "subset_meta_post6$typeTreatment" = "Cold-intervention",
                                  "subset_meta_post6$time_pointFMT2:subset_meta_post6$typeTreatment" = "Interaction in Cold-intervention")
 
-beta_phylogenetic_nmds_post6 <- CAP_df %>%
+CAP_df %>%
   group_by(type, time_point) %>%
   mutate(x_cen = mean(CAP1, na.rm = TRUE)) %>%
   mutate(y_cen = mean(CAP2, na.rm = TRUE)) %>%
@@ -1508,9 +1506,7 @@ beta_phylogenetic_nmds_post6 <- CAP_df %>%
   theme_classic()
 ```
 
-```{r beta_neutral_nmds_plot_post6_final, fig.height=7}
-ggarrange(beta_richness_nmds_post6, beta_neutral_nmds_post6, beta_phylogenetic_nmds_post6, ncol=3, nrow=1, common.legend = TRUE, legend="right")
-```
+
 
 #### Functional differences
 

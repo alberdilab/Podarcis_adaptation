@@ -1,4 +1,4 @@
-# FMT
+# Faecal Microbiota Transplantation (FMT)
 ```{r knitr_options_FMT, include=FALSE}
 knitr::opts_chunk$set(fig.width=10, fig.height=7, fig.fullwidth=TRUE,
 fig.path='Figures/', warning=FALSE,
@@ -10,10 +10,9 @@ load("data/data_27022025.Rdata")
 load("data/calculations_28022025.Rdata")
 ```
 
-## FMT1
-### Is the GM of the intervention group more similar to warm population after one week from FMT?
+## Is the GM of the intervention group more similar to warm population after one week from FMT?
 
-#### Shapiro test
+### Shapiro test
 
 ```{r shapiro_fmt1, comment="", message=FALSE, warning=FALSE,}
 alpha_div %>%
@@ -41,7 +40,7 @@ alpha_div %>%
   pull(shapiro_p_value)
 ```
 
-#### Alpha
+### Alpha diversity
 ```{r alpha_div_plot_5, comment="", message=FALSE, warning=FALSE, fig.height=4, fig.width=10, fig.fullwidth=TRUE}
 alpha_div %>%
   pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
@@ -78,8 +77,7 @@ alpha_div %>%
 ```
 ***p<0.05 when comparing neutral beta diversity between Cold-control and Warm-control
 
-
-#### Beta diversity
+### Beta diversity
 
 ***Number of samples used***
 ```{r beta_div_neutral_treat1_samples_2, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE}
@@ -167,7 +165,7 @@ pairwise%>%
 
 ***NMDS***
 ```{r beta_neutral_nmds_post1, warning=FALSE, comments="", message=FALSE, results="hide"}
-beta_richness_nmds_post1 <- richness_post1 %>%
+richness_post1 %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace = FALSE) %>%
 				scores() %>%
 				as_tibble(., rownames = "sample") %>%
@@ -187,7 +185,7 @@ beta_richness_nmds_post1 <- richness_post1 %>%
 				theme_classic() +
 				theme(legend.position="none")
 
-beta_neutral_nmds_post1 <- neutral_post1 %>%
+neutral_post1 %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace = FALSE) %>%
 				scores() %>%
 				as_tibble(., rownames = "sample") %>%
@@ -207,7 +205,7 @@ beta_neutral_nmds_post1 <- neutral_post1 %>%
 				theme_classic() +
 				theme(legend.position="none")
 
-beta_phylogenetic_nmds_post1 <- phylo_post1 %>%
+phylo_post1 %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace = FALSE) %>%
 				scores() %>%
 				as_tibble(., rownames = "sample") %>%
@@ -228,12 +226,58 @@ beta_phylogenetic_nmds_post1 <- phylo_post1 %>%
 				theme(legend.position="none")
 ```
 
-```{r beta_neutral_nmds_plot_post1_final, fig.height=7}
-ggarrange(beta_richness_nmds_post1, beta_neutral_nmds_post1, beta_phylogenetic_nmds_post1, ncol=3, nrow=1, common.legend = TRUE, legend="right")
+### Differentially abundant MAGs
+#### Warm vs Intervention
+
+***Structural zeros***
+
+```{r struct_zero_wild_pop_warm, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+warm_samples <- sample_metadata %>% 
+  filter(type == "Hot_control") %>% 
+  filter(time_point == "FMT1") %>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+treatment_samples <- sample_metadata %>% 
+  filter(type == "Treatment") %>% 
+  filter(time_point == "FMT1")%>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+meta_wild <- sample_metadata%>% 
+  filter(type %in% c("Hot_control", "Treatment") & time_point == "FMT1")
+
+structural_zeros <- genome_counts_filt %>%
+  select(c("genome", meta_wild$Tube_code)) %>%
+  filter(rowSums(across(where(is.numeric)))!=0) %>% 
+  rowwise() %>%
+  mutate(all_zeros_warm = all(c_across(all_of(warm_samples)) == 0)) %>% # set true if all samples in warm have zeros
+  mutate(all_zeros_treatment = all(c_across(all_of(treatment_samples)) == 0)) %>% # set true if all samples in treatment have zeros
+  mutate(average_warm = mean(c_across(all_of(warm_samples)), na.rm = TRUE)) %>% # get average genome counts across accli
+  mutate(average_treatment = mean(c_across(all_of(treatment_samples)), na.rm = TRUE)) %>% # get average genome counts across post2
+  filter(all_zeros_warm == TRUE | all_zeros_treatment == TRUE)  %>% # filter only genomes with structural zeros
+  mutate(present = case_when(all_zeros_warm & !all_zeros_treatment ~ "treatment",!all_zeros_warm & all_zeros_treatment ~ "warm_control",!all_zeros_warm & !all_zeros_treatment ~ "None",TRUE ~ NA_character_)) %>%
+  mutate(average = ifelse(present == "warm_control", average_warm, average_treatment)) %>%
+  dplyr::select(genome, present, average) %>%
+  left_join(genome_metadata, by = join_by(genome == genome)) %>%
+  arrange(present, -average)
+
 ```
 
-#### Differentially abundant MAGs
-##### Warm vs Intervention
+```{r}
+struc <- structural_zeros %>% 
+  filter(present=="warm_control")%>% 
+  count(phylum, name = "Hot_control") %>%
+  arrange(desc(Hot_control))
+structural_zeros %>% 
+  filter(present=="treatment")%>% 
+  count(phylum, name = "Treatment") %>%
+  arrange(desc(Treatment)) %>% 
+  full_join(., struc, by="phylum") %>%
+  mutate(across(everything(), ~ ifelse(is.na(.), 0, .))) %>% 
+  tt()
+```
+
 
 ```{r FMT1}
 physeq_FMT1 <- subset_samples(physeq_all, type %in% c("Hot_control", "Treatment") & time_point == "FMT1")
@@ -249,8 +293,8 @@ ancom_rand_output_fmt1 = ancombc2(data = physeq_FMT1,
                   prv_cut =0, 
                   lib_cut = 0, 
                   s0_perc = 0.05,
-                  group = "type", 
-                  struc_zero = TRUE, 
+                  group = NULL, 
+                  struc_zero = FALSE, 
                   neg_lb = FALSE,
                   alpha = 0.05, 
                   n_cl = 2, 
@@ -275,19 +319,6 @@ save(ancom_rand_output_fmt1, file="data/ancom_rand_output_fmt1.RData")
 load("data/ancom_rand_output_fmt1.RData")
 ```
 
-***Structural zeros***
-```{r structural_zeros_fmt1}
-# Extract structural zeros
-structural_zeros <- ancom_rand_output_fmt1$zero_ind
-
-# Convert to a data frame for better readability
-structural_zeros_df <- as.data.frame(structural_zeros) %>% 
-  column_to_rownames(., "taxon")
-
-# Find taxa that are structural zeros in at least one group
-structural_zero_taxa <- rownames(structural_zeros_df)[apply(structural_zeros_df, 1, any)]
-length(structural_zero_taxa)
-```
 
 ```{r structural_zeros_fmt1_1}
 ancom_rand_output_fmt1$res %>%
@@ -365,11 +396,61 @@ ancombc_rand_table_mag%>%
 ```
 
 ##### Intervention vs cold control
+
+***Structural zeros***
+
+```{r struct_zero_wild_pop_inter, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+cold_samples <- sample_metadata %>% 
+  filter(type == "Control") %>% 
+  filter(time_point == "FMT1") %>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+treatment_samples <- sample_metadata %>% 
+  filter(type == "Treatment") %>% 
+  filter(time_point == "FMT1")%>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+meta_wild <- sample_metadata%>% 
+  filter(type %in% c("Control", "Treatment") & time_point == "FMT1")
+
+structural_zeros <- genome_counts_filt %>%
+  select(c("genome", meta_wild$Tube_code)) %>%
+  filter(rowSums(across(where(is.numeric)))!=0) %>% 
+  rowwise() %>%
+  mutate(all_zeros_cold = all(c_across(all_of(cold_samples)) == 0)) %>% # set true if all samples in cold have zeros
+  mutate(all_zeros_treatment = all(c_across(all_of(treatment_samples)) == 0)) %>% # set true if all samples in treatment have zeros
+  mutate(average_cold = mean(c_across(all_of(cold_samples)), na.rm = TRUE)) %>% # get average genome counts across accli
+  mutate(average_treatment = mean(c_across(all_of(treatment_samples)), na.rm = TRUE)) %>% # get average genome counts across post2
+  filter(all_zeros_cold == TRUE | all_zeros_treatment == TRUE)  %>% # filter only genomes with structural zeros
+  mutate(present = case_when(all_zeros_cold & !all_zeros_treatment ~ "treatment",!all_zeros_cold & all_zeros_treatment ~ "cold_control",!all_zeros_cold & !all_zeros_treatment ~ "None",TRUE ~ NA_character_)) %>%
+  mutate(average = ifelse(present == "cold_control", average_cold, average_treatment)) %>%
+  dplyr::select(genome, present, average) %>%
+  left_join(genome_metadata, by = join_by(genome == genome)) %>%
+  arrange(present, -average)
+
+```
+
+```{r}
+struc <- structural_zeros %>% 
+  filter(present=="cold_control")%>% 
+  count(phylum, name = "Cold_control") %>%
+  arrange(desc(Cold_control))
+structural_zeros %>% 
+  filter(present=="treatment")%>% 
+  count(phylum, name = "Treatment") %>%
+  arrange(desc(Treatment)) %>% 
+  full_join(., struc, by="phylum") %>%
+  mutate(across(everything(), ~ ifelse(is.na(.), 0, .))) %>% 
+  tt()
+```
+
 ```{r}
 physeq_FMT1_cold <- subset_samples(physeq_all, type %in% c("Control", "Treatment") & time_point == "FMT1")
 physeq_FMT1_cold <- prune_taxa(taxa_sums(physeq_FMT1_cold)>0, physeq_FMT1_cold)
 ```
-```{r ancom_rand_pond_FMT1_cold, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+```{r ancom_rand_pond_FMT1_cold, comment="", message=FALSE, warning=FALSE}
 ancom_rand_output_cold = ancombc2(data = physeq_FMT1_cold, 
                   assay_name = "counts", 
                   tax_level = NULL,
@@ -379,8 +460,8 @@ ancom_rand_output_cold = ancombc2(data = physeq_FMT1_cold,
                   prv_cut =0, 
                   lib_cut = 0, 
                   s0_perc = 0.05,
-                  group = "type", 
-                  struc_zero = TRUE, 
+                  group = NULL, 
+                  struc_zero = FALSE, 
                   neg_lb = FALSE,
                   alpha = 0.05, 
                   n_cl = 2, 
@@ -393,10 +474,9 @@ ancom_rand_output_cold = ancombc2(data = physeq_FMT1_cold,
                   em_control = list(tol = 1e-5, max_iter = 100),
                   mdfdr_control = list(fwer_ctrl_method = "holm", B = 100), 
                   trend_control = NULL)
-
 ```
 
-```{r 10, eval=FALSE}
+```{r }
 save(ancom_rand_output_cold, file="data/ancom_rand_output_cold.RData")
 ```
 
@@ -404,25 +484,14 @@ save(ancom_rand_output_cold, file="data/ancom_rand_output_cold.RData")
 load("data/ancom_rand_output_cold.RData")
 ```
 
-***Structural zeros***
-```{r structural_zeros_fmt1_2}
-# Extract structural zeros
-structural_zeros <- ancom_rand_output_cold$zero_ind
-
-# Convert to a data frame for better readability
-structural_zeros_df <- as.data.frame(structural_zeros) %>% 
-  column_to_rownames(., "taxon")
-
-# Find taxa that are structural zeros in at least one group
-structural_zero_taxa <- rownames(structural_zeros_df)[apply(structural_zeros_df, 1, any)]
-length(structural_zero_taxa)
-```
-
 
 ```{r 3_1, eval=TRUE}
 ancom_rand_output_cold$res %>%
   dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
-  filter(p_typeTreatment < 0.05)
+  filter(p_typeTreatment < 0.05) %>% 
+  left_join(., genome_metadata, by=join_by("taxon"=="genome")) %>% 
+  select(2,3,8,9,10) %>% 
+  tt()
 ```
 
 ```{r ancom_rand_FMT1_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE}
@@ -458,7 +527,7 @@ tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
 ```{r ancombc_rand_plot_phy_FMT1_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
 ancombc_rand_table_mag%>%
       mutate(genome=factor(taxon,levels=ancombc_rand_table_mag$taxon)) %>%
-ggplot(., aes(x=lfc_typeTreatment, y=forcats::fct_reorder(genome,lfc_typeTreatment), fill=phylum)) + #forcats::fct_rev()
+ggplot(., aes(x=lfc_typeTreatment, y=forcats::fct_reorder(genome,lfc_typeTreatment), fill=phylum)) + 
   geom_col() + 
   scale_fill_manual(values=tax_color) + 
   geom_hline(yintercept=0) + 
@@ -570,10 +639,9 @@ element_gift %>%
   remove_rownames()
 ```
 
-## FMT2
-### Is the GM of the intervention group still more similar to warm population after one week from FMT?
+## Is the GM of the intervention group still more similar to warm population after one week from FMT?
 
-#### Shapiro test
+### Shapiro test
 
 ```{r shapiro_fmt2, comment="", message=FALSE, warning=FALSE,}
 alpha_div %>%
@@ -601,7 +669,7 @@ alpha_div %>%
   pull(shapiro_p_value)
 ```
 
-#### Alpha
+### Alpha diversity
 ```{r alpha_div_plot_FMT2, comment="", message=FALSE, warning=FALSE, fig.height=4, fig.width=10, fig.fullwidth=TRUE}
 alpha_div %>%
   pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
@@ -641,7 +709,7 @@ alpha_div %>%
 ***p<0.05 when comparing richness and neutral beta diversity between Cold-control and Cold-intervention
 
 
-#### Beta diversity
+### Beta diversity
 
 ***Number of samples used***
 ```{r beta_div_neutral_FMT2, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE}
@@ -728,7 +796,7 @@ pairwise%>%
 
 ***NMDS***
 ```{r beta_neutral_nmds_FMT2, warning=FALSE, comments="", message=FALSE, results="hide"}
-beta_richness_nmds_FMT2 <- richness_FMT2 %>%
+ richness_FMT2 %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace = FALSE) %>%
 				scores() %>%
 				as_tibble(., rownames = "sample") %>%
@@ -748,7 +816,7 @@ beta_richness_nmds_FMT2 <- richness_FMT2 %>%
 				theme_classic() +
 				theme(legend.position="none")
 
-beta_neutral_nmds_FMT2 <- neutral_FMT2 %>%
+neutral_FMT2 %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace = FALSE) %>%
 				scores() %>%
 				as_tibble(., rownames = "sample") %>%
@@ -768,7 +836,7 @@ beta_neutral_nmds_FMT2 <- neutral_FMT2 %>%
 				theme_classic() +
 				theme(legend.position="none")
 
-beta_phylogenetic_nmds_FMT2 <- phylo_FMT2 %>%
+phylo_FMT2 %>%
 				metaMDS(.,trymax = 500, k=2, verbosity=FALSE, trace = FALSE) %>%
 				scores() %>%
 				as_tibble(., rownames = "sample") %>%
@@ -789,17 +857,62 @@ beta_phylogenetic_nmds_FMT2 <- phylo_FMT2 %>%
 				theme(legend.position="none")
 ```
 
-```{r beta_neutral_nmds_plot_FMT2_final, fig.height=7}
-ggarrange(beta_richness_nmds_FMT2, beta_neutral_nmds_FMT2, beta_phylogenetic_nmds_FMT2, ncol=3, nrow=1, common.legend = TRUE, legend="right")
+
+### Differentially abundant MAGs
+#### Warm vs Intervention
+***Structural zeros***
+
+```{r struct_zero_wild_pop, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+warm_samples <- sample_metadata %>% 
+  filter(type == "Hot_control") %>% 
+  filter(time_point == "FMT2") %>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+treatment_samples <- sample_metadata %>% 
+  filter(type == "Treatment") %>% 
+  filter(time_point == "FMT2")%>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+meta_wild <- sample_metadata%>% 
+  filter(type %in% c("Hot_control", "Treatment") & time_point == "FMT2")
+
+structural_zeros <- genome_counts_filt %>%
+  select(c("genome", meta_wild$Tube_code)) %>%
+  filter(rowSums(across(where(is.numeric)))!=0) %>% 
+  rowwise() %>%
+  mutate(all_zeros_warm = all(c_across(all_of(warm_samples)) == 0)) %>% # set true if all samples in warm have zeros
+  mutate(all_zeros_treatment = all(c_across(all_of(treatment_samples)) == 0)) %>% # set true if all samples in treatment have zeros
+  mutate(average_warm = mean(c_across(all_of(warm_samples)), na.rm = TRUE)) %>% # get average genome counts across accli
+  mutate(average_treatment = mean(c_across(all_of(treatment_samples)), na.rm = TRUE)) %>% # get average genome counts across post2
+  filter(all_zeros_warm == TRUE | all_zeros_treatment == TRUE)  %>% # filter only genomes with structural zeros
+  mutate(present = case_when(all_zeros_warm & !all_zeros_treatment ~ "treatment",!all_zeros_warm & all_zeros_treatment ~ "warm_control",!all_zeros_warm & !all_zeros_treatment ~ "None",TRUE ~ NA_character_)) %>%
+  mutate(average = ifelse(present == "warm_control", average_warm, average_treatment)) %>%
+  dplyr::select(genome, present, average) %>%
+  left_join(genome_metadata, by = join_by(genome == genome)) %>%
+  arrange(present, -average)
+
 ```
 
-#### Differentially abundant MAGs
-##### Warm vs Intervention
+```{r}
+struc <- structural_zeros %>% 
+  filter(present=="warm_control")%>% 
+  count(phylum, name = "Hot_control") %>%
+  arrange(desc(Hot_control))
+structural_zeros %>% 
+  filter(present=="treatment")%>% 
+  count(phylum, name = "Treatment") %>%
+  arrange(desc(Treatment)) %>% 
+  full_join(., struc, by="phylum") %>%
+  mutate(across(everything(), ~ ifelse(is.na(.), 0, .))) %>% 
+  tt()
+```
 ```{r}
 physeq_FMT2 <- subset_samples(physeq_all, type %in% c("Hot_control", "Treatment") & time_point == "FMT2")
 physeq_FMT2 <- prune_taxa(taxa_sums(physeq_FMT2)>0, physeq_FMT2)
 ```
-```{r ancom_rand_pond_FMT2, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+```{r ancom_rand_pond_FMT2, comment="", message=FALSE, warning=FALSE}
 ancom_rand_output_fmt2 = ancombc2(data = physeq_FMT2, 
                   assay_name = "counts", 
                   tax_level = NULL,
@@ -809,8 +922,8 @@ ancom_rand_output_fmt2 = ancombc2(data = physeq_FMT2,
                   prv_cut =0, 
                   lib_cut = 0, 
                   s0_perc = 0.05,
-                  group = "type", 
-                  struc_zero = TRUE, 
+                  group = NULL, 
+                  struc_zero = FALSE, 
                   neg_lb = FALSE,
                   alpha = 0.05, 
                   n_cl = 2, 
@@ -826,21 +939,20 @@ ancom_rand_output_fmt2 = ancombc2(data = physeq_FMT2,
 
 ```
 
-```{r 4, eval=FALSE}
+```{r }
 save(ancom_rand_output_fmt2, file="data/ancom_rand_output_fmt2.RData")
 ```
 
 ```{r 5, eval=TRUE}
 load("data/ancom_rand_output_fmt2.RData")
+```
+```{r}
 ancom_rand_output_fmt2$res %>%
   dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
-  filter(p_typeTreatment < 0.05)
-```
-
-```{r}
-ancom_rand_output$res %>%
-  dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
-  filter(p_typeTreatment < 0.05)
+  filter(p_typeTreatment < 0.05) %>% 
+  left_join(., genome_metadata, by=join_by("taxon"=="genome")) %>% 
+  select(2,3,7,8,9) %>% 
+  tt()  
 ```
 
 ```{r ancom_rand_FMT2, comment="", echo=FALSE, message=FALSE, warning=FALSE}
@@ -882,7 +994,6 @@ ggplot(., aes(x=lfc_typeTreatment, y=forcats::fct_reorder(genome,lfc_typeTreatme
   geom_col() + 
   scale_fill_manual(values=tax_color) + 
   geom_hline(yintercept=0) + 
-#  coord_flip()+
   theme(panel.background = element_blank(),
         axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
         axis.text.x = element_text(size = 12),
@@ -913,11 +1024,60 @@ ancombc_rand_table_mag%>%
 ```
 
 ##### Intervention vs cold control
+***Structural zeros***
+
+```{r struct_zero_wild_pop_fmt2_int, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+cold_samples <- sample_metadata %>% 
+  filter(type == "Control") %>% 
+  filter(time_point == "FMT2") %>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+treatment_samples <- sample_metadata %>% 
+  filter(type == "Treatment") %>% 
+  filter(time_point == "FMT2")%>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+meta_wild <- sample_metadata%>% 
+  filter(type %in% c("Control", "Treatment") & time_point == "FMT2")
+
+structural_zeros <- genome_counts_filt %>%
+  select(c("genome", meta_wild$Tube_code)) %>%
+  filter(rowSums(across(where(is.numeric)))!=0) %>% 
+  rowwise() %>%
+  mutate(all_zeros_cold = all(c_across(all_of(cold_samples)) == 0)) %>% # set true if all samples in cold have zeros
+  mutate(all_zeros_treatment = all(c_across(all_of(treatment_samples)) == 0)) %>% # set true if all samples in treatment have zeros
+  mutate(average_cold = mean(c_across(all_of(cold_samples)), na.rm = TRUE)) %>% # get average genome counts across accli
+  mutate(average_treatment = mean(c_across(all_of(treatment_samples)), na.rm = TRUE)) %>% # get average genome counts across post2
+  filter(all_zeros_cold == TRUE | all_zeros_treatment == TRUE)  %>% # filter only genomes with structural zeros
+  mutate(present = case_when(all_zeros_cold & !all_zeros_treatment ~ "treatment",!all_zeros_cold & all_zeros_treatment ~ "cold_control",!all_zeros_cold & !all_zeros_treatment ~ "None",TRUE ~ NA_character_)) %>%
+  mutate(average = ifelse(present == "cold_control", average_cold, average_treatment)) %>%
+  dplyr::select(genome, present, average) %>%
+  left_join(genome_metadata, by = join_by(genome == genome)) %>%
+  arrange(present, -average)
+
+```
+
+```{r}
+struc <- structural_zeros %>% 
+  filter(present=="cold_control")%>% 
+  count(phylum, name = "Cold_control") %>%
+  arrange(desc(Cold_control))
+structural_zeros %>% 
+  filter(present=="treatment")%>% 
+  count(phylum, name = "Treatment") %>%
+  arrange(desc(Treatment)) %>% 
+  full_join(., struc, by="phylum") %>%
+  mutate(across(everything(), ~ ifelse(is.na(.), 0, .))) %>% 
+  tt()
+```
+
 ```{r}
 physeq_FMT2 <- subset_samples(physeq_all, type %in% c("Control", "Treatment") & time_point == "FMT2")
 physeq_FMT2 <- prune_taxa(taxa_sums(physeq_FMT2)>0, physeq_FMT2)
 ```
-```{r ancom_rand_pond_FMT2_cold, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+```{r ancom_rand_pond_FMT2_cold, comment="", message=FALSE, warning=FALSE}
 ancom_rand_output_cold_fmt2 = ancombc2(data = physeq_FMT2, 
                   assay_name = "counts", 
                   tax_level = NULL,
@@ -927,8 +1087,8 @@ ancom_rand_output_cold_fmt2 = ancombc2(data = physeq_FMT2,
                   prv_cut =0, 
                   lib_cut = 0, 
                   s0_perc = 0.05,
-                  group = "type", 
-                  struc_zero = TRUE, 
+                  group = NULL, 
+                  struc_zero = FALSE, 
                   neg_lb = FALSE,
                   alpha = 0.05, 
                   n_cl = 2, 
@@ -945,14 +1105,20 @@ ancom_rand_output_cold_fmt2 = ancombc2(data = physeq_FMT2,
 ```
 
 ```{r 8, eval=FALSE}
-save(ancom_rand_output_fmt2, file="data/ancom_rand_output_cold_fmt2.RData")
+save(ancom_rand_output_cold_fmt2, file="data/ancom_rand_output_cold_fmt2.RData")
 ```
 
 ```{r 7, eval=TRUE}
 load("data/ancom_rand_output_cold_fmt2.RData")
+
+```
+```{r}
 ancom_rand_output_cold_fmt2$res %>%
   dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
-  filter(p_typeTreatment < 0.05)
+  filter(p_typeTreatment < 0.05) %>% 
+  left_join(., genome_metadata, by=join_by("taxon"=="genome")) %>% 
+  select(2,3,7,8,9) %>% 
+  tt()
 ```
 
 ```{r ancom_rand_FMT2_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE}
