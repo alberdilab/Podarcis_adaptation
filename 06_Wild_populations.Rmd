@@ -406,7 +406,7 @@ physeq_wild_mag <- subset_samples(physeq_all, time_point == "Wild")
 physeq_wild_mag <- prune_taxa(taxa_sums(physeq_wild_mag)>0, physeq_wild_mag)
 ```
 
-```{r ancom_rand_pond_mag_wild, comment="", message=FALSE, warning=FALSE}
+```{r ancom_rand_pond_mag_wild, comment="", message=FALSE, warning=FALSE, eval=FALSE}
 ancom_rand_output_mag_wild = ancombc2(
   data = physeq_wild_mag,
   assay_name = "counts",
@@ -440,6 +440,10 @@ ancom_rand_output_mag_wild = ancombc2(
 
 ```{r 13, eval=FALSE}
 save(ancom_rand_output_mag_wild, file="data/ancom_rand_output_mag_wild.RData")
+```
+
+```{r 13_1}
+load("data/ancom_rand_output_mag_wild.RData")
 ```
 
 ***Differentially abundant MAGs***

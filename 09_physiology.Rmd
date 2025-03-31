@@ -1,0 +1,170 @@
+# Physiological measurements
+
+## Respirometry
+
+```{r load_data_resp}
+load("data/data_27022025.Rdata")
+respirometry_resp2 <- read_excel("data/respirometry_resp2.xlsx")
+```
+
+```{r dataframe_modify, warning=FALSE}
+respirometry_resp2$individual <- as.factor(respirometry_resp2$individual)
+respirometry_resp2$cage <- as.factor(respirometry_resp2$cage)
+respirometry_resp2$time_point <- as.factor(respirometry_resp2$time_point)
+respirometry_resp2$type <- as.factor(respirometry_resp2$type)
+respirometry_resp2$population <- as.factor(respirometry_resp2$population)
+respirometry_resp2$QC_normalized <- as.numeric(respirometry_resp2$QC_normalized)
+respirometry_resp2$r2 <- as.numeric(respirometry_resp2$r2)
+
+
+#Filter NA values
+respirometry_resp2<-respirometry_resp2 %>%
+  filter(QC_normalized!="NA")
+```
+
+### Acclimation oxygen consumption
+
+```{r plot}
+respirometry_resp2 %>%
+  filter(time_point=="0")%>%
+  filter(individual!="AH1_2nd_8") %>%
+  filter(individual!="LI1_2nd_4") %>%
+  filter(individual!="LI1_2nd_3") %>% #lizard doesn't stop moving during the whole measurement, increasing the value and making it and outlier
+  filter(individual!="LI1_2nd_10") %>%
+  ggplot(aes(x = population, y = QC_normalized, color=population, fill=population, alpha=0.2)) +
+    geom_boxplot()+
+    geom_jitter() +
+      scale_color_manual(name="Population",
+          breaks=c("Cold","Warm"),
+          labels=c("Cold","Warm"),
+          values=c('#008080', "#d57d2c")) +
+      scale_fill_manual(name="Population",
+          breaks=c("Cold","Warm"),
+          labels=c("Cold","Warm"),
+          values=c('#00808050', "#d57d2c50"))+
+    #geom_text(aes(label = individual), hjust = 0, nudge_x = 0.05) +
+    theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))+
+    stat_compare_means(size=3,vjust = 3, hjust=1 )+
+    theme(legend.position="none",
+          panel.background = element_blank(),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank())+
+    theme_minimal()+
+    labs(x = "Population", y= "Normalized O2 consumption (ml/s/g)")
+```
+
+### Time-point oxygen consumption
+
+```{r plot_1}
+respirometry_resp2 %>%
+  filter(weight!=5.19)%>%
+  filter(weight!=5.91)%>%
+  filter(weight!=5.03)%>%
+  filter(r2!=0.808)%>%
+  filter(QC_normalized!=0.000036) %>% #r2 low
+  filter(r2!=0.728) %>%  #r2 low
+  ggplot(aes(x = time_point, y = QC_normalized, color=time_point, fill=time_point, alpha=0.2, label=cage)) +
+    geom_boxplot()+
+    geom_jitter() +
+      scale_color_manual(name="Time_point",
+          breaks=c("0","1","2"),
+          labels=c("Acclimation","1 week post FMT", "2 weeks post FMT"),
+          values=c('#BFA366', "#dec14b", "#6E5244")) +
+      scale_fill_manual(name="Time_point",
+          breaks=c("0","1","2"),
+          labels=c("Acclimation","1 week post FMT", "2 weeks post FMT"),
+          values=c('#BFA36650', "#dec14b50","#6E524450"))+
+    geom_text()+
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+    facet_wrap(~ factor(type))+
+    stat_compare_means(size=3)+
+    theme(legend.position="none")+
+    labs(x = "Time_point", y= "Normalized O2 consumption (ml/s/g)")
+```
+
+```{r plot_1_1}
+respirometry_resp2 %>%
+  filter(weight!=5.19)%>%
+  filter(weight!=5.91)%>%
+  filter(weight!=5.03)%>%
+  filter(r2!=0.808)%>%
+  filter(QC_normalized!=0.000036) %>% #r2 low
+  filter(r2!=0.728) %>%
+  ggplot(aes(x = time_point, y = QC_normalized, color=time_point, fill=time_point, alpha=0.2)) +
+    geom_boxplot()+
+    geom_jitter() +
+    scale_color_manual(name="Time_point",
+          breaks=c("0","1","2"),
+          labels=c("Acclimation","1 week post FMT", "2 weeks post FMT"),
+          values=c('#BFA366', "#dec14b", "#6E5244")) +
+      scale_fill_manual(name="Time_point",
+          breaks=c("0","1","2"),
+          labels=c("Acclimation","1 week post FMT", "2 weeks post FMT"),
+          values=c('#BFA36650', "#dec14b50","#6E524450"))+
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+    facet_wrap(~ factor(type))+
+    stat_compare_means(size=3)+
+    theme(legend.position="none")+
+    labs(x = "Time_point", y= "Normalized O2 consumption (ml/s/g)")+
+    geom_signif(comparisons = list(c("0", "1"), c("0", "2"), c("1", "2")),
+              map_signif_level = TRUE)
+```
+
+### Data modelling 
+
+#### CC vs CI Raw data modelling (LMM)
+
+```{r model, eval=TRUE}
+#subset all the wrong measurements
+respirometry_resp2_subset<-respirometry_resp2%>%
+  filter(type!="WC")%>%
+  filter(weight!=5.19)%>%
+  filter(weight!=5.91)%>%
+  filter(weight!=5.03)%>%
+  filter(r2!=0.808)%>%
+  filter(QC_normalized!=0.000036) %>% #r2 low
+  filter(r2!=0.728) %>%
+  filter(cage!="Cold_17") %>%
+  filter(cage!="Cold_3") %>%
+  filter(cage!="Cold_6") %>%
+  filter(cage!="Cold_9") %>%
+  filter(cage!="Hot_2") %>%
+  filter(cage!="Hot_8")
+
+#Create linear model formula
+model <- lme(fixed = QC_normalized ~  time_point+type, data = respirometry_resp2_subset,
+             random = ~ 1 | individual)
+
+#Print the model summary
+summary(model)
+MuMIn::r.squaredGLMM(model)
+```
+
+
+#### CI vs WC Raw data modelling (LMM)
+
+```{r model_2, eval=TRUE}
+#Filter out WC from the dataframe and create a subset
+respirometry_resp2_subset<-respirometry_resp2%>%
+  filter(weight!=5.19)%>%
+  filter(weight!=5.91)%>%
+  filter(weight!=5.03)%>%
+  filter(r2!=0.808)%>%
+  filter(QC_normalized!=0.000036) %>% #r2 low
+  filter(r2!=0.728) %>%
+  filter(cage!="Cold_17") %>%
+  filter(cage!="Cold_3") %>%
+  filter(cage!="Cold_6") %>%
+  filter(cage!="Cold_9") %>%
+  filter(cage!="Hot_2") %>%
+  filter(cage!="Hot_8")
+
+#Create linear model formula
+model <- lme(fixed = QC_normalized ~  time_point+type, data = respirometry_resp2_subset,
+             random = ~ 1 | individual)
+
+#Print the model summary
+summary(model)
+MuMIn::r.squaredGLMM(model)
+```
+

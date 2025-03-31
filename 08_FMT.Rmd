@@ -1,20 +1,1767 @@
 # Faecal Microbiota Transplantation (FMT)
-```{r knitr_options_FMT, include=FALSE}
+```{r knitr_options_FMT2, include=FALSE}
 knitr::opts_chunk$set(fig.width=10, fig.height=7, fig.fullwidth=TRUE,
 fig.path='Figures/', warning=FALSE,
 message=FALSE)
 set.seed(2802)
 ```
-```{r load_data_FMT}
+```{r load_data_FMT2}
 load("data/data_27022025.Rdata")
 load("data/calculations_28022025.Rdata")
 ```
+
+## What is the trend of the microbiota in each type after FMT?
+
+### Alpha diversity
+
+```{r alpha_div_plot_all, comment="", message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
+label_map <- c(
+  "Control" = "Cold-control", 
+  "Treatment" = "Cold-intervention",
+  "Hot_control" = "Warm-control",
+  "richness" = "Species Richness",
+  "neutral" = "Neutral Diversity",
+  "phylogenetic" = "Phylogenetic Diversity"
+)
+
+alpha_div %>%
+  pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
+  left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point %in% c("FMT1","Acclimation", "FMT2")) %>%
+  mutate(metric = factor(metric, levels = c("richness", "neutral", "phylogenetic"))) %>%
+  ggplot(aes(y = value, x = time_point, color = type, fill = type)) +
+  geom_boxplot(outlier.shape = NA, show.legend = FALSE) +
+  geom_point(position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.8), alpha = 0.5, show.legend = FALSE) +
+  facet_grid(metric ~ type, scales = "free_y", labeller = labeller(metric = label_map, type = label_map))+
+#  facet_nested(.~metric+type, labeller = labeller(metric = label_map, type = label_map))+
+  scale_color_manual(name="Type",
+                       breaks=c("Control", "Hot_control", "Treatment"),
+                       labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                       values=c("#4477AA","#d57d2c","#76b183")) +
+      scale_fill_manual(name="Type",
+                       breaks=c("Control", "Hot_control", "Treatment"),
+                       labels=c("Cold-Cold", "Hot-Hot", "Cold-Hot"),
+                       values=c("#4477AA50","#d57d2c50","#76b18350")) +
+  theme_minimal() +
+  theme(axis.text.x=element_text(size=10))+
+  labs(x = "Time Point", y = "value")
+```
+
+```{r 2}
+alpha_div_meta <- alpha_div %>%
+  left_join(sample_metadata, by = join_by(sample == Tube_code)) %>%
+  filter(time_point=="FMT1"|time_point=="Acclimation"|time_point=="FMT2") 
+```
+
+***Richness***
+```{r alpha_div_data_post7_comparison, comment="", message=FALSE, warning=FALSE}
+Modelq0GLMMNB <- glmer.nb(richness ~ type*time_point+(1|individual), data = alpha_div_meta)
+summary(Modelq0GLMMNB)
+emmeans::emmeans(Modelq0GLMMNB, pairwise ~ type)
+emmeans::emmeans(Modelq0GLMMNB, pairwise ~ time_point)
+```
+
+***Neutral***
+```{r alpha_div_data_1_post7_comparison, comment="", message=FALSE, warning=FALSE}
+Modelq1n <- nlme::lme(neutral ~ type*time_point, 
+               random = ~ 1 | individual,
+               data = alpha_div_meta)
+summary(Modelq1n)
+emmeans::emmeans(Modelq1n, pairwise ~ type)
+emmeans::emmeans(Modelq1n, pairwise ~ time_point)
+```
+
+***Phylogenetic***
+```{r alpha_div_data_2_post7_comparison, comment="", message=FALSE, warning=FALSE}
+Model_phylo <- nlme::lme(phylogenetic ~ type*time_point, 
+               random = ~ 1 | individual,
+               data = alpha_div_meta)
+summary(Model_phylo)
+emmeans::emmeans(Model_phylo, pairwise ~ type)
+emmeans::emmeans(Model_phylo, pairwise ~ time_point)
+```
+
+#### Beta diversity
+
+***Number of samples used***
+```{r beta_div_neutral_all_samples_2_comparison, results = TRUE, message=FALSE, warning=FALSE, comments=FALSE}
+samples_to_keep_post7 <- sample_metadata %>%
+  filter(time_point=="FMT1"|time_point=="Acclimation"|time_point=="FMT2") %>% 
+  select(Tube_code) %>% 
+  pull()
+subset_meta_post7 <- sample_metadata %>%
+  filter(time_point=="FMT1"|time_point=="Acclimation"|time_point=="FMT2")
+
+subset_meta_post7$time_point<-as.factor(subset_meta_post7$time_point)
+subset_meta_post7$type<-as.factor(subset_meta_post7$type)
+length(samples_to_keep_post7)
+```
+
+***Richness***
+```{r beta_richness_permanova_post7_2_comparison, warning=FALSE, comments="", message=FALSE}
+richness_post7 <- as.matrix(beta_q0n$S)
+richness_post7 <- as.dist(richness_post7[rownames(richness_post7) %in% samples_to_keep_post7,
+               colnames(richness_post7) %in% samples_to_keep_post7])
+betadisper(richness_post7, subset_meta_post7$type) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_richness_permanova_post7_1_comparison, warning=FALSE, comments="", message=FALSE}
+adonis2(richness_post7 ~ type*time_point,
+        data = subset_meta_post7 %>% arrange(match(Tube_code,labels(richness_post7))),
+        permutations = 999,
+        strata = subset_meta_post7 %>% arrange(match(Tube_code,labels(richness_post7))) %>% pull(individual),
+        by="terms") %>%
+        broom::tidy() %>%
+        tt()
+```
+
+***Neutral***
+```{r beta_neutral_permanova_post7_2_comparison, warning=FALSE, comments="", message=FALSE}
+neutral_post7 <- as.matrix(beta_q1n$S)
+neutral_post7 <- as.dist(neutral_post7[rownames(neutral_post7) %in% samples_to_keep_post7,
+               colnames(neutral_post7) %in% samples_to_keep_post7])
+betadisper(neutral_post7, subset_meta_post7$type) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_neutral_permanova_post7_1_comparison, warning=FALSE, comments="", message=FALSE}
+adonis2(neutral_post7 ~ type*time_point,
+        data = subset_meta_post7 %>% arrange(match(Tube_code,labels(neutral_post7))),
+        permutations = 999,
+        strata = subset_meta_post7 %>% arrange(match(Tube_code,labels(neutral_post7))) %>% pull(individual),
+        by="terms") %>%        
+        broom::tidy() %>%
+        tt()
+```
+
+***Phylogenetic***
+```{r beta_phylo_permanova_post7_2_comparison, warning=FALSE, comments="", message=FALSE}
+phylo_post7 <- as.matrix(beta_q1p$S)
+phylo_post7 <- as.dist(phylo_post7[rownames(phylo_post7) %in% samples_to_keep_post7,
+               colnames(phylo_post7) %in% samples_to_keep_post7])
+betadisper(phylo_post7, subset_meta_post7$type) %>% permutest(., pairwise = TRUE)
+```
+
+```{r beta_phylo_permanova_post7_1_comparison, warning=FALSE, comments="", message=FALSE}
+adonis2(phylo_post7 ~ type*time_point,
+        data = subset_meta_post7 %>% arrange(match(Tube_code,labels(phylo_post7))),
+        permutations = 999,
+        strata = subset_meta_post7 %>% arrange(match(Tube_code,labels(phylo_post7))) %>% pull(individual),
+          by="terms") %>%        
+        broom::tidy() %>%
+        tt()
+```
+
+***dbRDA***
+```{r beta_neutral_nmds_post7_comparison, warning=FALSE, comments="", message=FALSE, results="hide"}
+#Richness
+cca_ord <- capscale(formula = richness_post7 ~ subset_meta_post7$time_point* subset_meta_post7$type)
+CAP_df <- as.data.frame(vegan::scores(cca_ord, display = "sites")) %>%
+  rownames_to_column('Tube_code') %>%
+  left_join(subset_meta_post7, by = 'Tube_code') %>%
+  column_to_rownames('Tube_code')%>%
+  mutate(x_cen = mean(CAP1, na.rm = TRUE)) %>%
+  mutate(y_cen = mean(CAP2, na.rm = TRUE))
+
+biplot_scores <- as.data.frame(vegan::scores(cca_ord, display = "bp")) %>%
+  rownames_to_column("Variable")
+biplot_scores$Variable <- recode(biplot_scores$Variable, 
+                                 "subset_meta_post7$time_pointFMT1" = "FMT1",
+                                 "subset_meta_post7$time_pointFMT2"="FMT2",
+                                 "subset_meta_post7$typeHot_control"="Warm-control",
+                                 "subset_meta_post7$typeTreatment" = "Cold-intervention",
+                                 "subset_meta_post7$time_pointFMT1:subset_meta_post7$typeHot_control"="FMT1 Warm-control",
+                                 "subset_meta_post7$time_pointFMT2:subset_meta_post7$typeHot_control"="FMT2 Warm-control",
+                                 "subset_meta_post7$time_pointFMT1:subset_meta_post7$typeTreatment" = "FMT1 Cold-intervention",
+                                 "subset_meta_post7$time_pointFMT2:subset_meta_post7$typeTreatment" = "FMT2 Cold-intervention")
+
+beta_richness_nmds_post7 <-CAP_df %>%
+  group_by(type, time_point) %>%
+  mutate(x_cen = mean(CAP1, na.rm = TRUE)) %>%
+  mutate(y_cen = mean(CAP2, na.rm = TRUE)) %>%
+  ungroup() %>%
+  ggplot(., aes(x=CAP1,y=CAP2, color=type,shape = time_point)) +
+  scale_color_manual(name="Type",
+          breaks=c("Control","Hot_control", "Treatment"),
+          labels=c("Cold-control","Warm-control", "Cold-intervention"),
+          values=c("#4477AA","#d57d2c", "#76b183")) +
+      scale_fill_manual(name="Type",
+          breaks=c("Control","Hot_control", "Treatment"),
+          labels=c("Cold-control","Warm-control", "Cold-intervention"),
+          values=c("#4477AA50","#d57d2c50","#76b18350")) +
+        scale_x_discrete(labels = c("Control" = "Cold-Cold", "Hot_control" = "Hot-Hot", "Treatment" = "Cold-Hot")) +
+  geom_point(size=2) +
+  geom_hline(yintercept = 0, linetype = "dotted") + 
+  geom_vline(xintercept = 0, linetype = "dotted") +
+  geom_segment(aes(x=x_cen, y=y_cen, xend=CAP1, yend=CAP2), alpha=0.2) +
+  geom_segment(data = biplot_scores, aes(x = 0, y = 0, xend = CAP1, yend = CAP2),
+               inherit.aes = FALSE, arrow = arrow(length = unit(0.2, "cm")), color = "black") +
+  geom_text(data = biplot_scores, aes(x = CAP1, y = CAP2, label = Variable),
+            inherit.aes = FALSE, color = "black", vjust = -0.5, hjust = 0.5)+
+  theme_classic()
+
+#Neutral
+cca_ord <- capscale(formula = neutral_post7 ~ subset_meta_post7$time_point* subset_meta_post7$type)
+CAP_df <- as.data.frame(vegan::scores(cca_ord, display = "sites")) %>%
+  rownames_to_column('Tube_code') %>%
+  left_join(subset_meta_post7, by = 'Tube_code') %>%
+  column_to_rownames('Tube_code')%>%
+  mutate(x_cen = mean(CAP1, na.rm = TRUE)) %>%
+  mutate(y_cen = mean(CAP2, na.rm = TRUE))
+
+biplot_scores <- as.data.frame(vegan::scores(cca_ord, display = "bp")) %>%
+  rownames_to_column("Variable")
+biplot_scores$Variable <- recode(biplot_scores$Variable, 
+                                 "subset_meta_post7$time_pointFMT1" = "FMT1",
+                                 "subset_meta_post7$time_pointFMT2"="FMT2",
+                                 "subset_meta_post7$typeHot_control"="Warm-control",
+                                 "subset_meta_post7$typeTreatment" = "Cold-intervention",
+                                 "subset_meta_post7$time_pointFMT1:subset_meta_post7$typeHot_control"="FMT1 Warm-control",
+                                 "subset_meta_post7$time_pointFMT2:subset_meta_post7$typeHot_control"="FMT2 Warm-control",
+                                 "subset_meta_post7$time_pointFMT1:subset_meta_post7$typeTreatment" = "FMT1 Cold-intervention",
+                                 "subset_meta_post7$time_pointFMT2:subset_meta_post7$typeTreatment" = "FMT2 Cold-intervention")
+
+beta_neutral_nmds_post7 <- CAP_df %>%
+  group_by(type, time_point) %>%
+  mutate(x_cen = mean(CAP1, na.rm = TRUE)) %>%
+  mutate(y_cen = mean(CAP2, na.rm = TRUE)) %>%
+  ungroup() %>%
+  ggplot(., aes(x=CAP1,y=CAP2, color=type,shape = time_point)) +
+  scale_color_manual(name="Type",
+          breaks=c("Control","Hot_control", "Treatment"),
+          labels=c("Cold-control","Warm-control", "Cold-intervention"),
+          values=c("#4477AA","#d57d2c", "#76b183")) +
+      scale_fill_manual(name="Type",
+          breaks=c("Control","Hot_control", "Treatment"),
+          labels=c("Cold-control","Warm-control", "Cold-intervention"),
+          values=c("#4477AA50","#d57d2c50","#76b18350")) +
+        scale_x_discrete(labels = c("Control" = "Cold-Cold", "Hot_control" = "Hot-Hot", "Treatment" = "Cold-Hot")) +
+  geom_point(size=2) +
+  geom_hline(yintercept = 0, linetype = "dotted") + 
+  geom_vline(xintercept = 0, linetype = "dotted") +
+  geom_segment(aes(x=x_cen, y=y_cen, xend=CAP1, yend=CAP2), alpha=0.2) +
+  geom_segment(data = biplot_scores, aes(x = 0, y = 0, xend = CAP1, yend = CAP2),
+               inherit.aes = FALSE, arrow = arrow(length = unit(0.2, "cm")), color = "black") +
+  geom_text(data = biplot_scores, aes(x = CAP1, y = CAP2, label = Variable),
+            inherit.aes = FALSE, color = "black", vjust = -0.5, hjust = 0.5)+
+  theme_classic()
+
+
+#Phylogenetic
+cca_ord <- capscale(formula = phylo_post7 ~ subset_meta_post7$time_point* subset_meta_post7$type)
+CAP_df <- as.data.frame(vegan::scores(cca_ord, display = "sites")) %>%
+  rownames_to_column('Tube_code') %>%
+  left_join(subset_meta_post7, by = 'Tube_code') %>%
+  column_to_rownames('Tube_code')%>%
+  mutate(x_cen = mean(CAP1, na.rm = TRUE)) %>%
+  mutate(y_cen = mean(CAP2, na.rm = TRUE))
+
+biplot_scores <- as.data.frame(vegan::scores(cca_ord, display = "bp")) %>%
+  rownames_to_column("Variable")
+biplot_scores$Variable <- recode(biplot_scores$Variable, 
+                                 "subset_meta_post7$time_pointFMT1" = "FMT1",
+                                 "subset_meta_post7$time_pointFMT2"="FMT2",
+                                 "subset_meta_post7$typeHot_control"="Warm-control",
+                                 "subset_meta_post7$typeTreatment" = "Cold-intervention",
+                                 "subset_meta_post7$time_pointFMT1:subset_meta_post7$typeHot_control"="FMT1 Warm-control",
+                                 "subset_meta_post7$time_pointFMT2:subset_meta_post7$typeHot_control"="FMT2 Warm-control",
+                                 "subset_meta_post7$time_pointFMT1:subset_meta_post7$typeTreatment" = "FMT1 Cold-intervention",
+                                 "subset_meta_post7$time_pointFMT2:subset_meta_post7$typeTreatment" = "FMT2 Cold-intervention")
+
+beta_phylogenetic_nmds_post7 <- CAP_df %>%
+  group_by(type, time_point) %>%
+  mutate(x_cen = mean(CAP1, na.rm = TRUE)) %>%
+  mutate(y_cen = mean(CAP2, na.rm = TRUE)) %>%
+  ungroup() %>%
+  ggplot(., aes(x=CAP1,y=CAP2, color=type,shape = time_point)) +
+  scale_color_manual(name="Type",
+          breaks=c("Control","Hot_control", "Treatment"),
+          labels=c("Cold-control","Warm-control", "Cold-intervention"),
+          values=c("#4477AA","#d57d2c", "#76b183")) +
+      scale_fill_manual(name="Type",
+          breaks=c("Control","Hot_control", "Treatment"),
+          labels=c("Cold-control","Warm-control", "Cold-intervention"),
+          values=c("#4477AA50","#d57d2c50","#76b18350")) +
+        scale_x_discrete(labels = c("Control" = "Cold-Cold", "Hot_control" = "Hot-Hot", "Treatment" = "Cold-Hot")) +
+  geom_point(size=2) +
+  geom_hline(yintercept = 0, linetype = "dotted") + 
+  geom_vline(xintercept = 0, linetype = "dotted") +
+  geom_segment(aes(x=x_cen, y=y_cen, xend=CAP1, yend=CAP2), alpha=0.2) +
+  geom_segment(data = biplot_scores, aes(x = 0, y = 0, xend = CAP1, yend = CAP2),
+               inherit.aes = FALSE, arrow = arrow(length = unit(0.2, "cm")), color = "black") +
+  geom_text(data = biplot_scores, aes(x = CAP1, y = CAP2, label = Variable),
+            inherit.aes = FALSE, color = "black", vjust = -0.5, hjust = 0.5)+
+  theme_classic()
+```
+
+```{r beta_neutral_nmds_plot_post7_final, fig.height=8, fig.width=12, fig.fullwidth=TRUE}
+ggarrange(beta_richness_nmds_post7, beta_neutral_nmds_post7, beta_phylogenetic_nmds_post7, ncol=3, nrow=1, common.legend = TRUE, legend="right")
+```
+```{r beta_neutral_nmds_plot_post7_final_1, fig.height=8, fig.width=12, fig.fullwidth=TRUE}
+beta_neutral_nmds_post7
+```
+
+## Differences between acclimation and FMT1 across the three experimental groups
+
+
+### Functional differences
+
+***CI from acclimation to FMT1***
+
+```{r comunity_elem_FMT3_cold_1, comment="", message=FALSE, warning=FALSE}
+significant_element<-element_gift %>%
+  filter(time_point %in% c("FMT1","Acclimation") & type == "Treatment") %>%
+  select(-time_point, -type) %>%
+  filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
+  select(Tube_code, where( ~ is.numeric(.) && sum(.) > 0)) %>%
+  left_join(sample_metadata[c(1, 10)], by = "Tube_code") %>% 
+  pivot_longer(-c(Tube_code, time_point),
+               names_to = "trait",
+               values_to = "value") %>%
+  group_by(trait) %>%
+  summarise(p_value = wilcox.test(value ~ time_point)$p.value) %>%
+  mutate(p_adjust = p.adjust(p_value, method = "BH")) %>%
+  filter(p_adjust < 0.05) %>%
+  remove_rownames() %>% 
+  left_join(., uniqueGIFT_db, by=join_by("trait"=="Code_element"))
+```
+
+```{r comunity_elem_fm2_3, comment="", message=FALSE, warning=FALSE}
+element_gift_sig <- element_gift %>%
+  select(Tube_code, all_of(intersect(
+    significant_element$trait,
+    colnames(element_gift)
+  ))) %>%
+  left_join(., sample_metadata[c(1, 7, 10)], by = join_by(Tube_code == Tube_code)) %>%
+  filter(time_point %in% c("FMT1","Acclimation"))%>%
+  filter(type=="Treatment")
+  
+difference_table <- element_gift_sig %>%
+  select(-Tube_code, -type) %>%
+  group_by(time_point) %>%
+  summarise(across(everything(), mean)) %>%
+  t() %>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric) %>%
+  rownames_to_column(., "Elements") %>%
+  left_join(.,uniqueGIFT_db[c(1,3,4)],by = join_by(Elements == Code_element)) %>% 
+  arrange(Function) %>% 
+  mutate(Difference=Acclimation-FMT1)%>% 
+  mutate(group_color = ifelse(Difference <0,"FMT1", "Acclimation")) 
+```
+
+```{r commun_wilcox_elem_plot_fmt2_1, comment="", message=FALSE, warning=FALSE, fig.height=6, fig.width=12, fig.fullwidth=TRUE}
+difference_table %>%
+  ggplot(aes(x=forcats::fct_reorder(Function,Difference), y=Difference, fill=group_color)) + 
+  geom_col() +
+  scale_fill_manual(values=c("#76b183",'#008080')) + 
+  geom_hline(yintercept=0) + 
+  coord_flip()+
+  theme(axis.text = element_text(size = 10),
+        axis.title = element_text(size = 12),
+        legend.position = "right", 
+        legend.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major = element_line(size = 0.15, linetype = 'solid',
+                                        colour = "grey"))+
+  xlab("Function") + 
+  ylab("Mean difference")
+```
+
+***CC from acclimation to FMT1***
+
+```{r comunity_elem_FMT3_cold, comment="", message=FALSE, warning=FALSE}
+significant_element<-element_gift %>%
+  filter(time_point %in% c("FMT1","Acclimation") & type == "Control") %>%
+  select(-time_point, -type) %>%
+  filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
+  select(Tube_code, where( ~ is.numeric(.) && sum(.) > 0)) %>%
+  left_join(sample_metadata[c(1, 10)], by = "Tube_code") %>% 
+  pivot_longer(-c(Tube_code, time_point),
+               names_to = "trait",
+               values_to = "value") %>%
+  group_by(trait) %>%
+  summarise(p_value = wilcox.test(value ~ time_point)$p.value) %>%
+  mutate(p_adjust = p.adjust(p_value, method = "BH")) %>%
+  filter(p_adjust < 0.05) %>%
+  remove_rownames() %>% 
+  left_join(., uniqueGIFT_db, by=join_by("trait"=="Code_element"))
+```
+
+```{r comunity_elem_fm2_5, comment="", message=FALSE, warning=FALSE}
+element_gift_sig <- element_gift %>%
+  select(Tube_code, all_of(intersect(
+    significant_element$trait,
+    colnames(element_gift)
+  ))) %>%
+  left_join(., sample_metadata[c(1, 7, 10)], by = join_by(Tube_code == Tube_code)) %>%
+  filter(time_point %in% c("FMT1","Acclimation"))%>%
+  filter(type=="Control")
+  
+difference_table <- element_gift_sig %>%
+  select(-Tube_code, -type) %>%
+  group_by(time_point) %>%
+  summarise(across(everything(), mean)) %>%
+  t() %>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric) %>%
+  rownames_to_column(., "Elements") %>%
+  left_join(.,uniqueGIFT_db[c(1,3,4)],by = join_by(Elements == Code_element)) %>% 
+  arrange(Function) %>% 
+  mutate(Difference=Acclimation-FMT1)%>% 
+  mutate(group_color = ifelse(Difference <0,"FMT1", "Acclimation")) 
+```
+
+```{r commun_wilcox_elem_plot_fmt2_5, comment="", message=FALSE, warning=FALSE, fig.height=6, fig.width=12, fig.fullwidth=TRUE}
+difference_table %>%
+  ggplot(aes(x=forcats::fct_reorder(Function,Difference), y=Difference, fill=group_color)) + 
+  geom_col() +
+  scale_fill_manual(values=c("#4477AA",'#008080')) + 
+  geom_hline(yintercept=0) + 
+  coord_flip()+
+  theme(axis.text = element_text(size = 10),
+        axis.title = element_text(size = 12),
+        legend.position = "right", 
+        legend.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major = element_line(size = 0.15, linetype = 'solid',
+                                        colour = "grey"))+
+  xlab("Function") + 
+  ylab("Mean difference")
+```
+
+***WC from acclimation to FMT1***
+
+```{r comunity_elem_FMT3_cold_2, comment="", message=FALSE, warning=FALSE}
+element_gift %>%
+  filter(time_point %in% c("FMT1","Acclimation") & type == "Hot_control") %>%
+  select(-time_point, -type) %>%
+  filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
+  select(Tube_code, where( ~ is.numeric(.) && sum(.) > 0)) %>%
+  left_join(sample_metadata[c(1, 10)], by = "Tube_code") %>% 
+  pivot_longer(-c(Tube_code, time_point),
+               names_to = "trait",
+               values_to = "value") %>%
+  group_by(trait) %>%
+  summarise(p_value = wilcox.test(value ~ time_point)$p.value) %>%
+  mutate(p_adjust = p.adjust(p_value, method = "BH")) %>%
+  filter(p_adjust < 0.05) %>%
+  remove_rownames() %>% 
+  left_join(., uniqueGIFT_db, by=join_by("trait"=="Code_element"))
+```
+
+### Differential abundances
+
+#### CI: acclimation vs FMT1
+***Structural zeros***
+
+```{r struct_zero_ci_accli_fmt1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+accli_ci_samples <- sample_metadata %>% 
+  filter(type == "Treatment") %>% 
+  filter(time_point == "Acclimation") %>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+fmt1_ci_samples <- sample_metadata %>% 
+  filter(type == "Treatment") %>% 
+  filter(time_point == "FMT1")%>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+meta_ci_accli_fmt1 <- sample_metadata%>% 
+  filter(time_point %in% c("Acclimation", "FMT1") & type == "Treatment")
+
+structural_zeros <- genome_counts_filt %>%
+  select(c("genome", meta_ci_accli_fmt1$Tube_code)) %>%
+  filter(rowSums(across(where(is.numeric)))!=0) %>% 
+  rowwise() %>%
+  mutate(all_zeros_accli_ci = all(c_across(all_of(accli_ci_samples)) == 0)) %>% # set true if all samples in warm have zeros
+  mutate(all_zeros_ci_fmt1 = all(c_across(all_of(fmt1_ci_samples)) == 0)) %>% # set true if all samples in treatment have zeros
+  mutate(average_accli_ci = mean(c_across(all_of(accli_ci_samples)), na.rm = TRUE)) %>% # get average genome counts across accli
+  mutate(average_ci_fmt1 = mean(c_across(all_of(fmt1_ci_samples)), na.rm = TRUE)) %>% # get average genome counts across post2
+  filter(all_zeros_accli_ci == TRUE | all_zeros_ci_fmt1 == TRUE)  %>% # filter only genomes with structural zeros
+  mutate(present = case_when(all_zeros_accli_ci & !all_zeros_ci_fmt1 ~ "FMT1",!all_zeros_accli_ci & all_zeros_ci_fmt1 ~ "Acclimation",!all_zeros_accli_ci & !all_zeros_ci_fmt1 ~ "None",TRUE ~ NA_character_)) %>%
+  mutate(average = ifelse(present == "Acclimation", average_accli_ci, average_ci_fmt1)) %>%
+  dplyr::select(genome, present, average) %>%
+  left_join(genome_metadata, by = join_by(genome == genome)) %>%
+  arrange(present, -average)
+
+```
+
+```{r structural_zeros_acci_fmt1_ci}
+struc <- structural_zeros %>% 
+  filter(present=="Acclimation")%>% 
+  count(phylum, name = "Acclimation") %>%
+  arrange(desc(Acclimation))
+structural_zeros %>% 
+  filter(present=="FMT1")%>% 
+  count(phylum, name = "FMT1") %>%
+  arrange(desc(FMT1)) %>% 
+  full_join(., struc, by="phylum") %>%
+  mutate(across(everything(), ~ ifelse(is.na(.), 0, .))) %>% 
+  tt()
+```
+
+```{r structural_zeros_acci_fmt1_ci_1}
+
+phylo_samples <- sample_metadata %>%
+  filter(type == "Treatment" & time_point %in% c("Acclimation", "FMT1") )%>% 
+  column_to_rownames("Tube_code") %>% 
+  sample_data()
+phylo_genome <- genome_counts_filt %>% 
+  filter(!genome %in% structural_zeros$genome) %>% 
+  select(one_of(c("genome",rownames(phylo_samples)))) %>%
+  filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
+  select(genome, where(~ is.numeric(.) && sum(.) > 0)) %>%
+  column_to_rownames("genome") %>% 
+  otu_table(., taxa_are_rows = TRUE)
+phylo_taxonomy <- genome_metadata %>% 
+  filter(genome %in% rownames(phylo_genome)) %>% 
+  column_to_rownames("genome") %>% 
+  dplyr::select(domain,phylum,class,order,family,genus,species) %>% 
+  as.matrix() %>% 
+  tax_table()
+
+physeq_genome_filtered <- phyloseq(phylo_genome, phylo_taxonomy, phylo_samples)
+```
+
+```{r ancom_rand_pond_accli_fmt1_ci, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+ancom_rand_output_ci_accli_fmt1 = ancombc2(data = physeq_genome_filtered, 
+                  assay_name = "counts", 
+                  tax_level = NULL,
+                  fix_formula = "time_point", 
+                  p_adj_method = "holm", 
+                  pseudo_sens = TRUE,
+                  prv_cut =0, 
+                  lib_cut = 0, 
+                  s0_perc = 0.05,
+                  group = NULL, 
+                  struc_zero = FALSE, 
+                  neg_lb = FALSE,
+                  alpha = 0.05, 
+                  n_cl = 2, 
+                  verbose = TRUE,
+                  global = FALSE, 
+                  pairwise = FALSE, 
+                  dunnet = FALSE, 
+                  trend = FALSE,
+                  iter_control = list(tol = 1e-5, max_iter = 20, verbose = FALSE),
+                  em_control = list(tol = 1e-5, max_iter = 100),
+                  mdfdr_control = list(fwer_ctrl_method = "holm", B = 100), 
+                  trend_control = NULL)
+
+```
+
+```{r 4, eval=FALSE }
+save(ancom_rand_output_ci_accli_fmt1, file="data/ancom_rand_output_ci_accli_fmt1.RData")
+```
+
+```{r 5_1, eval=TRUE}
+load("data/ancom_rand_output_ci_accli_fmt1.RData")
+```
+```{r accli_fmt_ci_data}
+ancom_rand_output_ci_accli_fmt1$res %>%
+  dplyr::select(taxon, lfc_time_pointFMT1, p_time_pointFMT1) %>%
+  filter(p_time_pointFMT1 < 0.05) %>% 
+  left_join(., genome_metadata, by=join_by("taxon"=="genome")) %>% 
+  select(2,3,7,8,9) %>% 
+  tt()  
+```
+
+```{r ancom_rand_FMT1_accli_ci, comment="", echo=TRUE, message=FALSE, warning=FALSE}
+taxonomy <- data.frame(physeq_genome_filtered@tax_table) %>%
+  rownames_to_column(., "taxon") %>%
+  mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
+
+ancombc_rand_table_mag <- ancom_rand_output_ci_accli_fmt1$res %>%
+  dplyr::select(taxon, lfc_time_pointFMT1, p_time_pointFMT1) %>%
+  #filter(p_time_pointFMT1 < 0.05) %>%
+  dplyr::arrange(p_time_pointFMT1) %>%
+  merge(., taxonomy, by="taxon") %>%
+  mutate_at(vars(phylum, species), ~ str_replace(., "[dpcofgs]__", ""))%>%
+  dplyr::arrange(lfc_time_pointFMT1)
+
+ancombc_rand_table_mag
+  
+colors_alphabetic <- read_tsv("https://raw.githubusercontent.com/earthhologenome/EHI_taxonomy_colour/main/ehi_phylum_colors.tsv") %>%
+  mutate_at(vars(phylum), ~ str_replace(., "[dpcofgs]__", ""))  %>%
+  right_join(taxonomy, by=join_by(phylum == phylum)) %>%
+  dplyr::select(phylum, colors) %>%
+  mutate(colors = str_c(colors, "80"))  %>% #add 80% alpha
+	unique() %>%
+	dplyr::arrange(phylum)
+
+tax_table <- as.data.frame(unique(ancombc_rand_table_mag$phylum))
+  
+colnames(tax_table)[1] <- "phylum"
+tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
+	dplyr::arrange(phylum) %>%
+	dplyr::select(colors) %>%
+	pull()
+```
+
+```{r ancombc_rand_plot_phy_FMT1_accli_ci, comment="", echo=TRUE, message=FALSE, warning=FALSE, fig.height=5, fig.width=6, fig.fullwidth=TRUE}
+ancombc_rand_table_mag %>%
+  mutate(
+    genome = factor(taxon, levels = ancombc_rand_table_mag$taxon),
+    significance = ifelse(p_time_pointFMT1 < 0.05, phylum, NA)  # Set non-significant to NA (not mapped in legend)
+  ) %>%
+  ggplot() +
+  # Plot significant points with legend
+  geom_point(aes(x = lfc_time_pointFMT1, y = -log10(p_time_pointFMT1), color = significance), 
+             size = 3, alpha = 0.7, na.rm = TRUE) +  
+  # Plot non-significant points separately without legend
+  geom_point(data = filter(ancombc_rand_table_mag, p_time_pointFMT1 >= 0.05),
+             aes(x = lfc_time_pointFMT1, y = -log10(p_time_pointFMT1)), 
+             color = "grey70", size = 3, alpha = 0.7, show.legend = FALSE) +
+  scale_color_manual(
+    values = tax_color,  # Only keeps phylum colors in legend
+    na.translate = FALSE  # Removes NA (non-significant) from legend
+  ) + 
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed") +  
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  scale_y_continuous(limits = c(0, 10)) +  
+  xlab("log2FoldChange") + 
+  ylab("-log10(p-value)") +
+  guides(color = guide_legend(title = "Phylum")) +  
+  theme_minimal()+ 
+  annotate("text", x = min(ancombc_rand_table_mag$lfc_time_pointFMT1), y = 3, 
+           label = "FMT1", hjust = 0, size = 4, fontface = "bold") +
+  annotate("text", x = max(ancombc_rand_table_mag$lfc_time_pointFMT1), y = 3, 
+           label = "Acclimation", hjust = 1, size = 4, fontface = "bold")
+
+```
+
+***Phyla of the significant MAGs in acclimation***
+```{r sign_features_FMT1_accli_ci, comment="", message=FALSE, warning=FALSE}
+ancombc_rand_table_mag%>%
+  filter(p_time_pointFMT1 < 0.05) %>%
+  filter(lfc_time_pointFMT1>0)  %>% 
+  count(phylum, name = "sample_count") %>%
+  arrange(desc(sample_count))  
+```
+
+***Phyla of the significant MAGs in FMT1***
+```{r sign_features_FMT1_accli_ci_1, comment="", message=FALSE, warning=FALSE}
+ancombc_rand_table_mag%>%
+    filter(p_time_pointFMT1 < 0.05) %>%
+  filter(lfc_time_pointFMT1<0)  %>% 
+  count(phylum, name = "sample_count") %>%
+  arrange(desc(sample_count))  
+```
+
+#### CC: acclimation vs FMT1
+***Structural zeros***
+
+```{r struct_zero_cc_accli_fmt1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+accli_cc_samples <- sample_metadata %>% 
+  filter(type == "Control") %>% 
+  filter(time_point == "Acclimation") %>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+fmt1_cc_samples <- sample_metadata %>% 
+  filter(type == "Control") %>% 
+  filter(time_point == "FMT1")%>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+meta_cc_accli_fmt1 <- sample_metadata%>% 
+  filter(time_point %in% c("Acclimation", "FMT1") & type == "Control")
+
+structural_zeros <- genome_counts_filt %>%
+  select(c("genome", meta_cc_accli_fmt1$Tube_code)) %>%
+  filter(rowSums(across(where(is.numeric)))!=0) %>% 
+  rowwise() %>%
+  mutate(all_zeros_accli_cc = all(c_across(all_of(accli_cc_samples)) == 0)) %>% # set true if all samples in warm have zeros
+  mutate(all_zeros_cc_fmt1 = all(c_across(all_of(fmt1_cc_samples)) == 0)) %>% # set true if all samples in treatment have zeros
+  mutate(average_accli_cc = mean(c_across(all_of(accli_cc_samples)), na.rm = TRUE)) %>% # get average genome counts across accli
+  mutate(average_cc_fmt1 = mean(c_across(all_of(fmt1_cc_samples)), na.rm = TRUE)) %>% # get average genome counts across post2
+  filter(all_zeros_accli_cc == TRUE | all_zeros_cc_fmt1 == TRUE)  %>% # filter only genomes with structural zeros
+  mutate(present = case_when(all_zeros_accli_cc & !all_zeros_cc_fmt1 ~ "FMT1",!all_zeros_accli_cc & all_zeros_cc_fmt1 ~ "Acclimation",!all_zeros_accli_cc & !all_zeros_cc_fmt1 ~ "None",TRUE ~ NA_character_)) %>%
+  mutate(average = ifelse(present == "Acclimation", average_accli_cc, average_cc_fmt1)) %>%
+  dplyr::select(genome, present, average) %>%
+  left_join(genome_metadata, by = join_by(genome == genome)) %>%
+  arrange(present, -average)
+
+```
+
+```{r structural_zeros_accli_fmt1_cc}
+struc <- structural_zeros %>% 
+  filter(present=="Acclimation")%>% 
+  count(phylum, name = "Acclimation") %>%
+  arrange(desc(Acclimation))
+structural_zeros %>% 
+  filter(present=="FMT1")%>% 
+  count(phylum, name = "FMT1") %>%
+  arrange(desc(FMT1)) %>% 
+  full_join(., struc, by="phylum") %>%
+  mutate(across(everything(), ~ ifelse(is.na(.), 0, .))) %>% 
+  tt()
+```
+
+```{r structural_zeros_acci_fmt1_cc_1}
+phylo_samples <- sample_metadata %>%
+  filter(type == "Control" & time_point %in% c("Acclimation", "FMT1") )%>% 
+  column_to_rownames("Tube_code") %>% 
+  sample_data()
+phylo_genome <- genome_counts_filt %>% 
+  filter(!genome %in% structural_zeros$genome) %>% 
+  select(one_of(c("genome",rownames(phylo_samples)))) %>%
+  filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
+  select(genome, where(~ is.numeric(.) && sum(.) > 0)) %>%
+  column_to_rownames("genome") %>% 
+  otu_table(., taxa_are_rows = TRUE)
+phylo_taxonomy <- genome_metadata %>% 
+  filter(genome %in% rownames(phylo_genome)) %>% 
+  column_to_rownames("genome") %>% 
+  dplyr::select(domain,phylum,class,order,family,genus,species) %>% 
+  as.matrix() %>% 
+  tax_table()
+
+physeq_genome_filtered <- phyloseq(phylo_genome, phylo_taxonomy, phylo_samples)
+```
+
+```{r ancom_rand_pond_accli_fmt1_cc, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+ancom_rand_output_cc_accli_fmt1 = ancombc2(data = physeq_genome_filtered, 
+                  assay_name = "counts", 
+                  tax_level = NULL,
+                  fix_formula = "time_point", 
+                  rand_formula = "(1|individual)",
+                  p_adj_method = "holm", 
+                  pseudo_sens = TRUE,
+                  prv_cut =0, 
+                  lib_cut = 0, 
+                  s0_perc = 0.05,
+                  group = NULL, 
+                  struc_zero = FALSE, 
+                  neg_lb = FALSE,
+                  alpha = 0.05, 
+                  n_cl = 2, 
+                  verbose = TRUE,
+                  global = FALSE, 
+                  pairwise = FALSE, 
+                  dunnet = FALSE, 
+                  trend = FALSE,
+                  iter_control = list(tol = 1e-5, max_iter = 20, verbose = FALSE),
+                  em_control = list(tol = 1e-5, max_iter = 100),
+                  lme_control = lme4::lmerControl(),
+                  mdfdr_control = list(fwer_ctrl_method = "holm", B = 100), 
+                  trend_control = NULL)
+
+```
+
+```{r 4_1 ,cc, eval=FALSE}
+save(ancom_rand_output_cc_accli_fmt1, file="data/ancom_rand_output_cc_accli_fmt1.RData")
+```
+
+```{r 5_2, eval=TRUE}
+load("data/ancom_rand_output_cc_accli_fmt1.RData")
+```
+```{r, cc_1}
+ancom_rand_output_cc_accli_fmt1$res %>%
+  dplyr::select(taxon, lfc_time_pointFMT1, p_time_pointFMT1) %>%
+  filter(p_time_pointFMT1 < 0.05) %>% 
+  left_join(., genome_metadata, by=join_by("taxon"=="genome")) %>% 
+  select(2,3,7,8,9) %>% 
+  tt()  
+```
+
+```{r ancom_rand_FMT1_accli_cc, comment="", echo=TRUE, message=FALSE, warning=FALSE}
+taxonomy <- data.frame(physeq_genome_filtered@tax_table) %>%
+  rownames_to_column(., "taxon") %>%
+  mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
+
+ancombc_rand_table_mag <- ancom_rand_output_cc_accli_fmt1$res %>%
+  dplyr::select(taxon, lfc_time_pointFMT1, p_time_pointFMT1) %>%
+  #filter(p_time_pointFMT1 < 0.05) %>%
+  dplyr::arrange(p_time_pointFMT1) %>%
+  merge(., taxonomy, by="taxon") %>%
+  mutate_at(vars(phylum, species), ~ str_replace(., "[dpcofgs]__", ""))%>%
+  dplyr::arrange(lfc_time_pointFMT1)
+
+ancombc_rand_table_mag
+  
+colors_alphabetic <- read_tsv("https://raw.githubusercontent.com/earthhologenome/EHI_taxonomy_colour/main/ehi_phylum_colors.tsv") %>%
+  mutate_at(vars(phylum), ~ str_replace(., "[dpcofgs]__", ""))  %>%
+  right_join(taxonomy, by=join_by(phylum == phylum)) %>%
+  dplyr::select(phylum, colors) %>%
+  mutate(colors = str_c(colors, "80"))  %>% #add 80% alpha
+	unique() %>%
+	dplyr::arrange(phylum)
+
+tax_table <- as.data.frame(unique(ancombc_rand_table_mag$phylum))
+  
+colnames(tax_table)[1] <- "phylum"
+tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
+	dplyr::arrange(phylum) %>%
+	dplyr::select(colors) %>%
+	pull()
+```
+
+```{r ancombc_rand_plot_phy_FMT1_accli_cc, comment="", echo=TRUE, message=FALSE, warning=FALSE, fig.height=5, fig.width=6, fig.fullwidth=TRUE}
+ancombc_rand_table_mag %>%
+  mutate(
+    genome = factor(taxon, levels = ancombc_rand_table_mag$taxon),
+    significance = ifelse(p_time_pointFMT1 < 0.05, phylum, NA)  # Set non-significant to NA (not mapped in legend)
+  ) %>%
+  ggplot() +
+  # Plot significant points with legend
+  geom_point(aes(x = lfc_time_pointFMT1, y = -log10(p_time_pointFMT1), color = significance), 
+             size = 3, alpha = 0.7, na.rm = TRUE) +  
+  # Plot non-significant points separately without legend
+  geom_point(data = filter(ancombc_rand_table_mag, p_time_pointFMT1 >= 0.05),
+             aes(x = lfc_time_pointFMT1, y = -log10(p_time_pointFMT1)), 
+             color = "grey70", size = 3, alpha = 0.7, show.legend = FALSE) +
+  scale_color_manual(
+    values = tax_color,  # Only keeps phylum colors in legend
+    na.translate = FALSE  # Removes NA (non-significant) from legend
+  ) + 
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed") +  
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  scale_y_continuous(limits = c(0, 10)) +  
+  xlab("log2FoldChange") + 
+  ylab("-log10(p-value)") +
+  guides(color = guide_legend(title = "Phylum")) +  
+  theme_minimal()+ 
+  annotate("text", x = min(ancombc_rand_table_mag$lfc_time_pointFMT1), y = 10, 
+           label = "FMT1", hjust = 0, size = 4, fontface = "bold") +
+  annotate("text", x = max(ancombc_rand_table_mag$lfc_time_pointFMT1), y = 10, 
+           label = "Acclimation", hjust = 1, size = 4, fontface = "bold")
+
+```
+
+***Phyla of the significant MAGs in acclimation***
+```{r sign_features_FMT1_accli_cc, comment="", message=FALSE, warning=FALSE}
+ancombc_rand_table_mag%>%
+  filter(p_time_pointFMT1 < 0.05) %>%
+  filter(lfc_time_pointFMT1>0)  %>% 
+  count(phylum, name = "sample_count") %>%
+  arrange(desc(sample_count))  
+```
+
+***Phyla of the significant MAGs in FMT1***
+```{r sign_features_FMT1_accli_cc_1, comment="", message=FALSE, warning=FALSE}
+ancombc_rand_table_mag%>%
+    filter(p_time_pointFMT1 < 0.05) %>%
+  filter(lfc_time_pointFMT1<0)  %>% 
+  count(phylum, name = "sample_count") %>%
+  arrange(desc(sample_count))  
+```
+
+#### WC: acclimation vs FMT1
+***Structural zeros***
+
+```{r struct_zero_wc_accli_fmt1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+accli_wc_samples <- sample_metadata %>% 
+  filter(type == "Hot_control") %>% 
+  filter(time_point == "Acclimation") %>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+fmt1_wc_samples <- sample_metadata %>% 
+  filter(type == "Hot_control") %>% 
+  filter(time_point == "FMT1")%>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+meta_wc_accli_fmt1 <- sample_metadata%>% 
+  filter(time_point %in% c("Acclimation", "FMT1") & type == "Hot_control")
+
+structural_zeros <- genome_counts_filt %>%
+  select(c("genome", meta_wc_accli_fmt1$Tube_code)) %>%
+  filter(rowSums(across(where(is.numeric)))!=0) %>% 
+  rowwise() %>%
+  mutate(all_zeros_accli_wc = all(c_across(all_of(accli_wc_samples)) == 0)) %>% # set true if all samples in warm have zeros
+  mutate(all_zeros_wc_fmt1 = all(c_across(all_of(fmt1_wc_samples)) == 0)) %>% # set true if all samples in treatment have zeros
+  mutate(average_accli_wc = mean(c_across(all_of(accli_wc_samples)), na.rm = TRUE)) %>% # get average genome counts across accli
+  mutate(average_wc_fmt1 = mean(c_across(all_of(fmt1_wc_samples)), na.rm = TRUE)) %>% # get average genome counts across post2
+  filter(all_zeros_accli_wc == TRUE | all_zeros_wc_fmt1 == TRUE)  %>% # filter only genomes with structural zeros
+  mutate(present = case_when(all_zeros_accli_wc & !all_zeros_wc_fmt1 ~ "FMT1",!all_zeros_accli_wc & all_zeros_wc_fmt1 ~ "Acclimation",!all_zeros_accli_wc & !all_zeros_wc_fmt1 ~ "None",TRUE ~ NA_character_)) %>%
+  mutate(average = ifelse(present == "Acclimation", average_accli_wc, average_wc_fmt1)) %>%
+  dplyr::select(genome, present, average) %>%
+  left_join(genome_metadata, by = join_by(genome == genome)) %>%
+  arrange(present, -average)
+
+```
+
+```{r structural_zeros_acci_fmt1_wc}
+struc <- structural_zeros %>% 
+  filter(present=="Acclimation")%>% 
+  count(phylum, name = "Acclimation") %>%
+  arrange(desc(Acclimation))
+structural_zeros %>% 
+  filter(present=="FMT1")%>% 
+  count(phylum, name = "FMT1") %>%
+  arrange(desc(FMT1)) %>% 
+  full_join(., struc, by="phylum") %>%
+  mutate(across(everything(), ~ ifelse(is.na(.), 0, .))) %>% 
+  tt()
+```
+
+
+```{r structural_zeros_acci_fmt1_wc_1}
+
+phylo_samples <- sample_metadata %>%
+  filter(type == "Hot_control" & time_point %in% c("Acclimation", "FMT1") )%>% 
+  column_to_rownames("Tube_code") %>% 
+  sample_data()
+phylo_genome <- genome_counts_filt %>% 
+  filter(!genome %in% structural_zeros$genome) %>% 
+  select(one_of(c("genome",rownames(phylo_samples)))) %>%
+  filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
+  select(genome, where(~ is.numeric(.) && sum(.) > 0)) %>%
+  column_to_rownames("genome") %>% 
+  otu_table(., taxa_are_rows = TRUE)
+phylo_taxonomy <- genome_metadata %>% 
+  filter(genome %in% rownames(phylo_genome)) %>% 
+  column_to_rownames("genome") %>% 
+  dplyr::select(domain,phylum,class,order,family,genus,species) %>% 
+  as.matrix() %>% 
+  tax_table()
+
+physeq_genome_filtered <- phyloseq(phylo_genome, phylo_taxonomy, phylo_samples)
+```
+
+```{r ancom_rand_pond_accli_fmt1_wc, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+ancom_rand_output_wc_accli_fmt1 = ancombc2(data = physeq_genome_filtered, 
+                  assay_name = "counts", 
+                  tax_level = NULL,
+                  fix_formula = "time_point",
+                  p_adj_method = "holm", 
+                  pseudo_sens = TRUE,
+                  prv_cut =0, 
+                  lib_cut = 0, 
+                  s0_perc = 0.05,
+                  group = NULL, 
+                  struc_zero = FALSE, 
+                  neg_lb = FALSE,
+                  alpha = 0.05, 
+                  n_cl = 2, 
+                  verbose = TRUE,
+                  global = FALSE, 
+                  pairwise = FALSE, 
+                  dunnet = FALSE, 
+                  trend = FALSE,
+                  iter_control = list(tol = 1e-5, max_iter = 20, verbose = FALSE),
+                  em_control = list(tol = 1e-5, max_iter = 100),
+                  mdfdr_control = list(fwer_ctrl_method = "holm", B = 100), 
+                  trend_control = NULL)
+
+```
+
+```{r 4_3 ,wc, eval=FALSE}
+save(ancom_rand_output_wc_accli_fmt1, file="data/ancom_rand_output_wc_accli_fmt1.RData")
+```
+
+```{r 5_3, eval=TRUE}
+load("data/ancom_rand_output_wc_accli_fmt1.RData")
+```
+```{r wc_3}
+ancom_rand_output_wc_accli_fmt1$res %>%
+  dplyr::select(taxon, lfc_time_pointFMT1, p_time_pointFMT1) %>%
+  filter(p_time_pointFMT1 < 0.05) %>% 
+  left_join(., genome_metadata, by=join_by("taxon"=="genome")) %>% 
+  select(2,3,7,8,9) %>% 
+  tt()  
+```
+
+```{r ancom_rand_FMT1_accli_wc, comment="", echo=TRUE, message=FALSE, warning=FALSE}
+taxonomy <- data.frame(physeq_genome_filtered@tax_table) %>%
+  rownames_to_column(., "taxon") %>%
+  mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
+
+ancombc_rand_table_mag <- ancom_rand_output_wc_accli_fmt1$res %>%
+  dplyr::select(taxon, lfc_time_pointFMT1, p_time_pointFMT1) %>%
+  #filter(p_time_pointFMT1 < 0.05) %>%
+  dplyr::arrange(p_time_pointFMT1) %>%
+  merge(., taxonomy, by="taxon") %>%
+  mutate_at(vars(phylum, species), ~ str_replace(., "[dpcofgs]__", ""))%>%
+  dplyr::arrange(lfc_time_pointFMT1)
+
+ancombc_rand_table_mag
+  
+colors_alphabetic <- read_tsv("https://raw.githubusercontent.com/earthhologenome/EHI_taxonomy_colour/main/ehi_phylum_colors.tsv") %>%
+  mutate_at(vars(phylum), ~ str_replace(., "[dpcofgs]__", ""))  %>%
+  right_join(taxonomy, by=join_by(phylum == phylum)) %>%
+  dplyr::select(phylum, colors) %>%
+  mutate(colors = str_c(colors, "80"))  %>% #add 80% alpha
+	unique() %>%
+	dplyr::arrange(phylum)
+
+tax_table <- as.data.frame(unique(ancombc_rand_table_mag$phylum))
+  
+colnames(tax_table)[1] <- "phylum"
+tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
+	dplyr::arrange(phylum) %>%
+	dplyr::select(colors) %>%
+	pull()
+```
+
+```{r ancombc_rand_plot_phy_FMT1_accli_wc, comment="", echo=TRUE, message=FALSE, warning=FALSE, fig.height=5, fig.width=6, fig.fullwidth=TRUE}
+ancombc_rand_table_mag %>%
+  mutate(
+    genome = factor(taxon, levels = ancombc_rand_table_mag$taxon),
+    significance = ifelse(p_time_pointFMT1 < 0.05, phylum, NA)  # Set non-significant to NA (not mapped in legend)
+  ) %>%
+  ggplot() +
+  # Plot significant points with legend
+  geom_point(aes(x = lfc_time_pointFMT1, y = -log10(p_time_pointFMT1), color = significance), 
+             size = 3, alpha = 0.7, na.rm = TRUE) +  
+  # Plot non-significant points separately without legend
+  geom_point(data = filter(ancombc_rand_table_mag, p_time_pointFMT1 >= 0.05),
+             aes(x = lfc_time_pointFMT1, y = -log10(p_time_pointFMT1)), 
+             color = "grey70", size = 3, alpha = 0.7, show.legend = FALSE) +
+  scale_color_manual(
+    values = tax_color,  # Only keeps phylum colors in legend
+    na.translate = FALSE  # Removes NA (non-significant) from legend
+  ) + 
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed") +  
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  scale_y_continuous(limits = c(0, 5)) +  
+  xlab("log2FoldChange") + 
+  ylab("-log10(p-value)") +
+  guides(color = guide_legend(title = "Phylum")) +  
+  theme_minimal()+ 
+  annotate("text", x = min(ancombc_rand_table_mag$lfc_time_pointFMT1), y = 5, 
+           label = "FMT1", hjust = 0, size = 4, fontface = "bold") +
+  annotate("text", x = max(ancombc_rand_table_mag$lfc_time_pointFMT1), y = 5, 
+           label = "Acclimation", hjust = 1, size = 4, fontface = "bold")
+
+```
+
+***Phyla of the significant MAGs in acclimation***
+```{r sign_features_FMT1_accli_wc, comment="", message=FALSE, warning=FALSE}
+ancombc_rand_table_mag%>%
+  filter(p_time_pointFMT1 < 0.05) %>%
+  filter(lfc_time_pointFMT1>0)  %>% 
+  count(phylum, name = "sample_count") %>%
+  arrange(desc(sample_count))  
+```
+
+***Phyla of the significant MAGs in FMT1***
+```{r sign_features_FMT1_accli_wc_1, comment="", message=FALSE, warning=FALSE}
+ancombc_rand_table_mag%>%
+  filter(p_time_pointFMT1 < 0.05) %>%
+  filter(lfc_time_pointFMT1<0)  %>% 
+  count(phylum, name = "sample_count") %>%
+  arrange(desc(sample_count))  
+```
+
+
+## Differences between FMT1 and FMT2 across the three experimental groups
+
+### Functional differences
+
+***CI from FMT1 to FMT2***
+
+```{r comunity_elem_FMT3_cold_6, comment="", message=FALSE, warning=FALSE}
+significant_element<-element_gift %>%
+  filter(time_point %in% c("FMT2","FMT1") & type == "Treatment") %>%
+  select(-time_point, -type) %>%
+  filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
+  select(Tube_code, where( ~ is.numeric(.) && sum(.) > 0)) %>%
+  left_join(sample_metadata[c(1, 10)], by = "Tube_code") %>% 
+  pivot_longer(-c(Tube_code, time_point),
+               names_to = "trait",
+               values_to = "value") %>%
+  group_by(trait) %>%
+  summarise(p_value = wilcox.test(value ~ time_point)$p.value) %>%
+  mutate(p_adjust = p.adjust(p_value, method = "BH")) %>%
+  filter(p_adjust < 0.05) %>%
+  remove_rownames() %>% 
+  left_join(., uniqueGIFT_db, by=join_by("trait"=="Code_element"))
+```
+
+```{r comunity_elem_fm2_2, comment="", message=FALSE, warning=FALSE}
+element_gift_sig <- element_gift %>%
+  select(Tube_code, all_of(intersect(
+    significant_element$trait,
+    colnames(element_gift)
+  ))) %>%
+  left_join(., sample_metadata[c(1, 7, 10)], by = join_by(Tube_code == Tube_code)) %>%
+  filter(time_point %in% c("FMT2","FMT1"))%>%
+  filter(type=="Treatment")
+  
+difference_table <- element_gift_sig %>%
+  select(-Tube_code, -type) %>%
+  group_by(time_point) %>%
+  summarise(across(everything(), mean)) %>%
+  t() %>%
+  row_to_names(row_number = 1) %>%
+  as.data.frame() %>%
+  mutate_if(is.character, as.numeric) %>%
+  rownames_to_column(., "Elements") %>%
+  left_join(.,uniqueGIFT_db[c(1,3,4)],by = join_by(Elements == Code_element)) %>% 
+  arrange(Function) %>% 
+  mutate(Difference=FMT1-FMT2)%>% 
+  mutate(group_color = ifelse(Difference <0,"FMT2", "FMT1")) 
+```
+
+```{r commun_wilcox_elem_plot_fmt2_2, comment="", message=FALSE, warning=FALSE, fig.height=6, fig.width=12, fig.fullwidth=TRUE}
+difference_table %>%
+  ggplot(aes(x=forcats::fct_reorder(Function,Difference), y=Difference, fill=group_color)) + 
+  geom_col() +
+  scale_fill_manual(values=c('#008080',"#76b183")) + 
+  geom_hline(yintercept=0) + 
+  coord_flip()+
+  theme(axis.text = element_text(size = 10),
+        axis.title = element_text(size = 12),
+        legend.position = "right", 
+        legend.title = element_blank(),
+        panel.background = element_blank(),
+        panel.grid.major = element_line(size = 0.15, linetype = 'solid',
+                                        colour = "grey"))+
+  xlab("Function") + 
+  ylab("Mean difference")
+```
+
+***CC from FMT1 to FMT2***
+
+```{r comunity_elem_FMT3_cold_5, comment="", message=FALSE, warning=FALSE}
+element_gift %>%
+  filter(time_point %in% c("FMT2","FMT1") & type == "Control") %>%
+  select(-time_point, -type) %>%
+  filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
+  select(Tube_code, where( ~ is.numeric(.) && sum(.) > 0)) %>%
+  left_join(sample_metadata[c(1, 10)], by = "Tube_code") %>% 
+  pivot_longer(-c(Tube_code, time_point),
+               names_to = "trait",
+               values_to = "value") %>%
+  group_by(trait) %>%
+  summarise(p_value = wilcox.test(value ~ time_point)$p.value) %>%
+  mutate(p_adjust = p.adjust(p_value, method = "BH")) %>%
+  filter(p_adjust < 0.05) %>%
+  remove_rownames() %>% 
+  left_join(., uniqueGIFT_db, by=join_by("trait"=="Code_element"))
+```
+
+***WC from FMT1 to FMT2***
+
+```{r comunity_elem_FMT3_cold_post6, comment="", message=FALSE, warning=FALSE}
+element_gift %>%
+  filter(time_point %in% c("FMT2","FMT1") & type == "Hot_control") %>%
+  select(-time_point, -type) %>%
+  filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
+  select(Tube_code, where( ~ is.numeric(.) && sum(.) > 0)) %>%
+  left_join(sample_metadata[c(1, 10)], by = "Tube_code") %>% 
+  pivot_longer(-c(Tube_code, time_point),
+               names_to = "trait",
+               values_to = "value") %>%
+  group_by(trait) %>%
+  summarise(p_value = wilcox.test(value ~ time_point)$p.value) %>%
+  mutate(p_adjust = p.adjust(p_value, method = "BH")) %>%
+  filter(p_adjust < 0.05) %>%
+  remove_rownames() %>% 
+  left_join(., uniqueGIFT_db, by=join_by("trait"=="Code_element"))
+```
+
+### Differential abundances
+
+#### CI: FMT1 vs FMT2
+***Structural zeros***
+
+```{r struct_zero_ci_fmt1_FMT2, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+fmt1_ci_samples <- sample_metadata %>% 
+  filter(type == "Treatment") %>% 
+  filter(time_point == "FMT1") %>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+FMT2_ci_samples <- sample_metadata %>% 
+  filter(type == "Treatment") %>% 
+  filter(time_point == "FMT2")%>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+meta_ci_fmt1_FMT2 <- sample_metadata%>% 
+  filter(time_point %in% c("FMT1", "FMT2") & type == "Treatment")
+
+structural_zeros <- genome_counts_filt %>%
+  select(c("genome", meta_ci_fmt1_FMT2$Tube_code)) %>%
+  filter(rowSums(across(where(is.numeric)))!=0) %>% 
+  rowwise() %>%
+  mutate(all_zeros_fmt1_ci = all(c_across(all_of(fmt1_ci_samples)) == 0)) %>% # set true if all samples in warm have zeros
+  mutate(all_zeros_ci_FMT2 = all(c_across(all_of(FMT2_ci_samples)) == 0)) %>% # set true if all samples in treatment have zeros
+  mutate(average_fmt1_ci = mean(c_across(all_of(fmt1_ci_samples)), na.rm = TRUE)) %>% # get average genome counts across fmt1
+  mutate(average_ci_FMT2 = mean(c_across(all_of(FMT2_ci_samples)), na.rm = TRUE)) %>% # get average genome counts across post2
+  filter(all_zeros_fmt1_ci == TRUE | all_zeros_ci_FMT2 == TRUE)  %>% # filter only genomes with structural zeros
+  mutate(present = case_when(all_zeros_fmt1_ci & !all_zeros_ci_FMT2 ~ "FMT2",!all_zeros_fmt1_ci & all_zeros_ci_FMT2 ~ "FMT1",!all_zeros_fmt1_ci & !all_zeros_ci_FMT2 ~ "None",TRUE ~ NA_character_)) %>%
+  mutate(average = ifelse(present == "FMT1", average_fmt1_ci, average_ci_FMT2)) %>%
+  dplyr::select(genome, present, average) %>%
+  left_join(genome_metadata, by = join_by(genome == genome)) %>%
+  arrange(present, -average)
+
+```
+
+```{r structural_zeros_acci_FMT2_ci}
+struc <- structural_zeros %>% 
+  filter(present=="FMT1")%>% 
+  count(phylum, name = "FMT1") %>%
+  arrange(desc(FMT1))
+structural_zeros %>% 
+  filter(present=="FMT2")%>% 
+  count(phylum, name = "FMT2") %>%
+  arrange(desc(FMT2)) %>% 
+  full_join(., struc, by="phylum") %>%
+  mutate(across(everything(), ~ ifelse(is.na(.), 0, .))) %>% 
+  tt()
+```
+
+
+```{r structural_zeros_acci_FMT2_ci_1}
+
+phylo_samples <- sample_metadata %>%
+  filter(type == "Treatment" & time_point %in% c("FMT1", "FMT2") )%>% 
+  column_to_rownames("Tube_code") %>% 
+  sample_data()
+phylo_genome <- genome_counts_filt %>% 
+  filter(!genome %in% structural_zeros$genome) %>% 
+  select(one_of(c("genome",rownames(phylo_samples)))) %>%
+  filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
+  select(genome, where(~ is.numeric(.) && sum(.) > 0)) %>%
+  column_to_rownames("genome") %>% 
+  otu_table(., taxa_are_rows = TRUE)
+phylo_taxonomy <- genome_metadata %>% 
+  filter(genome %in% rownames(phylo_genome)) %>% 
+  column_to_rownames("genome") %>% 
+  dplyr::select(domain,phylum,class,order,family,genus,species) %>% 
+  as.matrix() %>% 
+  tax_table()
+
+physeq_genome_filtered <- phyloseq(phylo_genome, phylo_taxonomy, phylo_samples)
+```
+
+```{r ancom_rand_pond_fmt1_FMT2_ci, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+ancom_rand_output_ci_fmt1_FMT2 = ancombc2(data = physeq_genome_filtered, 
+                  assay_name = "counts", 
+                  tax_level = NULL,
+                  fix_formula = "time_point", 
+                  p_adj_method = "holm", 
+                  pseudo_sens = TRUE,
+                  prv_cut =0, 
+                  lib_cut = 0, 
+                  s0_perc = 0.05,
+                  group = NULL, 
+                  struc_zero = FALSE, 
+                  neg_lb = FALSE,
+                  alpha = 0.05, 
+                  n_cl = 2, 
+                  verbose = TRUE,
+                  global = FALSE, 
+                  pairwise = FALSE, 
+                  dunnet = FALSE, 
+                  trend = FALSE,
+                  iter_control = list(tol = 1e-5, max_iter = 20, verbose = FALSE),
+                  em_control = list(tol = 1e-5, max_iter = 100),
+                  mdfdr_control = list(fwer_ctrl_method = "holm", B = 100), 
+                  trend_control = NULL)
+
+```
+
+```{r 4_4 , eval=FALSE}
+save(ancom_rand_output_ci_fmt1_FMT2, file="data/ancom_rand_output_ci_fmt1_FMT2.RData")
+```
+
+```{r 5_4, eval=TRUE}
+load("data/ancom_rand_output_ci_fmt1_FMT2.RData")
+```
+```{r}
+ancom_rand_output_ci_fmt1_FMT2$res %>%
+  dplyr::select(taxon, lfc_time_pointFMT2, p_time_pointFMT2) %>%
+  filter(p_time_pointFMT2 < 0.05) %>% 
+  left_join(., genome_metadata, by=join_by("taxon"=="genome")) %>% 
+  select(2,3,7,8,9) %>% 
+  tt()  
+```
+
+```{r ancom_rand_FMT2_fmt1_ci, comment="", echo=TRUE, message=FALSE, warning=FALSE}
+taxonomy <- data.frame(physeq_genome_filtered@tax_table) %>%
+  rownames_to_column(., "taxon") %>%
+  mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
+
+ancombc_rand_table_mag <- ancom_rand_output_ci_fmt1_FMT2$res %>%
+  dplyr::select(taxon, lfc_time_pointFMT2, p_time_pointFMT2) %>%
+  #filter(p_time_pointFMT2 < 0.05) %>%
+  dplyr::arrange(p_time_pointFMT2) %>%
+  merge(., taxonomy, by="taxon") %>%
+  mutate_at(vars(phylum, species), ~ str_replace(., "[dpcofgs]__", ""))%>%
+  dplyr::arrange(lfc_time_pointFMT2)
+
+ancombc_rand_table_mag
+  
+colors_alphabetic <- read_tsv("https://raw.githubusercontent.com/earthhologenome/EHI_taxonomy_colour/main/ehi_phylum_colors.tsv") %>%
+  mutate_at(vars(phylum), ~ str_replace(., "[dpcofgs]__", ""))  %>%
+  right_join(taxonomy, by=join_by(phylum == phylum)) %>%
+  dplyr::select(phylum, colors) %>%
+  mutate(colors = str_c(colors, "80"))  %>% #add 80% alpha
+	unique() %>%
+	dplyr::arrange(phylum)
+
+tax_table <- as.data.frame(unique(ancombc_rand_table_mag$phylum))
+  
+colnames(tax_table)[1] <- "phylum"
+tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
+	dplyr::arrange(phylum) %>%
+	dplyr::select(colors) %>%
+	pull()
+```
+
+```{r ancombc_rand_plot_phy_FMT2_fmt1_ci, comment="", echo=TRUE, message=FALSE, warning=FALSE, fig.height=5, fig.width=6, fig.fullwidth=TRUE}
+ancombc_rand_table_mag %>%
+  mutate(
+    genome = factor(taxon, levels = ancombc_rand_table_mag$taxon),
+    significance = ifelse(p_time_pointFMT2 < 0.05, phylum, NA)  # Set non-significant to NA (not mapped in legend)
+  ) %>%
+  ggplot() +
+  # Plot significant points with legend
+  geom_point(aes(x = lfc_time_pointFMT2, y = -log10(p_time_pointFMT2), color = significance), 
+             size = 3, alpha = 0.7, na.rm = TRUE) +  
+  # Plot non-significant points separately without legend
+  geom_point(data = filter(ancombc_rand_table_mag, p_time_pointFMT2 >= 0.05),
+             aes(x = lfc_time_pointFMT2, y = -log10(p_time_pointFMT2)), 
+             color = "grey70", size = 3, alpha = 0.7, show.legend = FALSE) +
+  scale_color_manual(
+    values = tax_color,  # Only keeps phylum colors in legend
+    na.translate = FALSE  # Removes NA (non-significant) from legend
+  ) + 
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed") +  
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  scale_y_continuous(limits = c(0, 4)) +  
+  xlab("log2FoldChange") + 
+  ylab("-log10(p-value)") +
+  guides(color = guide_legend(title = "Phylum")) +  
+  theme_minimal()+ 
+  annotate("text", x = min(ancombc_rand_table_mag$lfc_time_pointFMT2), y = 4, 
+           label = "FMT2", hjust = 0, size = 4, fontface = "bold") +
+  annotate("text", x = max(ancombc_rand_table_mag$lfc_time_pointFMT2), y = 4, 
+           label = "FMT1", hjust = 1, size = 4, fontface = "bold")
+
+```
+
+***Phyla of the significant MAGs in FMT1***
+```{r sign_features_FMT2_fmt1_ci, comment="", message=FALSE, warning=FALSE}
+ancombc_rand_table_mag%>%
+  filter(p_time_pointFMT2 < 0.05) %>%
+  filter(lfc_time_pointFMT2>0)  %>% 
+  count(phylum, name = "sample_count") %>%
+  arrange(desc(sample_count))  
+```
+
+***Phyla of the significant MAGs in FMT2***
+```{r sign_features_FMT2_fmt1_ci_1, comment="", message=FALSE, warning=FALSE}
+ancombc_rand_table_mag%>%
+  filter(p_time_pointFMT2 < 0.05) %>%
+  filter(lfc_time_pointFMT2<0)  %>% 
+  count(phylum, name = "sample_count") %>%
+  arrange(desc(sample_count))  
+```
+
+#### CC: FMT1 vs FMT2
+***Structural zeros***
+
+```{r struct_zero_cc_fmt1_FMT2, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+fmt1_cc_samples <- sample_metadata %>% 
+  filter(type == "Control") %>% 
+  filter(time_point == "FMT1") %>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+FMT2_cc_samples <- sample_metadata %>% 
+  filter(type == "Control") %>% 
+  filter(time_point == "FMT2")%>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+meta_cc_fmt1_FMT2 <- sample_metadata%>% 
+  filter(time_point %in% c("FMT1", "FMT2") & type == "Control")
+
+structural_zeros <- genome_counts_filt %>%
+  select(c("genome", meta_cc_fmt1_FMT2$Tube_code)) %>%
+  filter(rowSums(across(where(is.numeric)))!=0) %>% 
+  rowwise() %>%
+  mutate(all_zeros_fmt1_cc = all(c_across(all_of(fmt1_cc_samples)) == 0)) %>% # set true if all samples in warm have zeros
+  mutate(all_zeros_cc_FMT2 = all(c_across(all_of(FMT2_cc_samples)) == 0)) %>% # set true if all samples in treatment have zeros
+  mutate(average_fmt1_cc = mean(c_across(all_of(fmt1_cc_samples)), na.rm = TRUE)) %>% # get average genome counts across fmt1
+  mutate(average_cc_FMT2 = mean(c_across(all_of(FMT2_cc_samples)), na.rm = TRUE)) %>% # get average genome counts across post2
+  filter(all_zeros_fmt1_cc == TRUE | all_zeros_cc_FMT2 == TRUE)  %>% # filter only genomes with structural zeros
+  mutate(present = case_when(all_zeros_fmt1_cc & !all_zeros_cc_FMT2 ~ "FMT2",!all_zeros_fmt1_cc & all_zeros_cc_FMT2 ~ "FMT1",!all_zeros_fmt1_cc & !all_zeros_cc_FMT2 ~ "None",TRUE ~ NA_character_)) %>%
+  mutate(average = ifelse(present == "FMT1", average_fmt1_cc, average_cc_FMT2)) %>%
+  dplyr::select(genome, present, average) %>%
+  left_join(genome_metadata, by = join_by(genome == genome)) %>%
+  arrange(present, -average)
+
+```
+
+```{r structural_zeros_acci_FMT2_cc}
+struc <- structural_zeros %>% 
+  filter(present=="FMT1")%>% 
+  count(phylum, name = "FMT1") %>%
+  arrange(desc(FMT1))
+structural_zeros %>% 
+  filter(present=="FMT2")%>% 
+  count(phylum, name = "FMT2") %>%
+  arrange(desc(FMT2)) %>% 
+  full_join(., struc, by="phylum") %>%
+  mutate(across(everything(), ~ ifelse(is.na(.), 0, .))) %>% 
+  tt()
+```
+
+
+```{r structural_zeros_acci_FMT2_cc_1}
+
+phylo_samples <- sample_metadata %>%
+  filter(type == "Control" & time_point %in% c("FMT1", "FMT2") )%>% 
+  column_to_rownames("Tube_code") %>% 
+  sample_data()
+phylo_genome <- genome_counts_filt %>% 
+  filter(!genome %in% structural_zeros$genome) %>% 
+  select(one_of(c("genome",rownames(phylo_samples)))) %>%
+  filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
+  select(genome, where(~ is.numeric(.) && sum(.) > 0)) %>%
+  column_to_rownames("genome") %>% 
+  otu_table(., taxa_are_rows = TRUE)
+phylo_taxonomy <- genome_metadata %>% 
+  filter(genome %in% rownames(phylo_genome)) %>% 
+  column_to_rownames("genome") %>% 
+  dplyr::select(domain,phylum,class,order,family,genus,species) %>% 
+  as.matrix() %>% 
+  tax_table()
+
+physeq_genome_filtered <- phyloseq(phylo_genome, phylo_taxonomy, phylo_samples)
+```
+
+```{r ancom_rand_pond_fmt1_FMT2_cc, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+ancom_rand_output_cc_fmt1_FMT2 = ancombc2(data = physeq_genome_filtered, 
+                  assay_name = "counts", 
+                  tax_level = NULL,
+                  fix_formula = "time_point", 
+                  p_adj_method = "holm", 
+                  pseudo_sens = TRUE,
+                  prv_cut =0, 
+                  lib_cut = 0, 
+                  s0_perc = 0.05,
+                  group = NULL, 
+                  struc_zero = FALSE, 
+                  neg_lb = FALSE,
+                  alpha = 0.05, 
+                  n_cl = 2, 
+                  verbose = TRUE,
+                  global = FALSE, 
+                  pairwise = FALSE, 
+                  dunnet = FALSE, 
+                  trend = FALSE,
+                  iter_control = list(tol = 1e-5, max_iter = 20, verbose = FALSE),
+                  em_control = list(tol = 1e-5, max_iter = 100),
+                  mdfdr_control = list(fwer_ctrl_method = "holm", B = 100), 
+                  trend_control = NULL)
+
+```
+
+```{r 4_5 ,cc, eval=FALSE}
+save(ancom_rand_output_cc_fmt1_FMT2, file="data/ancom_rand_output_cc_fmt1_FMT2.RData")
+```
+
+```{r 5_5, eval=TRUE}
+load("data/ancom_rand_output_cc_fmt1_FMT2.RData")
+```
+```{r 5_cc}
+ancom_rand_output_cc_fmt1_FMT2$res %>%
+  dplyr::select(taxon, lfc_time_pointFMT2, p_time_pointFMT2) %>%
+  filter(p_time_pointFMT2 < 0.05) %>% 
+  left_join(., genome_metadata, by=join_by("taxon"=="genome")) %>% 
+  select(2,3,7,8,9) %>% 
+  tt()  
+```
+
+```{r ancom_rand_FMT2_fmt1_cc, comment="", echo=TRUE, message=FALSE, warning=FALSE}
+taxonomy <- data.frame(physeq_genome_filtered@tax_table) %>%
+  rownames_to_column(., "taxon") %>%
+  mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
+
+ancombc_rand_table_mag <- ancom_rand_output_cc_fmt1_FMT2$res %>%
+  dplyr::select(taxon, lfc_time_pointFMT2, p_time_pointFMT2) %>%
+  #filter(p_time_pointFMT2 < 0.05) %>%
+  dplyr::arrange(p_time_pointFMT2) %>%
+  merge(., taxonomy, by="taxon") %>%
+  mutate_at(vars(phylum, species), ~ str_replace(., "[dpcofgs]__", ""))%>%
+  dplyr::arrange(lfc_time_pointFMT2)
+
+ancombc_rand_table_mag
+  
+colors_alphabetic <- read_tsv("https://raw.githubusercontent.com/earthhologenome/EHI_taxonomy_colour/main/ehi_phylum_colors.tsv") %>%
+  mutate_at(vars(phylum), ~ str_replace(., "[dpcofgs]__", ""))  %>%
+  right_join(taxonomy, by=join_by(phylum == phylum)) %>%
+  dplyr::select(phylum, colors) %>%
+  mutate(colors = str_c(colors, "80"))  %>% #add 80% alpha
+	unique() %>%
+	dplyr::arrange(phylum)
+
+tax_table <- as.data.frame(unique(ancombc_rand_table_mag$phylum))
+  
+colnames(tax_table)[1] <- "phylum"
+tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
+	dplyr::arrange(phylum) %>%
+	dplyr::select(colors) %>%
+	pull()
+```
+
+```{r ancombc_rand_plot_phy_FMT2_fmt1_cc, comment="", echo=TRUE, message=FALSE, warning=FALSE, fig.height=5, fig.width=6, fig.fullwidth=TRUE}
+ancombc_rand_table_mag %>%
+  mutate(
+    genome = factor(taxon, levels = ancombc_rand_table_mag$taxon),
+    significance = ifelse(p_time_pointFMT2 < 0.05, phylum, NA)  # Set non-significant to NA (not mapped in legend)
+  ) %>%
+  ggplot() +
+  # Plot significant points with legend
+  geom_point(aes(x = lfc_time_pointFMT2, y = -log10(p_time_pointFMT2), color = significance), 
+             size = 3, alpha = 0.7, na.rm = TRUE) +  
+  # Plot non-significant points separately without legend
+  geom_point(data = filter(ancombc_rand_table_mag, p_time_pointFMT2 >= 0.05),
+             aes(x = lfc_time_pointFMT2, y = -log10(p_time_pointFMT2)), 
+             color = "grey70", size = 3, alpha = 0.7, show.legend = FALSE) +
+  scale_color_manual(
+    values = tax_color,  # Only keeps phylum colors in legend
+    na.translate = FALSE  # Removes NA (non-significant) from legend
+  ) + 
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed") +  
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  scale_y_continuous(limits = c(0, 4)) +  
+  xlab("log2FoldChange") + 
+  ylab("-log10(p-value)") +
+  guides(color = guide_legend(title = "Phylum")) +  
+  theme_minimal()+ 
+  annotate("text", x = min(ancombc_rand_table_mag$lfc_time_pointFMT2), y = 4, 
+           label = "FMT2", hjust = 0, size = 4, fontface = "bold") +
+  annotate("text", x = max(ancombc_rand_table_mag$lfc_time_pointFMT2), y = 4, 
+           label = "FMT1", hjust = 1, size = 4, fontface = "bold")
+
+```
+
+***Phyla of the significant MAGs in FMT1***
+```{r sign_features_FMT2_fmt1_cc, comment="", message=FALSE, warning=FALSE}
+ancombc_rand_table_mag%>%
+  filter(p_time_pointFMT2 < 0.05) %>%
+  filter(lfc_time_pointFMT2>0)  %>% 
+  count(phylum, name = "sample_count") %>%
+  arrange(desc(sample_count))  
+```
+
+***Phyla of the significant MAGs in FMT2***
+```{r sign_features_FMT2_fmt1_cc_1, comment="", message=FALSE, warning=FALSE}
+ancombc_rand_table_mag%>%
+  filter(p_time_pointFMT2 < 0.05) %>%
+  filter(lfc_time_pointFMT2<0)  %>% 
+  count(phylum, name = "sample_count") %>%
+  arrange(desc(sample_count))  
+```
+
+#### WC: FMT1 vs FMT2
+***Structural zeros***
+
+```{r struct_zero_wc_fmt1_FMT2, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+fmt1_wc_samples <- sample_metadata %>% 
+  filter(type == "Hot_control") %>% 
+  filter(time_point == "FMT1") %>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+FMT2_wc_samples <- sample_metadata %>% 
+  filter(type == "Hot_control") %>% 
+  filter(time_point == "FMT2")%>%
+  dplyr::select("Tube_code") %>%
+  pull()
+
+meta_wc_fmt1_FMT2 <- sample_metadata%>% 
+  filter(time_point %in% c("FMT1", "FMT2") & type == "Hot_control")
+
+structural_zeros <- genome_counts_filt %>%
+  select(c("genome", meta_wc_fmt1_FMT2$Tube_code)) %>%
+  filter(rowSums(across(where(is.numeric)))!=0) %>% 
+  rowwise() %>%
+  mutate(all_zeros_fmt1_wc = all(c_across(all_of(fmt1_wc_samples)) == 0)) %>% # set true if all samples in warm have zeros
+  mutate(all_zeros_wc_FMT2 = all(c_across(all_of(FMT2_wc_samples)) == 0)) %>% # set true if all samples in treatment have zeros
+  mutate(average_fmt1_wc = mean(c_across(all_of(fmt1_wc_samples)), na.rm = TRUE)) %>% # get average genome counts across fmt1
+  mutate(average_wc_FMT2 = mean(c_across(all_of(FMT2_wc_samples)), na.rm = TRUE)) %>% # get average genome counts across post2
+  filter(all_zeros_fmt1_wc == TRUE | all_zeros_wc_FMT2 == TRUE)  %>% # filter only genomes with structural zeros
+  mutate(present = case_when(all_zeros_fmt1_wc & !all_zeros_wc_FMT2 ~ "FMT2",!all_zeros_fmt1_wc & all_zeros_wc_FMT2 ~ "FMT1",!all_zeros_fmt1_wc & !all_zeros_wc_FMT2 ~ "None",TRUE ~ NA_character_)) %>%
+  mutate(average = ifelse(present == "FMT1", average_fmt1_wc, average_wc_FMT2)) %>%
+  dplyr::select(genome, present, average) %>%
+  left_join(genome_metadata, by = join_by(genome == genome)) %>%
+  arrange(present, -average)
+
+```
+
+```{r structural_zeros_acci_FMT2_wc}
+struc <- structural_zeros %>% 
+  filter(present=="FMT1")%>% 
+  count(phylum, name = "FMT1") %>%
+  arrange(desc(FMT1))
+structural_zeros %>% 
+  filter(present=="FMT2")%>% 
+  count(phylum, name = "FMT2") %>%
+  arrange(desc(FMT2)) %>% 
+  full_join(., struc, by="phylum") %>%
+  mutate(across(everything(), ~ ifelse(is.na(.), 0, .))) %>% 
+  tt()
+```
+
+
+```{r structural_zeros_acci_FMT2_wc_1}
+phylo_samples <- sample_metadata %>%
+  filter(type == "Hot_control" & time_point %in% c("FMT1", "FMT2") )%>% 
+  column_to_rownames("Tube_code") %>% 
+  sample_data()
+phylo_genome <- genome_counts_filt %>% 
+  filter(!genome %in% structural_zeros$genome) %>% 
+  select(one_of(c("genome",rownames(phylo_samples)))) %>%
+  filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
+  select(genome, where(~ is.numeric(.) && sum(.) > 0)) %>%
+  column_to_rownames("genome") %>% 
+  otu_table(., taxa_are_rows = TRUE)
+phylo_taxonomy <- genome_metadata %>% 
+  filter(genome %in% rownames(phylo_genome)) %>% 
+  column_to_rownames("genome") %>% 
+  dplyr::select(domain,phylum,class,order,family,genus,species) %>% 
+  as.matrix() %>% 
+  tax_table()
+
+physeq_genome_filtered <- phyloseq(phylo_genome, phylo_taxonomy, phylo_samples)
+```
+
+```{r ancom_rand_pond_fmt1_FMT2_wc, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+ancom_rand_output_wc_fmt1_FMT2 = ancombc2(data = physeq_genome_filtered, 
+                  assay_name = "counts", 
+                  tax_level = NULL,
+                  fix_formula = "time_point", 
+                  p_adj_method = "holm", 
+                  pseudo_sens = TRUE,
+                  prv_cut =0, 
+                  lib_cut = 0, 
+                  s0_perc = 0.05,
+                  group = NULL, 
+                  struc_zero = FALSE, 
+                  neg_lb = FALSE,
+                  alpha = 0.05, 
+                  n_cl = 2, 
+                  verbose = TRUE,
+                  global = FALSE, 
+                  pairwise = FALSE, 
+                  dunnet = FALSE, 
+                  trend = FALSE,
+                  iter_control = list(tol = 1e-5, max_iter = 20, verbose = FALSE),
+                  em_control = list(tol = 1e-5, max_iter = 100),
+                  mdfdr_control = list(fwer_ctrl_method = "holm", B = 100), 
+                  trend_control = NULL)
+
+```
+
+```{r 4_6 ,wc, eval=FALSE}
+save(ancom_rand_output_wc_fmt1_FMT2, file="data/ancom_rand_output_wc_fmt1_FMT2.RData")
+```
+
+```{r 5_6, eval=TRUE}
+load("data/ancom_rand_output_wc_fmt1_FMT2.RData")
+```
+```{r 6_wc_1}
+ancom_rand_output_wc_fmt1_FMT2$res %>%
+  dplyr::select(taxon, lfc_time_pointFMT2, p_time_pointFMT2) %>%
+  filter(p_time_pointFMT2 < 0.05) %>% 
+  left_join(., genome_metadata, by=join_by("taxon"=="genome")) %>% 
+  select(2,3,7,8,9) %>% 
+  tt()  
+```
+
+```{r ancom_rand_FMT2_fmt1_wc, comment="", echo=TRUE, message=FALSE, warning=FALSE}
+taxonomy <- data.frame(physeq_genome_filtered@tax_table) %>%
+  rownames_to_column(., "taxon") %>%
+  mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
+
+ancombc_rand_table_mag <- ancom_rand_output_wc_fmt1_FMT2$res %>%
+  dplyr::select(taxon, lfc_time_pointFMT2, p_time_pointFMT2) %>%
+  #filter(p_time_pointFMT2 < 0.05) %>%
+  dplyr::arrange(p_time_pointFMT2) %>%
+  merge(., taxonomy, by="taxon") %>%
+  mutate_at(vars(phylum, species), ~ str_replace(., "[dpcofgs]__", ""))%>%
+  dplyr::arrange(lfc_time_pointFMT2)
+
+ancombc_rand_table_mag
+  
+colors_alphabetic <- read_tsv("https://raw.githubusercontent.com/earthhologenome/EHI_taxonomy_colour/main/ehi_phylum_colors.tsv") %>%
+  mutate_at(vars(phylum), ~ str_replace(., "[dpcofgs]__", ""))  %>%
+  right_join(taxonomy, by=join_by(phylum == phylum)) %>%
+  dplyr::select(phylum, colors) %>%
+  mutate(colors = str_c(colors, "80"))  %>% #add 80% alpha
+	unique() %>%
+	dplyr::arrange(phylum)
+
+tax_table <- as.data.frame(unique(ancombc_rand_table_mag$phylum))
+  
+colnames(tax_table)[1] <- "phylum"
+tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
+	dplyr::arrange(phylum) %>%
+	dplyr::select(colors) %>%
+	pull()
+```
+
+```{r ancombc_rand_plot_phy_FMT2_fmt1_wc, comment="", echo=TRUE, message=FALSE, warning=FALSE, fig.height=5, fig.width=6, fig.fullwidth=TRUE}
+ancombc_rand_table_mag %>%
+  mutate(
+    genome = factor(taxon, levels = ancombc_rand_table_mag$taxon),
+    significance = ifelse(p_time_pointFMT2 < 0.05, phylum, NA)  # Set non-significant to NA (not mapped in legend)
+  ) %>%
+  ggplot() +
+  # Plot significant points with legend
+  geom_point(aes(x = lfc_time_pointFMT2, y = -log10(p_time_pointFMT2), color = significance), 
+             size = 3, alpha = 0.7, na.rm = TRUE) +  
+  # Plot non-significant points separately without legend
+  geom_point(data = filter(ancombc_rand_table_mag, p_time_pointFMT2 >= 0.05),
+             aes(x = lfc_time_pointFMT2, y = -log10(p_time_pointFMT2)), 
+             color = "grey70", size = 3, alpha = 0.7, show.legend = FALSE) +
+  scale_color_manual(
+    values = tax_color,  # Only keeps phylum colors in legend
+    na.translate = FALSE  # Removes NA (non-significant) from legend
+  ) + 
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed") +  
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  scale_y_continuous(limits = c(0, 4)) +  
+  xlab("log2FoldChange") + 
+  ylab("-log10(p-value)") +
+  guides(color = guide_legend(title = "Phylum")) +  
+  theme_minimal()+ 
+  annotate("text", x = min(ancombc_rand_table_mag$lfc_time_pointFMT2), y = 4, 
+           label = "FMT2", hjust = 0, size = 4, fontface = "bold") +
+  annotate("text", x = max(ancombc_rand_table_mag$lfc_time_pointFMT2), y = 4, 
+           label = "FMT1", hjust = 1, size = 4, fontface = "bold")
+
+```
+
+***Phyla of the significant MAGs in FMT1***
+```{r sign_features_FMT2_fmt1_wc, comment="", message=FALSE, warning=FALSE}
+ancombc_rand_table_mag%>%
+  filter(p_time_pointFMT2 < 0.05) %>%
+  filter(lfc_time_pointFMT2>0)  %>% 
+  count(phylum, name = "sample_count") %>%
+  arrange(desc(sample_count))  
+```
+
+***Phyla of the significant MAGs in FMT2***
+```{r sign_features_FMT2_fmt1_wc_1, comment="", message=FALSE, warning=FALSE}
+ancombc_rand_table_mag%>%
+  filter(p_time_pointFMT2 < 0.05) %>%
+  filter(lfc_time_pointFMT2<0)  %>% 
+  count(phylum, name = "sample_count") %>%
+  arrange(desc(sample_count))  
+```
+
+# What are the differences at FMT1 between groups?
 
 ## Is the GM of the intervention group more similar to warm population after one week from FMT?
 
 ### Shapiro test
 
-```{r shapiro_fmt1, comment="", message=FALSE, warning=FALSE,}
+```{r shapiro_fmt1_1, comment="", message=FALSE, warning=FALSE,}
 alpha_div %>%
   pivot_longer(-sample, names_to = "metric", values_to = "value") %>%
   left_join(., sample_metadata, by = join_by(sample == Tube_code)) %>%
@@ -283,7 +2030,7 @@ structural_zeros %>%
 physeq_FMT1 <- subset_samples(physeq_all, type %in% c("Hot_control", "Treatment") & time_point == "FMT1")
 physeq_FMT1 <- prune_taxa(taxa_sums(physeq_FMT1)>0, physeq_FMT1)
 ```
-```{r ancom_rand_pond_FMT1, comment="", message=FALSE, warning=FALSE, eval=FALSE}
+```{r ancom_rand_pond_FMT1, comment="", message=FALSE, warning=FALSE, eval=TRUE}
 ancom_rand_output_fmt1 = ancombc2(data = physeq_FMT1, 
                   assay_name = "counts", 
                   tax_level = NULL,
@@ -311,7 +2058,7 @@ ancom_rand_output_fmt1 = ancombc2(data = physeq_FMT1,
 ```
 
 
-```{r, eval=FALSE}
+```{r, eval=TRUE}
 save(ancom_rand_output_fmt1, file="data/ancom_rand_output_fmt1.RData")
 ```
 
@@ -326,14 +2073,14 @@ ancom_rand_output_fmt1$res %>%
   filter(p_typeTreatment < 0.05)
 ```
 
-```{r ancom_rand_FMT1, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+```{r ancom_rand_FMT1, comment="", echo=TRUE, message=FALSE, warning=FALSE}
 taxonomy <- data.frame(physeq_FMT1@tax_table) %>%
   rownames_to_column(., "taxon") %>%
   mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
 
 ancombc_rand_table_mag <- ancom_rand_output_fmt1$res %>%
   dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
-  filter(p_typeTreatment < 0.05) %>%
+  #filter(p_typeTreatment < 0.05) %>%
   dplyr::arrange(p_typeTreatment) %>%
   merge(., taxonomy, by="taxon") %>%
   mutate_at(vars(phylum, species), ~ str_replace(., "[dpcofgs]__", ""))%>%
@@ -358,30 +2105,41 @@ tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
 	pull()
 ```
 
-```{r ancombc_rand_plot_phy_FMT1, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
-ancombc_rand_table_mag%>%
-      mutate(genome=factor(taxon,levels=ancombc_rand_table_mag$taxon)) %>%
-ggplot(., aes(x=lfc_typeTreatment, y=forcats::fct_reorder(genome,lfc_typeTreatment), fill=phylum)) + #forcats::fct_rev()
-  geom_col() + 
-  scale_fill_manual(values=tax_color) + 
-  geom_hline(yintercept=0) + 
-#  coord_flip()+
-  theme(panel.background = element_blank(),
-        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
-        axis.text.x = element_text(size = 12),
-        axis.text.y = element_text(size = 8),
-        axis.title = element_text(size = 14, face = "bold"),
-        legend.text = element_text(size = 12),
-        legend.title = element_text(size = 14, face = "bold"),
-        legend.position = "right", legend.box = "vertical")+
+```{r ancombc_rand_plot_phy_FMT1, comment="", echo=TRUE, message=FALSE, warning=FALSE, fig.height=5, fig.width=6, fig.fullwidth=TRUE}
+ancombc_rand_table_mag %>%
+  mutate(
+    genome = factor(taxon, levels = ancombc_rand_table_mag$taxon),
+    significance = ifelse(p_typeTreatment < 0.05, phylum, NA)  # Set non-significant to NA (not mapped in legend)
+  ) %>%
+  ggplot() +
+  # Plot significant points with legend
+  geom_point(aes(x = lfc_typeTreatment, y = -log10(p_typeTreatment), color = significance), 
+             size = 3, alpha = 0.7, na.rm = TRUE) +  
+  # Plot non-significant points separately without legend
+  geom_point(data = filter(ancombc_rand_table_mag, p_typeTreatment >= 0.05),
+             aes(x = lfc_typeTreatment, y = -log10(p_typeTreatment)), 
+             color = "grey70", size = 3, alpha = 0.7, show.legend = FALSE) +
+  scale_color_manual(
+    values = tax_color,  # Only keeps phylum colors in legend
+    na.translate = FALSE  # Removes NA (non-significant) from legend
+  ) + 
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed") +  
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  scale_y_continuous(limits = c(0, 4)) +  
   xlab("log2FoldChange") + 
-  ylab("MAGs")+
-  guides(fill=guide_legend(title="Phylum"))
+  ylab("-log10(p-value)") +
+  guides(color = guide_legend(title = "Phylum")) +  
+  theme_minimal()+ 
+  annotate("text", x = min(ancombc_rand_table_mag$lfc_typeTreatment), y = 4, 
+           label = "Cold-intervention", hjust = 0, size = 4, fontface = "bold") +
+  annotate("text", x = max(ancombc_rand_table_mag$lfc_typeTreatment), y = 4, 
+           label = "Warm-control", hjust = 1, size = 4, fontface = "bold")
 ```
 
 ***Phyla of the significant MAGs in warm control***
 ```{r sign_features_FMT1_warm, comment="", message=FALSE, warning=FALSE}
 ancombc_rand_table_mag%>%
+  filter(p_typeTreatment < 0.05) %>%
   filter(lfc_typeTreatment>0)  %>% 
   count(phylum, name = "sample_count") %>%
   arrange(desc(sample_count))  
@@ -390,12 +2148,13 @@ ancombc_rand_table_mag%>%
 ***Phyla of the significant MAGs in intervention group***
 ```{r sign_features_FMT1_cold, comment="", message=FALSE, warning=FALSE}
 ancombc_rand_table_mag%>%
+  filter(p_typeTreatment < 0.05) %>%
   filter(lfc_typeTreatment<0)  %>% 
   count(phylum, name = "sample_count") %>%
   arrange(desc(sample_count))  
 ```
 
-##### Intervention vs cold control
+#### Intervention vs cold control
 
 ***Structural zeros***
 
@@ -494,14 +2253,14 @@ ancom_rand_output_cold$res %>%
   tt()
 ```
 
-```{r ancom_rand_FMT1_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+```{r ancom_rand_FMT1_cold, comment="", echo=TRUE, message=FALSE, warning=FALSE}
 taxonomy <- data.frame(physeq_FMT1_cold@tax_table) %>%
   rownames_to_column(., "taxon") %>%
   mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
 
 ancombc_rand_table_mag <- ancom_rand_output_cold$res %>%
   dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
-  filter(p_typeTreatment < 0.05) %>%
+  #filter(p_typeTreatment < 0.05) %>%
   dplyr::arrange(p_typeTreatment) %>%
   merge(., taxonomy, by="taxon") %>%
   mutate_at(vars(phylum, species), ~ str_replace(., "[dpcofgs]__", ""))%>%
@@ -524,29 +2283,41 @@ tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
 	pull()
 ```
 
-```{r ancombc_rand_plot_phy_FMT1_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
-ancombc_rand_table_mag%>%
-      mutate(genome=factor(taxon,levels=ancombc_rand_table_mag$taxon)) %>%
-ggplot(., aes(x=lfc_typeTreatment, y=forcats::fct_reorder(genome,lfc_typeTreatment), fill=phylum)) + 
-  geom_col() + 
-  scale_fill_manual(values=tax_color) + 
-  geom_hline(yintercept=0) + 
-  theme(panel.background = element_blank(),
-        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
-        axis.text.x = element_text(size = 12),
-        axis.text.y = element_text(size = 8),
-        axis.title = element_text(size = 14, face = "bold"),
-        legend.text = element_text(size = 12),
-        legend.title = element_text(size = 14, face = "bold"),
-        legend.position = "right", legend.box = "vertical")+
+```{r ancombc_rand_plot_phy_FMT1_cold, comment="", echo=TRUE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
+ancombc_rand_table_mag %>%
+  mutate(
+    genome = factor(taxon, levels = ancombc_rand_table_mag$taxon),
+    significance = ifelse(p_typeTreatment < 0.05, phylum, NA)  # Set non-significant to NA (not mapped in legend)
+  ) %>%
+  ggplot() +
+  # Plot significant points with legend
+  geom_point(aes(x = lfc_typeTreatment, y = -log10(p_typeTreatment), color = significance), 
+             size = 3, alpha = 0.7, na.rm = TRUE) +  
+  # Plot non-significant points separately without legend
+  geom_point(data = filter(ancombc_rand_table_mag, p_typeTreatment >= 0.05),
+             aes(x = lfc_typeTreatment, y = -log10(p_typeTreatment)), 
+             color = "grey70", size = 3, alpha = 0.7, show.legend = FALSE) +
+  scale_color_manual(
+    values = tax_color,  # Only keeps phylum colors in legend
+    na.translate = FALSE  # Removes NA (non-significant) from legend
+  ) + 
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed") +  
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  scale_y_continuous(limits = c(0, 4)) +  
   xlab("log2FoldChange") + 
-  ylab("Species")+
-  guides(fill=guide_legend(title="Phylum"))
+  ylab("-log10(p-value)") +
+  guides(color = guide_legend(title = "Phylum")) +  
+  theme_minimal()+ 
+  annotate("text", x = min(ancombc_rand_table_mag$lfc_typeTreatment), y = 4, 
+           label = "Cold-control", hjust = 0, size = 4, fontface = "bold") +
+  annotate("text", x = max(ancombc_rand_table_mag$lfc_typeTreatment), y = 4, 
+           label = "Cold-intervention", hjust = 1, size = 4, fontface = "bold")
 ```
 
 ***Phyla of the significant MAGs in intervention group***
 ```{r sign_features_FMT1_int, comment="", message=FALSE, warning=FALSE}
 ancombc_rand_table_mag%>%
+  filter(p_typeTreatment < 0.05) %>%
   filter(lfc_typeTreatment>0)  %>% 
   count(phylum, name = "sample_count") %>%
   arrange(desc(sample_count))  
@@ -555,6 +2326,7 @@ ancombc_rand_table_mag%>%
 ***Phyla of the significant MAGs in cold control***
 ```{r sign_features_FMT1_cold_con, comment="", message=FALSE, warning=FALSE}
 ancombc_rand_table_mag%>%
+  filter(p_typeTreatment < 0.05) %>%
   filter(lfc_typeTreatment<0)  %>% 
   count(phylum, name = "sample_count") %>%
   arrange(desc(sample_count))  
@@ -955,14 +2727,14 @@ ancom_rand_output_fmt2$res %>%
   tt()  
 ```
 
-```{r ancom_rand_FMT2, comment="", echo=FALSE, message=FALSE, warning=FALSE}
+```{r ancom_rand_FMT2, comment="", echo=TRUE, message=FALSE, warning=FALSE}
 taxonomy <- data.frame(physeq_FMT2@tax_table) %>%
   rownames_to_column(., "taxon") %>%
   mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
 
 ancombc_rand_table_mag <- ancom_rand_output_fmt2$res %>%
   dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
-  filter(p_typeTreatment < 0.05) %>%
+  #filter(p_typeTreatment < 0.05) %>%
   dplyr::arrange(p_typeTreatment) %>%
   merge(., taxonomy, by="taxon") %>%
   mutate_at(vars(phylum, species), ~ str_replace(., "[dpcofgs]__", ""))%>%
@@ -987,29 +2759,41 @@ tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
 	pull()
 ```
 
-```{r ancombc_rand_plot_phy_FMT2, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
-ancombc_rand_table_mag%>%
-      mutate(genome=factor(taxon,levels=ancombc_rand_table_mag$taxon)) %>%
-ggplot(., aes(x=lfc_typeTreatment, y=forcats::fct_reorder(genome,lfc_typeTreatment), fill=phylum)) + #forcats::fct_rev()
-  geom_col() + 
-  scale_fill_manual(values=tax_color) + 
-  geom_hline(yintercept=0) + 
-  theme(panel.background = element_blank(),
-        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
-        axis.text.x = element_text(size = 12),
-        axis.text.y = element_text(size = 8),
-        axis.title = element_text(size = 14, face = "bold"),
-        legend.text = element_text(size = 12),
-        legend.title = element_text(size = 14, face = "bold"),
-        legend.position = "right", legend.box = "vertical")+
+```{r ancombc_rand_plot_phy_FMT2, comment="", echo=TRUE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
+ancombc_rand_table_mag %>%
+  mutate(
+    genome = factor(taxon, levels = ancombc_rand_table_mag$taxon),
+    significance = ifelse(p_typeTreatment < 0.05, phylum, NA)  # Set non-significant to NA (not mapped in legend)
+  ) %>%
+  ggplot() +
+  # Plot significant points with legend
+  geom_point(aes(x = lfc_typeTreatment, y = -log10(p_typeTreatment), color = significance), 
+             size = 3, alpha = 0.7, na.rm = TRUE) +  
+  # Plot non-significant points separately without legend
+  geom_point(data = filter(ancombc_rand_table_mag, p_typeTreatment >= 0.05),
+             aes(x = lfc_typeTreatment, y = -log10(p_typeTreatment)), 
+             color = "grey70", size = 3, alpha = 0.7, show.legend = FALSE) +
+  scale_color_manual(
+    values = tax_color,  # Only keeps phylum colors in legend
+    na.translate = FALSE  # Removes NA (non-significant) from legend
+  ) + 
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed") +  
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  scale_y_continuous(limits = c(0, 4)) +  
   xlab("log2FoldChange") + 
-  ylab("Species")+
-  guides(fill=guide_legend(title="Phylum"))
+  ylab("-log10(p-value)") +
+  guides(color = guide_legend(title = "Phylum")) +  
+  theme_minimal()+ 
+  annotate("text", x = min(ancombc_rand_table_mag$lfc_typeTreatment), y = 4, 
+           label = "Cold-intervention", hjust = 0, size = 4, fontface = "bold") +
+  annotate("text", x = max(ancombc_rand_table_mag$lfc_typeTreatment), y = 4, 
+           label = "Warm-control", hjust = 1, size = 4, fontface = "bold")
 ```
 
 ***Phyla of the significant MAGs in warm control***
 ```{r sign_features_FMT2_warm, comment="", message=FALSE, warning=FALSE}
 ancombc_rand_table_mag%>%
+  filter(p_typeTreatment < 0.05) %>%
   filter(lfc_typeTreatment>0)  %>% 
   count(phylum, name = "sample_count") %>%
   arrange(desc(sample_count))  
@@ -1018,12 +2802,13 @@ ancombc_rand_table_mag%>%
 ***Phyla of the significant MAGs in intervention group***
 ```{r sign_features_FMT2_cold, comment="", message=FALSE, warning=FALSE}
 ancombc_rand_table_mag%>%
+  filter(p_typeTreatment < 0.05) %>%
   filter(lfc_typeTreatment<0)  %>% 
   count(phylum, name = "sample_count") %>%
   arrange(desc(sample_count))  
 ```
 
-##### Intervention vs cold control
+#### Intervention vs cold control
 ***Structural zeros***
 
 ```{r struct_zero_wild_pop_fmt2_int, comment="", echo=FALSE, message=FALSE, warning=FALSE}
@@ -1039,11 +2824,11 @@ treatment_samples <- sample_metadata %>%
   dplyr::select("Tube_code") %>%
   pull()
 
-meta_wild <- sample_metadata%>% 
+meta_fmt2 <- sample_metadata%>% 
   filter(type %in% c("Control", "Treatment") & time_point == "FMT2")
 
 structural_zeros <- genome_counts_filt %>%
-  select(c("genome", meta_wild$Tube_code)) %>%
+  select(c("genome", meta_fmt2$Tube_code)) %>%
   filter(rowSums(across(where(is.numeric)))!=0) %>% 
   rowwise() %>%
   mutate(all_zeros_cold = all(c_across(all_of(cold_samples)) == 0)) %>% # set true if all samples in cold have zeros
@@ -1072,13 +2857,32 @@ structural_zeros %>%
   mutate(across(everything(), ~ ifelse(is.na(.), 0, .))) %>% 
   tt()
 ```
-
 ```{r}
-physeq_FMT2 <- subset_samples(physeq_all, type %in% c("Control", "Treatment") & time_point == "FMT2")
-physeq_FMT2 <- prune_taxa(taxa_sums(physeq_FMT2)>0, physeq_FMT2)
+
+phylo_samples <- sample_metadata %>%
+  filter(type %in% c("Control", "Treatment") & time_point == "FMT2")%>% 
+  column_to_rownames("Tube_code") %>% 
+  sample_data()
+phylo_genome <- genome_counts_filt %>% 
+  filter(!genome %in% structural_zeros$genome) %>% 
+  select(one_of(c("genome",rownames(phylo_samples)))) %>%
+  filter(rowSums(across(where(is.numeric), ~ . != 0)) > 0) %>%
+  select(genome, where(~ is.numeric(.) && sum(.) > 0)) %>%
+  column_to_rownames("genome") %>% 
+  otu_table(., taxa_are_rows = TRUE)
+phylo_taxonomy <- genome_metadata %>% 
+  filter(genome %in% rownames(phylo_genome)) %>% 
+  column_to_rownames("genome") %>% 
+  dplyr::select(domain,phylum,class,order,family,genus,species) %>% 
+  as.matrix() %>% 
+  tax_table()
+
+physeq_genome_filtered <- phyloseq(phylo_genome, phylo_taxonomy, phylo_samples)
 ```
+
+
 ```{r ancom_rand_pond_FMT2_cold, comment="", message=FALSE, warning=FALSE}
-ancom_rand_output_cold_fmt2 = ancombc2(data = physeq_FMT2, 
+ancom_rand_output_cold_fmt2 = ancombc2(data = physeq_genome_filtered, 
                   assay_name = "counts", 
                   tax_level = NULL,
                   fix_formula = "type", 
@@ -1104,7 +2908,7 @@ ancom_rand_output_cold_fmt2 = ancombc2(data = physeq_FMT2,
 
 ```
 
-```{r 8, eval=FALSE}
+```{r 8, eval=TRUE}
 save(ancom_rand_output_cold_fmt2, file="data/ancom_rand_output_cold_fmt2.RData")
 ```
 
@@ -1122,13 +2926,13 @@ ancom_rand_output_cold_fmt2$res %>%
 ```
 
 ```{r ancom_rand_FMT2_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE}
-taxonomy <- data.frame(physeq_FMT2@tax_table) %>%
+taxonomy <- data.frame(physeq_genome_filtered@tax_table) %>%
   rownames_to_column(., "taxon") %>%
   mutate_at(vars(order, phylum, family, genus, species), ~ str_replace(., "[dpcofgs]__", ""))
 
 ancombc_rand_table_mag <- ancom_rand_output_cold_fmt2$res %>%
   dplyr::select(taxon, lfc_typeTreatment, p_typeTreatment) %>%
-  filter(p_typeTreatment < 0.05) %>%
+  #filter(p_typeTreatment < 0.05) %>%
   dplyr::arrange(p_typeTreatment) %>%
   merge(., taxonomy, by="taxon") %>%
   mutate_at(vars(phylum, species), ~ str_replace(., "[dpcofgs]__", ""))%>%
@@ -1151,29 +2955,41 @@ tax_color <- merge(tax_table, colors_alphabetic, by="phylum")%>%
 	pull()
 ```
 
-```{r ancombc_rand_plot_phy_FMT2_cold, comment="", echo=FALSE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
-ancombc_rand_table_mag%>%
-      mutate(genome=factor(taxon,levels=ancombc_rand_table_mag$taxon)) %>%
-ggplot(., aes(x=lfc_typeTreatment, y=forcats::fct_reorder(genome,lfc_typeTreatment), fill=phylum)) + #forcats::fct_rev()
-  geom_col() + 
-  scale_fill_manual(values=tax_color) + 
-  geom_hline(yintercept=0) + 
-  theme(panel.background = element_blank(),
-        axis.line = element_line(size = 0.5, linetype = "solid", colour = "black"),
-        axis.text.x = element_text(size = 12),
-        axis.text.y = element_text(size = 8),
-        axis.title = element_text(size = 14, face = "bold"),
-        legend.text = element_text(size = 12),
-        legend.title = element_text(size = 14, face = "bold"),
-        legend.position = "right", legend.box = "vertical")+
+```{r ancombc_rand_plot_phy_FMT2_cold, comment="", echo=TRUE, message=FALSE, warning=FALSE, fig.height=10, fig.width=8, fig.fullwidth=TRUE}
+ancombc_rand_table_mag %>%
+  mutate(
+    genome = factor(taxon, levels = ancombc_rand_table_mag$taxon),
+    significance = ifelse(p_typeTreatment < 0.05, phylum, NA)  # Set non-significant to NA (not mapped in legend)
+  ) %>%
+  ggplot() +
+  # Plot significant points with legend
+  geom_point(aes(x = lfc_typeTreatment, y = -log10(p_typeTreatment), color = significance), 
+             size = 3, alpha = 0.7, na.rm = TRUE) +  
+  # Plot non-significant points separately without legend
+  geom_point(data = filter(ancombc_rand_table_mag, p_typeTreatment >= 0.05),
+             aes(x = lfc_typeTreatment, y = -log10(p_typeTreatment)), 
+             color = "grey70", size = 3, alpha = 0.7, show.legend = FALSE) +
+  scale_color_manual(
+    values = tax_color,  # Only keeps phylum colors in legend
+    na.translate = FALSE  # Removes NA (non-significant) from legend
+  ) + 
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed") +  
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  scale_y_continuous(limits = c(0, 4)) +  
   xlab("log2FoldChange") + 
-  ylab("Species")+
-  guides(fill=guide_legend(title="Phylum"))
+  ylab("-log10(p-value)") +
+  guides(color = guide_legend(title = "Phylum")) +  
+  theme_minimal()+ 
+  annotate("text", x = min(ancombc_rand_table_mag$lfc_typeTreatment), y = 4, 
+           label = "Cold-control", hjust = 0, size = 4, fontface = "bold") +
+  annotate("text", x = max(ancombc_rand_table_mag$lfc_typeTreatment), y = 4, 
+           label = "Cold-intervention", hjust = 1, size = 4, fontface = "bold")
 ```
 
 ***Phyla of the significant MAGs in intervention group***
 ```{r sign_features_FMT2_int, comment="", message=FALSE, warning=FALSE}
 ancombc_rand_table_mag%>%
+  filter(p_typeTreatment < 0.05) %>%
   filter(lfc_typeTreatment>0)  %>% 
   count(phylum, name = "sample_count") %>%
   arrange(desc(sample_count))  
@@ -1182,6 +2998,7 @@ ancombc_rand_table_mag%>%
 ***Phyla of the significant MAGs in cold control***
 ```{r sign_features_FMT2_cold_con, comment="", message=FALSE, warning=FALSE}
 ancombc_rand_table_mag%>%
+  filter(p_typeTreatment < 0.05) %>%
   filter(lfc_typeTreatment<0)  %>% 
   count(phylum, name = "sample_count") %>%
   arrange(desc(sample_count))  
@@ -1308,3 +3125,5 @@ element_gift %>%
   filter(p_adjust < 0.05)%>%
   remove_rownames()
 ```
+
+
